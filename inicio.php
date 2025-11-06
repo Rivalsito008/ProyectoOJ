@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DashPro - Admin Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .sidebar {
+            transition: width 0.3s ease;
+        }
+        .sidebar-collapsed {
+            width: 80px;
+        }
+        .sidebar-expanded {
+            width: 256px;
+        }
+        .content {
+            margin-left: 80px;
+            transition: margin-left 0.3s ease;
+        }
+        .hide-on-collapse {
+            display: none;
+        }
+        .show-on-expand {
+            display: inline-block;
+        }
+        .nav-item svg {
+            min-width: 20px;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <?php
+    // Datos de ejemplo para el dashboard
+    $stats = [
+        ['title' => 'Ventas Totales', 'value' => '$45,231', 'change' => '+20.1%'],
+        ['title' => 'Nuevos Usuarios', 'value' => '2,345', 'change' => '+15.3%'],
+        ['title' => 'Pedidos', 'value' => '1,234', 'change' => '+8.2%'],
+        ['title' => 'Ingresos', 'value' => '$89,432', 'change' => '+12.5%']
+    ];
+
+    $recentOrders = [
+        ['id' => '#001', 'cliente' => 'Juan Pérez', 'producto' => 'Laptop Pro', 'monto' => '$1,299', 'estado' => 'Completado'],
+        ['id' => '#002', 'cliente' => 'María García', 'producto' => 'Mouse Wireless', 'monto' => '$29', 'estado' => 'Pendiente'],
+        ['id' => '#003', 'cliente' => 'Carlos López', 'producto' => 'Teclado Mecánico', 'monto' => '$89', 'estado' => 'Completado'],
+        ['id' => '#004', 'cliente' => 'Ana Martínez', 'producto' => 'Monitor 4K', 'monto' => '$499', 'estado' => 'En proceso'],
+        ['id' => '#005', 'cliente' => 'Pedro Sánchez', 'producto' => 'Webcam HD', 'monto' => '$79', 'estado' => 'Completado']
+    ];
+    ?>
+
+    <!-- Sidebar -->
+    <aside id="sidebar" class="sidebar sidebar-collapsed fixed top-0 left-0 z-40 h-screen bg-white border-r border-gray-200">
+        <div class="h-full px-3 py-4 overflow-y-auto">
+            <div class="flex items-center justify-center mb-6 px-2 h-10">
+                <div id="logo-compact" class="w-8 h-8 rounded-lg bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold">D</div>
+                <h2 id="logo-full" class="hide-on-collapse text-2xl font-bold bg-gradient-to-r from-blue-500 to-purple-600 bg-clip-text text-transparent">DashPro</h2>
+            </div>
+            
+            <nav class="space-y-2">
+                <a href="#" class="nav-item flex items-center px-3 py-3 rounded-lg bg-blue-500 text-white justify-center">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                    </svg>
+                    <span class="nav-label hide-on-collapse font-medium whitespace-nowrap ml-3">Dashboard</span>
+                </a>
+                <a href="#" class="nav-item flex items-center px-3 py-3 rounded-lg text-gray-700 hover:bg-gray-100 justify-center">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                    </svg>
+                    <span class="nav-label hide-on-collapse font-medium whitespace-nowrap ml-3">Usuarios</span>
+                </a>
+                <a href="#" class="nav-item flex items-center px-3 py-3 rounded-lg text-gray-700 hover:bg-gray-100 justify-center">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
+                    </svg>
+                    <span class="nav-label hide-on-collapse font-medium whitespace-nowrap ml-3">Pedidos</span>
+                </a>
+                <a href="#" class="nav-item flex items-center px-3 py-3 rounded-lg text-gray-700 hover:bg-gray-100 justify-center">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                    </svg>
+                    <span class="nav-label hide-on-collapse font-medium whitespace-nowrap ml-3">Analytics</span>
+                </a>
+                <a href="#" class="nav-item flex items-center px-3 py-3 rounded-lg text-gray-700 hover:bg-gray-100 justify-center">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    </svg>
+                    <span class="nav-label hide-on-collapse font-medium whitespace-nowrap ml-3">Configuración</span>
+                </a>
+            </nav>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="content">
+        <!-- Header -->
+        <header class="bg-white border-b border-gray-200 sticky top-0 z-30">
+            <div class="px-4 py-4 flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                    <div class="relative hidden md:block">
+                        <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                        <input type="text" placeholder="Buscar..." class="pl-10 pr-4 py-2 rounded-lg border border-gray-200 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 w-64">
+                    </div>
+                </div>
+                
+                <div class="flex items-center gap-4">
+                    <button id="darkModeToggle" class="p-2 rounded-lg hover:bg-gray-100">🌙</button>
+                    <button class="p-2 rounded-lg hover:bg-gray-100 relative">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+                        </svg>
+                        <span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+                    </button>
+                    <div class="flex items-center gap-2">
+                        <img src="https://ui-avatars.com/api/?name=Admin+User&background=3b82f6&color=fff" alt="User" class="w-8 h-8 rounded-full">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Dashboard Content -->
+        <main class="p-6">
+            <div class="mb-6">
+                <h1 class="text-3xl font-bold mb-2">Dashboard</h1>
+                <p class="text-gray-600">Bienvenido de vuelta, aquí está tu resumen</p>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+                <?php foreach ($stats as $stat): ?>
+                <div class="bg-white rounded-xl p-6 border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+                    <p class="text-sm text-gray-600 mb-1"><?php echo $stat['title']; ?></p>
+                    <p class="text-3xl font-bold mb-2"><?php echo $stat['value']; ?></p>
+                    <p class="text-sm text-green-500 font-medium"><?php echo $stat['change']; ?> desde el mes pasado</p>
+                </div>
+                <?php endforeach; ?>
+            </div>
+
+            <!-- Charts -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                <div class="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
+                    <h3 class="text-lg font-semibold mb-4">Ventas y Usuarios</h3>
+                    <div style="position: relative; height: 300px;">
+                        <canvas id="lineChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
+                    <h3 class="text-lg font-semibold mb-4">Distribución de Productos</h3>
+                    <div style="position: relative; height: 300px;">
+                        <canvas id="pieChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Orders Table -->
+            <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+                <div class="p-6 border-b border-gray-200">
+                    <h3 class="text-lg font-semibold">Pedidos Recientes</h3>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cliente</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Producto</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Monto</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200">
+                            <?php foreach ($recentOrders as $order): ?>
+                            <tr class="hover:bg-gray-50 transition-colors">
+                                <td class="px-6 py-4 whitespace-nowrap font-medium"><?php echo $order['id']; ?></td>
+                                <td class="px-6 py-4 whitespace-nowrap"><?php echo $order['cliente']; ?></td>
+                                <td class="px-6 py-4 whitespace-nowrap"><?php echo $order['producto']; ?></td>
+                                <td class="px-6 py-4 whitespace-nowrap font-semibold"><?php echo $order['monto']; ?></td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <?php
+                                    $badgeClass = '';
+                                    switch ($order['estado']) {
+                                        case 'Completado':
+                                            $badgeClass = 'bg-green-100 text-green-800';
+                                            break;
+                                        case 'Pendiente':
+                                            $badgeClass = 'bg-yellow-100 text-yellow-800';
+                                            break;
+                                        case 'En proceso':
+                                            $badgeClass = 'bg-blue-100 text-blue-800';
+                                            break;
+                                    }
+                                    ?>
+                                    <span class="px-3 py-1 rounded-full text-xs font-medium <?php echo $badgeClass; ?>">
+                                        <?php echo $order['estado']; ?>
+                                    </span>
+                                </td>
+                            </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Sidebar hover effect
+        const sidebar = document.getElementById('sidebar');
+        const logoCompact = document.getElementById('logo-compact');
+        const logoFull = document.getElementById('logo-full');
+        const navLabels = document.querySelectorAll('.nav-label');
+        const navItems = document.querySelectorAll('.nav-item');
+
+        sidebar.addEventListener('mouseenter', () => {
+            sidebar.classList.remove('sidebar-collapsed');
+            sidebar.classList.add('sidebar-expanded');
+            logoCompact.style.display = 'none';
+            logoFull.style.display = 'block';
+            navLabels.forEach(label => {
+                label.style.display = 'inline-block';
+            });
+            navItems.forEach(item => {
+                item.classList.remove('justify-center');
+            });
+        });
+
+        sidebar.addEventListener('mouseleave', () => {
+            sidebar.classList.remove('sidebar-expanded');
+            sidebar.classList.add('sidebar-collapsed');
+            logoCompact.style.display = 'flex';
+            logoFull.style.display = 'none';
+            navLabels.forEach(label => {
+                label.style.display = 'none';
+            });
+            navItems.forEach(item => {
+                item.classList.add('justify-center');
+            });
+        });
+
+        // Dark mode toggle
+        let darkMode = false;
+        const darkModeToggle = document.getElementById('darkModeToggle');
+        
+        darkModeToggle.addEventListener('click', () => {
+            darkMode = !darkMode;
+            document.body.classList.toggle('dark');
+            darkModeToggle.textContent = darkMode ? '☀️' : '🌙';
+            
+            if (darkMode) {
+                document.body.classList.remove('bg-gray-50');
+                document.body.classList.add('bg-gray-900', 'text-gray-100');
+            } else {
+                document.body.classList.remove('bg-gray-900', 'text-gray-100');
+                document.body.classList.add('bg-gray-50');
+            }
+        });
+
+        // Line Chart
+        const lineCtx = document.getElementById('lineChart').getContext('2d');
+        new Chart(lineCtx, {
+            type: 'line',
+            data: {
+                labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun'],
+                datasets: [{
+                    label: 'Ventas',
+                    data: [4000, 3000, 2000, 2780, 1890, 2390],
+                    borderColor: '#3b82f6',
+                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                }, {
+                    label: 'Usuarios',
+                    data: [2400, 1398, 9800, 3908, 4800, 3800],
+                    borderColor: '#8b5cf6',
+                    backgroundColor: 'rgba(139, 92, 246, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                aspectRatio: 2,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        // Pie Chart
+        const pieCtx = document.getElementById('pieChart').getContext('2d');
+        new Chart(pieCtx, {
+            type: 'pie',
+            data: {
+                labels: ['Producto A', 'Producto B', 'Producto C', 'Producto D'],
+                datasets: [{
+                    data: [400, 300, 300, 200],
+                    backgroundColor: ['#3b82f6', '#8b5cf6', '#ec4899', '#f59e0b']
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                aspectRatio: 1.5,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
