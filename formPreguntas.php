@@ -29,19 +29,24 @@
         .nav-item svg {
             min-width: 20px;
         }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal.active {
+            display: flex;
+        }
     </style>
 </head>
 <body class="bg-gray-50">
-    <?php
-    // Datos de ejemplo para el dashboard
-    $stats = [
-        ['title' => 'Tribunales Activos', 'value' => '11', 'change' => '--'],
-        ['title' => 'Victimas Totales', 'value' => '300', 'change' => '--'],
-        ['title' => 'Casos Totales del Mes', 'value' => '25', 'change' => '+5.2% desde el mes pasado'],
-        ['title' => 'Promedio de Puntajes Finales', 'value' => '50', 'change' => '--'],
-    ];
-    ?>
-
     <!-- Sidebar -->
     <aside id="sidebar" class="sidebar sidebar-collapsed fixed top-0 left-0 z-40 h-screen bg-white border-r border-gray-200">
         <div class="h-full px-3 py-4 overflow-y-auto">
@@ -51,13 +56,13 @@
             </div>
             
             <nav class="space-y-2">
-                <a href="inicio.php" class="nav-item flex items-center px-3 py-3 rounded-lg bg-blue-500 text-white justify-center">
+                <a href="inicio.php" class="nav-item flex items-center px-3 py-3 rounded-lg text-gray-700 hover:bg-gray-100 justify-center">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
                     </svg>
                     <span class="nav-label hide-on-collapse font-medium whitespace-nowrap ml-3">Inicio</span>
                 </a>
-                <a href="form.php" class="nav-item flex items-center px-3 py-3 rounded-lg text-gray-700 hover:bg-gray-100 justify-center">
+                <a href="form.php" class="nav-item flex items-center px-3 py-3 rounded-lg bg-blue-500 text-white justify-center">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
                     </svg>
@@ -93,13 +98,11 @@
     </aside>
 
     <!-- Main Content -->
-    <div class="content">
+    <div id="mainContent" class="content" style="display: none;">
         <!-- Header -->
         <header class="bg-white border-b border-gray-200 sticky top-0 z-30">
             <div class="px-4 py-4 flex items-center justify-between">
                 <div class="flex items-center gap-4">
-                    <div class="relative hidden md:block">
-                    </div>
                 </div>
                 
                 <div class="flex items-center gap-4">
@@ -113,34 +116,34 @@
             </div>
         </header>
 
-        <!-- Dashboard Content -->
-        <main class="p-6">
-            <div class="mb-6">
-                <h1 class="text-3xl font-bold mb-2">Dashboard</h1>
-                <p class="text-gray-600">Bienvenido de vuelta, aquí está tu resumen</p>
-            </div>
-
-            <!-- Stats Cards -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-                <?php foreach ($stats as $stat): ?>
-                <div class="bg-white rounded-xl p-6 border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
-                    <p class="text-sm text-gray-600 mb-1"><?php echo $stat['title']; ?></p>
-                    <p class="text-3xl font-bold mb-2"><?php echo $stat['value']; ?></p>
-                    <p class="text-sm text-green-500 font-medium"><?php echo $stat['change']; ?></p>
-                </div>
-                <?php endforeach; ?>
-            </div>
-                <div class="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
-                    <h3 class="text-lg font-semibold mb-4">Niveles de Riesgo en Zonas Geograficas</h3>
-                    <div style="position: relative; height: 300px;">
-                        <canvas id="pieChart"></canvas>
-                    </div>
-                </div>
-            </div>
+        <main>
         </main>
     </div>
 
     <script>
+        // Funciones para los modales
+        function confirmarFormulario() {
+            document.getElementById('confirmModal').classList.remove('active');
+            document.getElementById('formularioImputado').classList.add('active');
+        }
+
+        function cancelarFormulario() {
+            // No hace nada, mantiene el modal activo (usuario debe elegir Sí)
+            header('inicio.php');
+        }
+
+        function cerrarFormulario() {
+            // Vuelve al modal de confirmación
+            document.getElementById('formularioImputado').classList.remove('active');
+            document.getElementById('confirmModal').classList.add('active');
+        }
+
+        function guardarFormulario() {
+            alert('Formulario guardado exitosamente');
+            document.getElementById('formularioImputado').classList.remove('active');
+            document.getElementById('mainContent').style.display = 'block';
+        }
+
         // Sidebar hover effect
         const sidebar = document.getElementById('sidebar');
         const logoCompact = document.getElementById('logo-compact');
@@ -172,28 +175,6 @@
             navItems.forEach(item => {
                 item.classList.add('justify-center');
             });
-        });
-        // Pie Chart
-        const pieCtx = document.getElementById('pieChart').getContext('2d');
-        new Chart(pieCtx, {
-            type: 'pie',
-            data: {
-                labels: ['Nivel Bajo', 'Nivel Moderado', 'Nivel Alto', 'Nivel Extremo'],
-                datasets: [{
-                    data: [400, 300, 300, 200],
-                    backgroundColor: ['#2ECC40', '#FFDC00', '#ff0d00ff', '#a12222ff']
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: true,
-                aspectRatio: 1.5,
-                plugins: {
-                    legend: {
-                        position: 'bottom'
-                    }
-                }
-            }
         });
     </script>
 </body>
