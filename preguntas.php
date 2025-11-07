@@ -124,89 +124,8 @@
             </div>
         </header>
 
-        <!-- Dashboard Content -->
+        <!-- Content -->
         <main class="p-6">
-            <div class="mb-6">
-                <h1 class="text-3xl font-bold mb-2">Dashboard</h1>
-                <p class="text-gray-600">Bienvenido de vuelta, aquí está tu resumen</p>
-            </div>
-
-            <!-- Stats Cards -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-                <?php foreach ($stats as $stat): ?>
-                <div class="bg-white rounded-xl p-6 border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
-                    <p class="text-sm text-gray-600 mb-1"><?php echo $stat['title']; ?></p>
-                    <p class="text-3xl font-bold mb-2"><?php echo $stat['value']; ?></p>
-                    <p class="text-sm text-green-500 font-medium"><?php echo $stat['change']; ?> desde el mes pasado</p>
-                </div>
-                <?php endforeach; ?>
-            </div>
-
-            <!-- Charts -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-                <div class="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
-                    <h3 class="text-lg font-semibold mb-4">Ventas y Usuarios</h3>
-                    <div style="position: relative; height: 300px;">
-                        <canvas id="lineChart"></canvas>
-                    </div>
-                </div>
-
-                <div class="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
-                    <h3 class="text-lg font-semibold mb-4">Distribución de Productos</h3>
-                    <div style="position: relative; height: 300px;">
-                        <canvas id="pieChart"></canvas>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Recent Orders Table -->
-            <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-                <div class="p-6 border-b border-gray-200">
-                    <h3 class="text-lg font-semibold">Pedidos Recientes</h3>
-                </div>
-                <div class="overflow-x-auto">
-                    <table class="w-full">
-                        <thead class="bg-gray-50">
-                            <tr>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cliente</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Producto</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Monto</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-gray-200">
-                            <?php foreach ($recentOrders as $order): ?>
-                            <tr class="hover:bg-gray-50 transition-colors">
-                                <td class="px-6 py-4 whitespace-nowrap font-medium"><?php echo $order['id']; ?></td>
-                                <td class="px-6 py-4 whitespace-nowrap"><?php echo $order['cliente']; ?></td>
-                                <td class="px-6 py-4 whitespace-nowrap"><?php echo $order['producto']; ?></td>
-                                <td class="px-6 py-4 whitespace-nowrap font-semibold"><?php echo $order['monto']; ?></td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <?php
-                                    $badgeClass = '';
-                                    switch ($order['estado']) {
-                                        case 'Completado':
-                                            $badgeClass = 'bg-green-100 text-green-800';
-                                            break;
-                                        case 'Pendiente':
-                                            $badgeClass = 'bg-yellow-100 text-yellow-800';
-                                            break;
-                                        case 'En proceso':
-                                            $badgeClass = 'bg-blue-100 text-blue-800';
-                                            break;
-                                    }
-                                    ?>
-                                    <span class="px-3 py-1 rounded-full text-xs font-medium <?php echo $badgeClass; ?>">
-                                        <?php echo $order['estado']; ?>
-                                    </span>
-                                </td>
-                            </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
         </main>
     </div>
 
@@ -242,68 +161,6 @@
             navItems.forEach(item => {
                 item.classList.add('justify-center');
             });
-        });
-
-        // Line Chart
-        const lineCtx = document.getElementById('lineChart').getContext('2d');
-        new Chart(lineCtx, {
-            type: 'line',
-            data: {
-                labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun'],
-                datasets: [{
-                    label: 'Ventas',
-                    data: [4000, 3000, 2000, 2780, 1890, 2390],
-                    borderColor: '#3b82f6',
-                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                    tension: 0.4,
-                    fill: true
-                }, {
-                    label: 'Usuarios',
-                    data: [2400, 1398, 9800, 3908, 4800, 3800],
-                    borderColor: '#8b5cf6',
-                    backgroundColor: 'rgba(139, 92, 246, 0.1)',
-                    tension: 0.4,
-                    fill: true
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: true,
-                aspectRatio: 2,
-                plugins: {
-                    legend: {
-                        position: 'bottom'
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true
-                    }
-                }
-            }
-        });
-
-        // Pie Chart
-        const pieCtx = document.getElementById('pieChart').getContext('2d');
-        new Chart(pieCtx, {
-            type: 'pie',
-            data: {
-                labels: ['Producto A', 'Producto B', 'Producto C', 'Producto D'],
-                datasets: [{
-                    data: [400, 300, 300, 200],
-                    backgroundColor: ['#3b82f6', '#8b5cf6', '#ec4899', '#f59e0b']
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: true,
-                aspectRatio: 1.5,
-                plugins: {
-                    legend: {
-                        position: 'bottom'
-                    }
-                }
-            }
         });
     </script>
 </body>
