@@ -104,9 +104,9 @@
                         <option value="">Seleccione...</option>
                         <option value="dui">DUI</option>
                         <option value="pasaporte">Pasaporte</option>
-                        <option value="carnet">NIT</option>
-                        <option value="carnet">CIP</option>
-                        <option value="carnet">Licencia de Confucir</option>
+                        <option value="nit">NIT</option>
+                        <option value="cip">CIP</option>
+                        <option value="licencia">Licencia de Conducir</option>
                     </select>
                 </div>
                 <div>
@@ -150,7 +150,7 @@
             </div>
             
             <nav class="space-y-2">
-                <a href="inicio.php" class="nav-item flex items-center px-3 py-3 rounded-lg text-gray-700 hover:bg-gray-100 justify-center">
+                <a href="" class="nav-item flex items-center px-3 py-3 rounded-lg text-gray-700 hover:bg-gray-100 justify-center">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
                     </svg>
@@ -192,11 +192,13 @@
     </aside>
 
     <!-- Main Content -->
-    <div id="mainContent" class="content" style="display: none;">
+    <div class="content">
         <!-- Header -->
         <header class="bg-white border-b border-gray-200 sticky top-0 z-30">
             <div class="px-4 py-4 flex items-center justify-between">
                 <div class="flex items-center gap-4">
+                    <div class="relative hidden md:block">
+                    </div>
                 </div>
                 
                 <div class="flex items-center gap-4">
@@ -209,34 +211,25 @@
                 </div>
             </div>
         </header>
-
-        <main>
-        </main>
-    </div>
-    </div>
-
     <script>
-        // Funciones para los modales
         function confirmarFormulario() {
+            //Botones para 
             document.getElementById('confirmModal').classList.remove('active');
             document.getElementById('formularioImputado').classList.add('active');
         }
 
         function cancelarFormulario() {
-            // No hace nada, mantiene el modal activo (usuario debe elegir Sí)
-            header('inicio.php');
+            window.location.href = 'inicio.php';
         }
 
         function cerrarFormulario() {
-            // Vuelve al modal de confirmación
-            document.getElementById('formularioImputado').classList.remove('active');
-            document.getElementById('confirmModal').classList.add('active');
+            window.location.href = 'inicio.php';
         }
 
         function guardarFormulario() {
-            alert('Formulario guardado exitosamente');
+            // Guarda y va al dashboard
             document.getElementById('formularioImputado').classList.remove('active');
-            document.getElementById('mainContent').style.display = 'block';
+            window.location.href = 'formPreguntas.php';
         }
 
         // Sidebar hover effect
