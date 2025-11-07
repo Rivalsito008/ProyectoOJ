@@ -211,6 +211,16 @@
                 </div>
             </div>
         </header>
+        <main>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+                <div class="bg-white rounded-xl p-6 border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+                    <p class="text-sm text-gray-600 mb-1">Pregunta 1</p>
+                    <p class="text-3xl font-bold mb-2">Lorem ipsum dolor sit amet consectetur adipisicing elit. Omnis harum dolor ut aliquam quas voluptatem nam enim et debitis, nulla necessitatibus iusto maxime officia saepe ex? Excepturi soluta error tempore!</p>
+                    <p class="text-sm text-green-500 font-medium">Si</p>
+                    <p class="text-sm text-red-500 font-medium">No</p>
+                </div>
+            </div>              
+        </main>
     </div>
 
     <script>
@@ -231,7 +241,7 @@
         function guardarFormulario() {
             // Guarda y va al dashboard
             document.getElementById('formularioImputado').classList.remove('active');
-            window.location.href = 'formPreguntas.php';
+            window.location.href = 'form.php';
         }
 
         // Sidebar hover effect
