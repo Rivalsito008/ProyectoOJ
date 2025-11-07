@@ -1,54 +1,184 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SIGEN - Sistema de Gestion Notarial</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         .sidebar {
             transition: width 0.3s ease;
         }
+
         .sidebar-collapsed {
             width: 80px;
         }
+
         .sidebar-expanded {
             width: 256px;
         }
+
         .content {
             margin-left: 80px;
             transition: margin-left 0.3s ease;
         }
+
         .hide-on-collapse {
             display: none;
         }
-        .show-on-expand {
-            display: inline-block;
-        }
+
         .nav-item svg {
             min-width: 20px;
         }
+
+        /* Contenedor de pestañas */
+        .tabs-container {
+            background: transparent;
+            padding-top: 8px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .tabs-wrapper {
+            display: flex;
+            gap: 8px;
+            padding: 0 8px;
+        }
+
+        /* Estilo de pestañas tipo navegador */
+        .browser-tab {
+            position: relative;
+            padding: 12px 20px;
+            background: transparent;
+            border-radius: 8px 8px 0 0;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 50px;
+            width: 50px;
+            border: none;
+            overflow: hidden;
+        }
+
+        .browser-tab:hover,
+        .browser-tab.active {
+            width: 160px;
+            min-width: 160px;
+            padding: 12px 20px;
+        }
+
+        .browser-tab:hover:not(.active) {
+            background: rgba(255, 255, 255, 0.5);
+        }
+
+        .browser-tab.active {
+            background: white;
+            box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .tab-indicator {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            transition: transform 0.3s ease;
+        }
+
+        .browser-tab:hover .tab-indicator,
+        .browser-tab.active .tab-indicator {
+            transform: scale(1.1);
+        }
+
+        .tab-label {
+            font-weight: 500;
+            color: #4b5563;
+            font-size: 14px;
+            user-select: none;
+            white-space: nowrap;
+            opacity: 0;
+            transform: translateX(-10px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .browser-tab:hover .tab-label,
+        .browser-tab.active .tab-label {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .browser-tab.active .tab-label {
+            color: #1f2937;
+        }
+
+        /* Tooltip */
+        .tab-tooltip {
+            position: absolute;
+            bottom: -35px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            z-index: 10;
+        }
+
+        .tab-tooltip::after {
+            content: '';
+            position: absolute;
+            top: -5px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 5px solid transparent;
+            border-right: 5px solid transparent;
+            border-bottom: 5px solid rgba(0, 0, 0, 0.8);
+        }
+
+        .browser-tab:hover .tab-tooltip {
+            opacity: 1;
+        }
+
+        /* Contenido */
+        .tab-content-wrapper {
+            background: white;
+            min-height: 500px;
+            padding: 40px;
+            border-radius: 12px 12px 12px 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
     </style>
 </head>
+
 <body class="bg-gray-50">
-    <?php
-    // Datos de ejemplo para el dashboard
-    $stats = [
-        ['title' => 'Tribunales Totales', 'value' => '11', 'change' => '🙏'],
-        ['title' => 'Preguntas Totales', 'value' => '2,345', 'change' => '+15.3%'],
-        ['title' => 'Pedidos', 'value' => '1,234', 'change' => '+8.2%']
-    ];
-
-    $recentOrders = [
-        ['id' => '#001', 'cliente' => 'Juan Pérez', 'producto' => 'Laptop Pro', 'monto' => '$1,299', 'estado' => 'Completado'],
-        ['id' => '#002', 'cliente' => 'María García', 'producto' => 'Mouse Wireless', 'monto' => '$29', 'estado' => 'Pendiente'],
-        ['id' => '#003', 'cliente' => 'Carlos López', 'producto' => 'Teclado Mecánico', 'monto' => '$89', 'estado' => 'Completado'],
-        ['id' => '#004', 'cliente' => 'Ana Martínez', 'producto' => 'Monitor 4K', 'monto' => '$499', 'estado' => 'En proceso'],
-        ['id' => '#005', 'cliente' => 'Pedro Sánchez', 'producto' => 'Webcam HD', 'monto' => '$79', 'estado' => 'Completado']
-    ];
-    ?>
-
     <!-- Sidebar -->
     <aside id="sidebar" class="sidebar sidebar-collapsed fixed top-0 left-0 z-40 h-screen bg-white border-r border-gray-200">
         <div class="h-full px-3 py-4 overflow-y-auto">
@@ -56,7 +186,7 @@
                 <div id="logo-compact" class="w-8 h-8 rounded-lg bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold">SG</div>
                 <h2 id="logo-full" class="hide-on-collapse text-2xl font-bold bg-gradient-to-r from-blue-500 to-purple-600 bg-clip-text text-transparent">SIGEN</h2>
             </div>
-            
+
             <nav class="space-y-2">
                 <a href="inicio.php" class="nav-item flex items-center px-3 py-3 rounded-lg text-gray-700 hover:bg-gray-100 justify-center">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -87,7 +217,7 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
                     </svg>
                     <span class="nav-label hide-on-collapse font-medium whitespace-nowrap ml-3">Usuarios</span>
-                </a>                
+                </a>
                 <a href="configuracion.php" class="nav-item flex items-center px-3 py-3 rounded-lg text-gray-700 hover:bg-gray-100 justify-center">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
@@ -106,13 +236,9 @@
             <div class="px-4 py-4 flex items-center justify-between">
                 <div class="flex items-center gap-4">
                     <div class="relative hidden md:block">
-                        <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                        </svg>
-                        <input type="text" placeholder="Buscar..." class="pl-10 pr-4 py-2 rounded-lg border border-gray-200 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 w-64">
                     </div>
                 </div>
-                
+
                 <div class="flex items-center gap-4">
                     <div class="flex items-center gap-2">
                         <img src="https://ui-avatars.com/api/?name=Admin+User&background=3b82f6&color=fff" alt="User" class="w-8 h-8 rounded-full">
@@ -124,8 +250,254 @@
             </div>
         </header>
 
+
         <!-- Content -->
         <main class="p-6">
+            <!-- Pestañas estilo navegador -->
+            <div class="tabs-container">
+                <div class="tabs-wrapper">
+                    <!-- Pestaña Todas -->
+                    <div class="browser-tab active" data-tab="Todo">
+                        <div class="tab-indicator bg-blue-500"></div>
+                        <span class="tab-label">Todo</span>
+                        <span class="tab-tooltip">Nivel Bajo</span>
+                    </div>
+                    <!-- Pestaña Bajo -->
+                    <div class="browser-tab" data-tab="bajo">
+                        <div class="tab-indicator bg-green-500"></div>
+                        <span class="tab-label">Bajo</span>
+                        <span class="tab-tooltip">Nivel Bajo</span>
+                    </div>
+
+                    <!-- Pestaña Moderado -->
+                    <div class="browser-tab" data-tab="moderado">
+                        <div class="tab-indicator bg-yellow-400"></div>
+                        <span class="tab-label">Moderado</span>
+                        <span class="tab-tooltip">Nivel Moderado</span>
+                    </div>
+
+                    <!-- Pestaña Alto -->
+                    <div class="browser-tab" data-tab="alto">
+                        <div class="tab-indicator bg-red-500"></div>
+                        <span class="tab-label">Alto</span>
+                        <span class="tab-tooltip">Nivel Alto</span>
+                    </div>
+
+                    <!-- Pestaña Extremo -->
+                    <div class="browser-tab" data-tab="extremo">
+                        <div class="tab-indicator bg-red-700"></div>
+                        <span class="tab-label">Extremo</span>
+                        <span class="tab-tooltip">Nivel Extremo</span>
+                    </div>
+                    <!--Activador Automatico-->
+                    <div class="browser-tab" data-tab="activadorAutomatico">
+                        <div class="tab-indicator bg-red-900"></div>
+                        <span class="tab-label">Activador Auto.</span>
+                        <span class="tab-tooltip">Activador Auto.</span>
+                    </div>
+                </div>
+
+                <!-- Contenido de las pestañas -->
+                <div class="tab-content-wrapper">
+                    <!-- Todas -->
+                    <div class="tab-content" id="activadorAutomatico">
+                        <!--Tabla-->
+                        <div class="relative overflow-x-auto">
+                            <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+                                <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                                    <tr>
+                                        <th scope="col" class="px-6 py-3">
+                                            ID
+                                        </th>
+                                        <th scope="col" class="px-6 py-3">
+                                            Pregunta
+                                        </th>
+                                        <th scope="col" class="px-6 py-3">
+                                            Ambito
+                                        </th>
+                                        <th scope="col" class="px-6 py-3">
+                                            Estado
+                                        </th>
+                                        <th scope="col" class="px-6 py-3">
+                                            Acción
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200">
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <!-- Riesgo Bajo -->
+                    <div class="tab-content active" id="bajo">
+                        <!--Tabla-->
+                        <div class="relative overflow-x-auto">
+                            <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+                                <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                                    <tr>
+                                        <th scope="col" class="px-6 py-3">
+                                            ID
+                                        </th>
+                                        <th scope="col" class="px-6 py-3">
+                                            Pregunta
+                                        </th>
+                                        <th scope="col" class="px-6 py-3">
+                                            Ambito
+                                        </th>
+                                        <th scope="col" class="px-6 py-3">
+                                            Estado
+                                        </th>
+                                        <th scope="col" class="px-6 py-3">
+                                            Acción
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200">
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <!-- Riesgo Moderado -->
+                    <div class="tab-content" id="moderado">
+                        <!--Tabla-->
+                        <div class="relative overflow-x-auto">
+                            <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+                                <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                                    <tr>
+                                        <th scope="col" class="px-6 py-3">
+                                            ID
+                                        </th>
+                                        <th scope="col" class="px-6 py-3">
+                                            Pregunta
+                                        </th>
+                                        <th scope="col" class="px-6 py-3">
+                                            Ambito
+                                        </th>
+                                        <th scope="col" class="px-6 py-3">
+                                            Estado
+                                        </th>
+                                        <th scope="col" class="px-6 py-3">
+                                            Acción
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200">
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <!-- Riesgo Alto -->
+                    <div class="tab-content" id="alto">
+                        <!--Tabla-->
+                        <div class="relative overflow-x-auto">
+                            <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+                                <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                                    <tr>
+                                        <th scope="col" class="px-6 py-3">
+                                            ID
+                                        </th>
+                                        <th scope="col" class="px-6 py-3">
+                                            Pregunta
+                                        </th>
+                                        <th scope="col" class="px-6 py-3">
+                                            Ambito
+                                        </th>
+                                        <th scope="col" class="px-6 py-3">
+                                            Estado
+                                        </th>
+                                        <th scope="col" class="px-6 py-3">
+                                            Acción
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200">
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <!-- Riesgo Extremo -->
+                    <div class="tab-content" id="extremo">
+                        <!--Tabla-->
+                        <div class="relative overflow-x-auto">
+                            <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+                                <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                                    <tr>
+                                        <th scope="col" class="px-6 py-3">
+                                            ID
+                                        </th>
+                                        <th scope="col" class="px-6 py-3">
+                                            Pregunta
+                                        </th>
+                                        <th scope="col" class="px-6 py-3">
+                                            Ambito
+                                        </th>
+                                        <th scope="col" class="px-6 py-3">
+                                            Estado
+                                        </th>
+                                        <th scope="col" class="px-6 py-3">
+                                            Acción
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200">
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <!-- Riesgo Activador -->
+                        <div class="tab-content" id="activadorAutomatico">
+                            <!--Tabla-->
+                            <div class="relative overflow-x-auto">
+                                <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+                                    <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                                        <tr>
+                                            <th scope="col" class="px-6 py-3">
+                                                ID
+                                            </th>
+                                            <th scope="col" class="px-6 py-3">
+                                                Pregunta
+                                            </th>
+                                            <th scope="col" class="px-6 py-3">
+                                                Ambito
+                                            </th>
+                                            <th scope="col" class="px-6 py-3">
+                                                Estado
+                                            </th>
+                                            <th scope="col" class="px-6 py-3">
+                                                Acción
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200">
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!--Button AñadirPregunta-->
+                    <div class="fixed bottom-8 right-8 z-50">
+                        <button class="group w-12 h-12 rounded-full border-2 border-green-500 text-white-500 bg-green hover:w-48 hover:rounded-full hover:bg-green-500 hover:text-white transition-all duration-300 ease-in-out flex items-center justify-center overflow-hidden shadow-lg hover:shadow-xl">
+                            <span class="text-2xl font-semibold group-hover:hidden transition-opacity duration-150">
+
+                            </span>
+                            <span class="text-sm font-medium opacity-0 group-hover:opacity-100 group-hover:block transition-opacity duration-150 delay-150 whitespace-nowrap px-4">
+                                Agregar pregunta
+                            </span>
+                        </button>
+                    </div>
+
         </main>
     </div>
 
@@ -162,6 +534,31 @@
                 item.classList.add('justify-center');
             });
         });
+
+        // Tab functionality
+        const browserTabs = document.querySelectorAll('.browser-tab');
+        const tabContents = document.querySelectorAll('.tab-content');
+
+        browserTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const tabName = tab.getAttribute('data-tab');
+
+                // Remove active class from all tabs
+                browserTabs.forEach(t => t.classList.remove('active'));
+
+                // Add active class to clicked tab
+                tab.classList.add('active');
+
+                // Remove active class from all contents
+                tabContents.forEach(content => {
+                    content.classList.remove('active');
+                });
+
+                // Add active class to selected content
+                document.getElementById(tabName).classList.add('active');
+            });
+        });
     </script>
 </body>
+
 </html>
