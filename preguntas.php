@@ -250,17 +250,16 @@
             </div>
         </header>
 
-
         <!-- Content -->
         <main class="p-6">
             <!-- Pestañas estilo navegador -->
             <div class="tabs-container">
                 <div class="tabs-wrapper">
                     <!-- Pestaña Todas -->
-                    <div class="browser-tab active" data-tab="Todo">
+                    <div class="browser-tab active" data-tab="todo">
                         <div class="tab-indicator bg-blue-500"></div>
                         <span class="tab-label">Todo</span>
-                        <span class="tab-tooltip">Nivel Bajo</span>
+                        <span class="tab-tooltip">Nivel Todo</span>
                     </div>
                     <!-- Pestaña Bajo -->
                     <div class="browser-tab" data-tab="bajo">
@@ -268,236 +267,154 @@
                         <span class="tab-label">Bajo</span>
                         <span class="tab-tooltip">Nivel Bajo</span>
                     </div>
-
                     <!-- Pestaña Moderado -->
                     <div class="browser-tab" data-tab="moderado">
                         <div class="tab-indicator bg-yellow-400"></div>
                         <span class="tab-label">Moderado</span>
                         <span class="tab-tooltip">Nivel Moderado</span>
                     </div>
-
                     <!-- Pestaña Alto -->
                     <div class="browser-tab" data-tab="alto">
                         <div class="tab-indicator bg-red-500"></div>
                         <span class="tab-label">Alto</span>
                         <span class="tab-tooltip">Nivel Alto</span>
                     </div>
-
                     <!-- Pestaña Extremo -->
                     <div class="browser-tab" data-tab="extremo">
                         <div class="tab-indicator bg-red-700"></div>
                         <span class="tab-label">Extremo</span>
                         <span class="tab-tooltip">Nivel Extremo</span>
                     </div>
-                    <!--Activador Automatico-->
-                    <div class="browser-tab" data-tab="activadorAutomatico">
+                    <!-- Activador Automatico -->
+                    <div class="browser-tab" data-tab="activador">
                         <div class="tab-indicator bg-red-900"></div>
-                        <span class="tab-label">Activador Auto.</span>
-                        <span class="tab-tooltip">Activador Auto.</span>
+                        <span class="tab-label">Activador</span>
+                        <span class="tab-tooltip">Activador Automático</span>
                     </div>
                 </div>
 
                 <!-- Contenido de las pestañas -->
                 <div class="tab-content-wrapper">
                     <!-- Todas -->
-                    <div class="tab-content" id="activadorAutomatico">
-                        <!--Tabla-->
+                    <div class="tab-content active" id="todo">
                         <div class="relative overflow-x-auto">
                             <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
                                 <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                                     <tr>
-                                        <th scope="col" class="px-6 py-3">
-                                            ID
-                                        </th>
-                                        <th scope="col" class="px-6 py-3">
-                                            Pregunta
-                                        </th>
-                                        <th scope="col" class="px-6 py-3">
-                                            Ambito
-                                        </th>
-                                        <th scope="col" class="px-6 py-3">
-                                            Estado
-                                        </th>
-                                        <th scope="col" class="px-6 py-3">
-                                            Acción
-                                        </th>
+                                        <th scope="col" class="px-6 py-3">ID</th>
+                                        <th scope="col" class="px-6 py-3">Pregunta</th>
+                                        <th scope="col" class="px-6 py-3">Ambito</th>
+                                        <th scope="col" class="px-6 py-3">Estado</th>
+                                        <th scope="col" class="px-6 py-3">Acción</th>
                                     </tr>
                                 </thead>
-                                <tbody>
-                                    <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200">
-                                    </tr>
-                                </tbody>
                             </table>
                         </div>
                     </div>
+
                     <!-- Riesgo Bajo -->
-                    <div class="tab-content active" id="bajo">
-                        <!--Tabla-->
+                    <div class="tab-content" id="bajo">
                         <div class="relative overflow-x-auto">
                             <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
                                 <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                                     <tr>
-                                        <th scope="col" class="px-6 py-3">
-                                            ID
-                                        </th>
-                                        <th scope="col" class="px-6 py-3">
-                                            Pregunta
-                                        </th>
-                                        <th scope="col" class="px-6 py-3">
-                                            Ambito
-                                        </th>
-                                        <th scope="col" class="px-6 py-3">
-                                            Estado
-                                        </th>
-                                        <th scope="col" class="px-6 py-3">
-                                            Acción
-                                        </th>
+                                        <th scope="col" class="px-6 py-3">ID</th>
+                                        <th scope="col" class="px-6 py-3">Pregunta</th>
+                                        <th scope="col" class="px-6 py-3">Ambito</th>
+                                        <th scope="col" class="px-6 py-3">Estado</th>
+                                        <th scope="col" class="px-6 py-3">Acción</th>
                                     </tr>
                                 </thead>
-                                <tbody>
-                                    <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200">
-                                    </tr>
-                                </tbody>
+                               
                             </table>
                         </div>
                     </div>
+
                     <!-- Riesgo Moderado -->
                     <div class="tab-content" id="moderado">
-                        <!--Tabla-->
                         <div class="relative overflow-x-auto">
                             <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
                                 <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                                     <tr>
-                                        <th scope="col" class="px-6 py-3">
-                                            ID
-                                        </th>
-                                        <th scope="col" class="px-6 py-3">
-                                            Pregunta
-                                        </th>
-                                        <th scope="col" class="px-6 py-3">
-                                            Ambito
-                                        </th>
-                                        <th scope="col" class="px-6 py-3">
-                                            Estado
-                                        </th>
-                                        <th scope="col" class="px-6 py-3">
-                                            Acción
-                                        </th>
+                                        <th scope="col" class="px-6 py-3">ID</th>
+                                        <th scope="col" class="px-6 py-3">Pregunta</th>
+                                        <th scope="col" class="px-6 py-3">Ambito</th>
+                                        <th scope="col" class="px-6 py-3">Estado</th>
+                                        <th scope="col" class="px-6 py-3">Acción</th>
                                     </tr>
                                 </thead>
-                                <tbody>
-                                    <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200">
-                                    </tr>
-                                </tbody>
+                                
                             </table>
                         </div>
                     </div>
+
                     <!-- Riesgo Alto -->
                     <div class="tab-content" id="alto">
-                        <!--Tabla-->
                         <div class="relative overflow-x-auto">
                             <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
                                 <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                                     <tr>
-                                        <th scope="col" class="px-6 py-3">
-                                            ID
-                                        </th>
-                                        <th scope="col" class="px-6 py-3">
-                                            Pregunta
-                                        </th>
-                                        <th scope="col" class="px-6 py-3">
-                                            Ambito
-                                        </th>
-                                        <th scope="col" class="px-6 py-3">
-                                            Estado
-                                        </th>
-                                        <th scope="col" class="px-6 py-3">
-                                            Acción
-                                        </th>
+                                        <th scope="col" class="px-6 py-3">ID</th>
+                                        <th scope="col" class="px-6 py-3">Pregunta</th>
+                                        <th scope="col" class="px-6 py-3">Ambito</th>
+                                        <th scope="col" class="px-6 py-3">Estado</th>
+                                        <th scope="col" class="px-6 py-3">Acción</th>
                                     </tr>
                                 </thead>
-                                <tbody>
-                                    <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200">
-                                    </tr>
-                                </tbody>
+                                
                             </table>
                         </div>
                     </div>
+
                     <!-- Riesgo Extremo -->
                     <div class="tab-content" id="extremo">
-                        <!--Tabla-->
                         <div class="relative overflow-x-auto">
                             <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
                                 <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                                     <tr>
-                                        <th scope="col" class="px-6 py-3">
-                                            ID
-                                        </th>
-                                        <th scope="col" class="px-6 py-3">
-                                            Pregunta
-                                        </th>
-                                        <th scope="col" class="px-6 py-3">
-                                            Ambito
-                                        </th>
-                                        <th scope="col" class="px-6 py-3">
-                                            Estado
-                                        </th>
-                                        <th scope="col" class="px-6 py-3">
-                                            Acción
-                                        </th>
+                                        <th scope="col" class="px-6 py-3">ID</th>
+                                        <th scope="col" class="px-6 py-3">Pregunta</th>
+                                        <th scope="col" class="px-6 py-3">Ambito</th>
+                                        <th scope="col" class="px-6 py-3">Estado</th>
+                                        <th scope="col" class="px-6 py-3">Acción</th>
                                     </tr>
                                 </thead>
-                                <tbody>
-                                    <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200">
-                                    </tr>
-                                </tbody>
+                               
                             </table>
                         </div>
-                        <!-- Riesgo Activador -->
-                        <div class="tab-content" id="activadorAutomatico">
-                            <!--Tabla-->
-                            <div class="relative overflow-x-auto">
-                                <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-                                    <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-                                        <tr>
-                                            <th scope="col" class="px-6 py-3">
-                                                ID
-                                            </th>
-                                            <th scope="col" class="px-6 py-3">
-                                                Pregunta
-                                            </th>
-                                            <th scope="col" class="px-6 py-3">
-                                                Ambito
-                                            </th>
-                                            <th scope="col" class="px-6 py-3">
-                                                Estado
-                                            </th>
-                                            <th scope="col" class="px-6 py-3">
-                                                Acción
-                                            </th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200">
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
+                    </div>
+
+                    <!-- Activador Automático -->
+                    <div class="tab-content" id="activador">
+                        <div class="relative overflow-x-auto">
+                            <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+                                <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                                    <tr>
+                                        <th scope="col" class="px-6 py-3">ID</th>
+                                        <th scope="col" class="px-6 py-3">Pregunta</th>
+                                        <th scope="col" class="px-6 py-3">Ambito</th>
+                                        <th scope="col" class="px-6 py-3">Estado</th>
+                                        <th scope="col" class="px-6 py-3">Acción</th>
+                                    </tr>
+                                </thead>
+                                
+                            </table>
                         </div>
                     </div>
+                </div>
+            </div>
 
-                    <!--Button AñadirPregunta-->
-                    <div class="fixed bottom-8 right-8 z-50">
-                        <button class="group w-12 h-12 rounded-full border-2 border-green-500 text-white-500 bg-green hover:w-48 hover:rounded-full hover:bg-green-500 hover:text-white transition-all duration-300 ease-in-out flex items-center justify-center overflow-hidden shadow-lg hover:shadow-xl">
-                            <span class="text-2xl font-semibold group-hover:hidden transition-opacity duration-150">
-
-                            </span>
-                            <span class="text-sm font-medium opacity-0 group-hover:opacity-100 group-hover:block transition-opacity duration-150 delay-150 whitespace-nowrap px-4">
-                                Agregar pregunta
-                            </span>
-                        </button>
-                    </div>
-
+            <!-- Button Añadir Pregunta -->
+            <div class="fixed bottom-8 right-8 z-50">
+                <button class="group w-12 h-12 rounded-full border-2 border-green-500 text-white bg-green-500 hover:w-48 hover:rounded-full hover:bg-green-500 hover:text-white transition-all duration-300 ease-in-out flex items-center justify-center overflow-hidden shadow-lg hover:shadow-xl">
+                    <span class="text-2xl font-semibold absolute group-hover:opacity-0 transition-opacity duration-150">
+                        +
+                    </span>
+                    <span class="text-sm font-medium absolute opacity-0 group-hover:opacity-100 transition-opacity duration-150 delay-100 whitespace-nowrap px-4">
+                        Agregar pregunta
+                    </span>
+                </button>
+            </div>
         </main>
     </div>
 
@@ -561,4 +478,4 @@
     </script>
 </body>
 
-</html>
+</html> 
