@@ -211,6 +211,8 @@
                 </div>
             </div>
         </header>
+    </div>
+
     <script>
         function confirmarFormulario() {
             //Botones para 
