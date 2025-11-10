@@ -20,6 +20,8 @@
             --item-active: #3b82f6;       /* Azul */
             --hover-item: rgba(99, 99, 99, 0.1); /* Hover gris suave modo claro */
             --font-size: 16px;
+            --text-colorcrd: #111827;
+            --text-colorhd: #111827;
         }
 
         [data-theme="dark"] {
@@ -203,12 +205,13 @@
         <header class="header-bg sticky top-0 z-30">
             <div class="px-4 py-4 flex items-center justify-between">
                 <div class="flex items-center gap-4">
+                    <div class="relative hidden md:block">
+                    </div>
                 </div>
                 
                 <div class="flex items-center gap-4">
-                    <div class="flex items-center gap-2 cursor-pointer">
+                    <div class="flex items-center gap-2">
                         <img src="https://ui-avatars.com/api/?name=Admin+User&background=3b82f6&color=fff" alt="User" class="w-8 h-8 rounded-full">
-                        <span class="hidden md:inline font-medium">Admin User</span>
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                         </svg>
@@ -390,6 +393,27 @@
             if (temaActual === 'auto') {
                 aplicarTema('auto');
             }
+        });
+        // Al final del script existente en configuracion.php, agrega:
+
+        // Cargar TODAS las preferencias guardadas al inicio
+        window.addEventListener('DOMContentLoaded', () => {
+            // Tema
+            const temaGuardado = localStorage.getItem('theme-preference') || 'auto';
+            document.querySelector(`input[name="theme"][value="${temaGuardado}"]`).checked = true;
+            aplicarTema(temaGuardado);
+            
+            // Tamaño de fuente
+            const fontSizeGuardado = localStorage.getItem('font-size') || '16';
+            fontRange.value = fontSizeGuardado;
+            document.documentElement.style.setProperty('--font-size', fontSizeGuardado + 'px');
+            fontValue.textContent = fontSizeGuardado + 'px';
+            
+            // Contraste
+            const contrasteGuardado = localStorage.getItem('contrast') || '1';
+            contrastRange.value = contrasteGuardado;
+            document.documentElement.style.setProperty('--contrast', contrasteGuardado);
+            contrastValue.textContent = contrasteGuardado;
         });
     </script>
 </body>

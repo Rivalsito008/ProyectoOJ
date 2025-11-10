@@ -1,14 +1,78 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SIGEN - Sistema de Gestion Notarial</title>
+    <title>SIGEN - Sistema de Gestión Notarial</title>
+    <script>
+    (function(){
+        // Aplicar tema
+        const t = localStorage.getItem('theme-preference') || 'auto';
+        let f = t;
+        if(t === 'auto'){
+            f = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        }
+        document.documentElement.setAttribute('data-theme', f);
+        
+        // Aplicar tamaño de fuente
+        const fontSize = localStorage.getItem('font-size') || '16';
+        document.documentElement.style.setProperty('--font-size', fontSize + 'px');
+        
+        // Aplicar contraste
+        const contrast = localStorage.getItem('contrast') || '1';
+        document.documentElement.style.setProperty('--contrast', contrast);
+    })();
+    </script>
     <script src="https://cdn.tailwindcss.com"></script>
+
     <style>
+        /* ===== VARIABLES CSS - PRIMERO ===== */
+        :root {
+            --bg-color: #f9fafb;
+            --text-color: #111827;
+            --card-bg: #ffffff;
+            --border-color: #e5e7eb;
+            --sidebar-bg: #ffffff;
+            --text-colorsdb: #3d444d;
+            --titledashboard: #000000ff;
+            --border-color-card: #d8d8d8ff;
+            --contrast: 1;
+            --item-active: #3b82f6;
+            --hover-item: rgba(99, 99, 99, 0.1);
+            --font-size: 16px;
+            --text-colorcrd: #111827;
+            --text-colorhd: #111827;
+        }
+
+        [data-theme="dark"] {
+            --titledashboard: #000000ff;
+            --bg-color: #e4e4e4ff;
+            --text-colorcrd: #000000ff;
+            --text-colorsdb: #ffffffff;
+            --text-colorhd: #ffffffff;
+            --card-bg: #ffffffff;
+            --sidebar-bg: #2a2240;
+            --border-color: #3d3454;
+            --hover-item: rgba(108, 85, 150, 0.35);
+            --item-active: #6c55ba; /* Morado para modo oscuro */
+            --border-color-card: #b4b4b4ff;
+        }
+
+        /* ===== APLICAR VARIABLES ===== */
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-colorcrd);
+            font-size: var(--font-size);
+            filter: contrast(var(--contrast));
+            transition: all 0.3s ease;
+        }
+
+        /* ===== SIDEBAR ===== */
         .sidebar {
             transition: width 0.3s ease;
+            background-color: var(--sidebar-bg);
+            color: var(--text-colorsdb);
+            border-right: 1px solid var(--border-color);
         }
 
         .sidebar-collapsed {
@@ -28,25 +92,54 @@
             display: none;
         }
 
+        /* ===== NAV ITEMS ===== */
         .nav-item {
-            transition: all 0.2s ease;
-            color: #3d444dff;
+            transition: all 0.25s ease;
+            color: var(--text-colorsdb);
+            border-radius: 0.5rem;
         }
-        
+
         .nav-item:hover {
-            background-color: rgba(99, 99, 99, 0.1);
+            background-color: var(--hover-item);
+            color: var(--text-colorsdb);
         }
-        
+
+        [data-theme="dark"] .nav-item:hover {
+            background-color: var(--hover-item);
+            color: #ffffff;
+            box-shadow: inset 0 0 6px rgba(180, 160, 255, 0.2);
+            transform: translateX(2px);
+        }
+
         .nav-item.active {
-            background-color: #3b82f6;
-            color: white;
+            background-color: var(--item-active);
+            color: #ffffff;
+            box-shadow: inset 0 0 8px rgba(255, 255, 255, 0.1);
         }
-        
+
+        .nav-item.active:hover {
+            background-color: var(--item-active);
+            color: #ffffff;
+            transform: none;
+        }
+
         .nav-item svg {
             min-width: 20px;
         }
 
-        /* Contenedor de pestañas */
+        /* ===== HEADER ===== */
+        .header-bg {
+            background-color: var(--sidebar-bg);
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-colorhd);
+        }
+
+        .titledashboard {
+            color: var(--titledashboard);
+            transition: color 0.3s ease;
+        }
+
+        /* ===== TABS CONTAINER ===== */
         .tabs-container {
             background: transparent;
             padding-top: 8px;
@@ -58,9 +151,10 @@
             display: flex;
             gap: 8px;
             padding: 0 8px;
+            flex-wrap: wrap;
         }
 
-        /* Estilo de pestañas tipo navegador */
+        /* ===== BROWSER TABS ===== */
         .browser-tab {
             position: relative;
             padding: 12px 20px;
@@ -85,11 +179,11 @@
         }
 
         .browser-tab:hover:not(.active) {
-            background: rgba(255, 255, 255, 0.5);
+            background: var(--hover-item);
         }
 
         .browser-tab.active {
-            background: white;
+            background: var(--card-bg);
             box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.05);
         }
 
@@ -108,7 +202,7 @@
 
         .tab-label {
             font-weight: 500;
-            color: #4b5563;
+            color: var(--text-colorcrd);
             font-size: 14px;
             user-select: none;
             white-space: nowrap;
@@ -123,11 +217,7 @@
             transform: translateX(0);
         }
 
-        .browser-tab.active .tab-label {
-            color: #1f2937;
-        }
-
-        /* Tooltip */
+        /* ===== TOOLTIP ===== */
         .tab-tooltip {
             position: absolute;
             bottom: -35px;
@@ -162,12 +252,12 @@
             opacity: 1;
         }
 
-        /* Contenido */
+        /* ===== TAB CONTENT ===== */
         .tab-content-wrapper {
-            background: white;
+            background: var(--card-bg);
             min-height: 500px;
             padding: 40px;
-            border-radius: 12px 12px 12px 12px;
+            border-radius: 12px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
 
@@ -184,21 +274,56 @@
             from {
                 opacity: 0;
             }
-
             to {
                 opacity: 1;
             }
         }
+
+        /* ===== TABLES ===== */
+        table {
+            background-color: var(--card-bg);
+            color: var(--text-colorcrd);
+        }
+
+        thead {
+            background-color: var(--bg-color);
+            color: var(--text-colorcrd);
+        }
+
+        thead th {
+            color: var(--text-colorcrd);
+        }
+
+        tbody tr {
+            background-color: var(--card-bg);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        tbody td {
+            color: var(--text-colorcrd);
+        }
+
+        /* ===== FLOATING BUTTON ===== */
+        .floating-btn {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            border: none;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .floating-btn:hover {
+            box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
+        }
     </style>
 </head>
 
-<body class="bg-gray-50">
+<body>
     <!-- Sidebar -->
-    <aside id="sidebar" class="sidebar sidebar-collapsed fixed top-0 left-0 z-40 h-screen bg-white border-r border-gray-200">
+    <aside id="sidebar" class="sidebar sidebar-collapsed fixed top-0 left-0 z-40 h-screen">
         <div class="h-full px-3 py-4 overflow-y-auto">
             <div class="flex items-center justify-center mb-6 px-2 h-10">
                 <div id="logo-compact" class="w-8 h-8 rounded-lg bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold">SG</div>
-                <h2 id="logo-full" class="hide-on-collapse text-2xl font-bold bg-gradient-to-r from-blue-500 to-purple-600 bg-clip-text text-transparent">SIGEN</h2>
+                <h2 id="logo-full" class="hide-on-collapse text-2xl font-bold bg-gradient-to-r from-blue-500 to-purple-600 bg-clip-text text-transparent ml-3">SIGEN</h2>
             </div>
 
             <nav class="space-y-2">
@@ -210,7 +335,7 @@
                 </a>
                 <a href="form.php" class="nav-item flex items-center px-3 py-3 rounded-lg justify-center">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                     </svg>
                     <span class="nav-label hide-on-collapse font-medium whitespace-nowrap ml-3">Formulario</span>
                 </a>
@@ -246,13 +371,11 @@
     <!-- Main Content -->
     <div class="content">
         <!-- Header -->
-        <header class="bg-white border-b border-gray-200 sticky top-0 z-30">
+        <header class="header-bg sticky top-0 z-30">
             <div class="px-4 py-4 flex items-center justify-between">
                 <div class="flex items-center gap-4">
-                    <div class="relative hidden md:block">
-                    </div>
+                    <div class="relative hidden md:block"></div>
                 </div>
-
                 <div class="flex items-center gap-4">
                     <div class="flex items-center gap-2">
                         <img src="https://ui-avatars.com/api/?name=Admin+User&background=3b82f6&color=fff" alt="User" class="w-8 h-8 rounded-full">
@@ -266,40 +389,47 @@
 
         <!-- Content -->
         <main class="p-6">
+            <h1 class="titledashboard text-3xl font-bold mb-6">Preguntas</h1>
+
             <!-- Pestañas estilo navegador -->
             <div class="tabs-container">
                 <div class="tabs-wrapper">
-                    <!-- Pestaña Todas -->
+                    <!-- Pestaña Todo -->
                     <div class="browser-tab active" data-tab="todo">
                         <div class="tab-indicator bg-blue-500"></div>
                         <span class="tab-label">Todo</span>
-                        <span class="tab-tooltip">Nivel Todo</span>
+                        <span class="tab-tooltip">Todas las preguntas</span>
                     </div>
+                    
                     <!-- Pestaña Bajo -->
                     <div class="browser-tab" data-tab="bajo">
                         <div class="tab-indicator bg-green-500"></div>
                         <span class="tab-label">Bajo</span>
                         <span class="tab-tooltip">Nivel Bajo</span>
                     </div>
+                    
                     <!-- Pestaña Moderado -->
                     <div class="browser-tab" data-tab="moderado">
                         <div class="tab-indicator bg-yellow-400"></div>
                         <span class="tab-label">Moderado</span>
                         <span class="tab-tooltip">Nivel Moderado</span>
                     </div>
+                    
                     <!-- Pestaña Alto -->
                     <div class="browser-tab" data-tab="alto">
                         <div class="tab-indicator bg-red-500"></div>
                         <span class="tab-label">Alto</span>
                         <span class="tab-tooltip">Nivel Alto</span>
                     </div>
+                    
                     <!-- Pestaña Extremo -->
                     <div class="browser-tab" data-tab="extremo">
                         <div class="tab-indicator bg-red-700"></div>
                         <span class="tab-label">Extremo</span>
                         <span class="tab-tooltip">Nivel Extremo</span>
                     </div>
-                    <!-- Activador Automatico -->
+                    
+                    <!-- Activador Automático -->
                     <div class="browser-tab" data-tab="activador">
                         <div class="tab-indicator bg-red-900"></div>
                         <span class="tab-label">Activador</span>
@@ -309,124 +439,142 @@
 
                 <!-- Contenido de las pestañas -->
                 <div class="tab-content-wrapper">
-                    <!-- Todas -->
+                    <!-- Tab: Todo -->
                     <div class="tab-content active" id="todo">
                         <div class="relative overflow-x-auto">
-                            <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-                                <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                            <table class="w-full text-sm text-left">
+                                <thead class="text-xs uppercase">
                                     <tr>
                                         <th scope="col" class="px-6 py-3">ID</th>
                                         <th scope="col" class="px-6 py-3">Pregunta</th>
-                                        <th scope="col" class="px-6 py-3">Ambito</th>
+                                        <th scope="col" class="px-6 py-3">Ámbito</th>
                                         <th scope="col" class="px-6 py-3">Estado</th>
                                         <th scope="col" class="px-6 py-3">Acción</th>
                                     </tr>
                                 </thead>
+                                <tbody>
+                                </tbody>
                             </table>
                         </div>
                     </div>
 
-                    <!-- Riesgo Bajo -->
+                    <!-- Tab: Bajo -->
                     <div class="tab-content" id="bajo">
                         <div class="relative overflow-x-auto">
-                            <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-                                <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                            <table class="w-full text-sm text-left">
+                                <thead class="text-xs uppercase">
                                     <tr>
                                         <th scope="col" class="px-6 py-3">ID</th>
                                         <th scope="col" class="px-6 py-3">Pregunta</th>
-                                        <th scope="col" class="px-6 py-3">Ambito</th>
+                                        <th scope="col" class="px-6 py-3">Ámbito</th>
                                         <th scope="col" class="px-6 py-3">Estado</th>
                                         <th scope="col" class="px-6 py-3">Acción</th>
                                     </tr>
                                 </thead>
-                               
+                                <tbody>
+                                    <tr>
+                                        <td class="px-6 py-4" colspan="5">Preguntas de nivel bajo</td>
+                                    </tr>
+                                </tbody>
                             </table>
                         </div>
                     </div>
 
-                    <!-- Riesgo Moderado -->
+                    <!-- Tab: Moderado -->
                     <div class="tab-content" id="moderado">
                         <div class="relative overflow-x-auto">
-                            <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-                                <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                            <table class="w-full text-sm text-left">
+                                <thead class="text-xs uppercase">
                                     <tr>
                                         <th scope="col" class="px-6 py-3">ID</th>
                                         <th scope="col" class="px-6 py-3">Pregunta</th>
-                                        <th scope="col" class="px-6 py-3">Ambito</th>
+                                        <th scope="col" class="px-6 py-3">Ámbito</th>
                                         <th scope="col" class="px-6 py-3">Estado</th>
                                         <th scope="col" class="px-6 py-3">Acción</th>
                                     </tr>
                                 </thead>
-                                
+                                <tbody>
+                                    <tr>
+                                        <td class="px-6 py-4" colspan="5">Preguntas de nivel moderado</td>
+                                    </tr>
+                                </tbody>
                             </table>
                         </div>
                     </div>
 
-                    <!-- Riesgo Alto -->
+                    <!-- Tab: Alto -->
                     <div class="tab-content" id="alto">
                         <div class="relative overflow-x-auto">
-                            <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-                                <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                            <table class="w-full text-sm text-left">
+                                <thead class="text-xs uppercase">
                                     <tr>
                                         <th scope="col" class="px-6 py-3">ID</th>
                                         <th scope="col" class="px-6 py-3">Pregunta</th>
-                                        <th scope="col" class="px-6 py-3">Ambito</th>
+                                        <th scope="col" class="px-6 py-3">Ámbito</th>
                                         <th scope="col" class="px-6 py-3">Estado</th>
                                         <th scope="col" class="px-6 py-3">Acción</th>
                                     </tr>
                                 </thead>
-                                
+                                <tbody>
+                                    <tr>
+                                        <td class="px-6 py-4" colspan="5">Preguntas de nivel alto</td>
+                                    </tr>
+                                </tbody>
                             </table>
                         </div>
                     </div>
 
-                    <!-- Riesgo Extremo -->
+                    <!-- Tab: Extremo -->
                     <div class="tab-content" id="extremo">
                         <div class="relative overflow-x-auto">
-                            <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-                                <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                            <table class="w-full text-sm text-left">
+                                <thead class="text-xs uppercase">
                                     <tr>
                                         <th scope="col" class="px-6 py-3">ID</th>
                                         <th scope="col" class="px-6 py-3">Pregunta</th>
-                                        <th scope="col" class="px-6 py-3">Ambito</th>
+                                        <th scope="col" class="px-6 py-3">Ámbito</th>
                                         <th scope="col" class="px-6 py-3">Estado</th>
                                         <th scope="col" class="px-6 py-3">Acción</th>
                                     </tr>
                                 </thead>
-                               
+                                <tbody>
+                                    <tr>
+                                        <td class="px-6 py-4" colspan="5">Preguntas de nivel extremo</td>
+                                    </tr>
+                                </tbody>
                             </table>
                         </div>
                     </div>
 
-                    <!-- Activador Automático -->
+                    <!-- Tab: Activador -->
                     <div class="tab-content" id="activador">
                         <div class="relative overflow-x-auto">
-                            <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-                                <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                            <table class="w-full text-sm text-left">
+                                <thead class="text-xs uppercase">
                                     <tr>
                                         <th scope="col" class="px-6 py-3">ID</th>
                                         <th scope="col" class="px-6 py-3">Pregunta</th>
-                                        <th scope="col" class="px-6 py-3">Ambito</th>
+                                        <th scope="col" class="px-6 py-3">Ámbito</th>
                                         <th scope="col" class="px-6 py-3">Estado</th>
                                         <th scope="col" class="px-6 py-3">Acción</th>
                                     </tr>
                                 </thead>
-                                
+                                <tbody>
+                                    <tr>
+                                        <td class="px-6 py-4" colspan="5">Preguntas con activador automático</td>
+                                    </tr>
+                                </tbody>
                             </table>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Button Añadir Pregunta -->
+            <!-- Botón flotante -->
             <div class="fixed bottom-8 right-8 z-50">
-                <button class="group w-12 h-12 rounded-full border-2 border-green-500 text-white bg-green-500 hover:w-48 hover:rounded-full hover:bg-green-500 hover:text-white transition-all duration-300 ease-in-out flex items-center justify-center overflow-hidden shadow-lg hover:shadow-xl">
-                    <span class="text-2xl font-semibold absolute group-hover:opacity-0 transition-opacity duration-150">
-                        +
-                    </span>
-                    <span class="text-sm font-medium absolute opacity-0 group-hover:opacity-100 transition-opacity duration-150 delay-100 whitespace-nowrap px-4">
-                        Agregar pregunta
-                    </span>
+                <button class="floating-btn group w-12 h-12 rounded-full transition-all duration-300 ease-in-out flex items-center justify-center overflow-hidden hover:w-48 hover:rounded-full">
+                    <span class="text-2xl font-semibold absolute group-hover:opacity-0 transition-opacity duration-150">+</span>
+                    <span class="text-sm font-medium absolute opacity-0 group-hover:opacity-100 transition-opacity duration-150 delay-100 whitespace-nowrap px-4">Agregar pregunta</span>
                 </button>
             </div>
         </main>
@@ -488,6 +636,15 @@
                 // Add active class to selected content
                 document.getElementById(tabName).classList.add('active');
             });
+        });
+
+        // Detectar cambios en preferencia de sistema (para modo auto)
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+            const temaActual = localStorage.getItem('theme-preference') || 'auto';
+            if (temaActual === 'auto') {
+                const nuevoTema = e.matches ? 'dark' : 'light';
+                document.documentElement.setAttribute('data-theme', nuevoTema);
+            }
         });
     </script>
 </body>
