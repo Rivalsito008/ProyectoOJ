@@ -11,19 +11,31 @@
             --text-color: #111827;
             --card-bg: #ffffff;
             --border-color: #e5e7eb;
+            --sidebar-bg: #ffffff;
+            --text-colorsdb: #3d444d;
+            --titledashboard: #000000ff;
+            --border-color-card: #d8d8d8ff;
             --contrast: 1;
+            --back-ground-color: #3b82f6; /* Azul para el activo en modo claro */
+            --item-active: #3b82f6;       /* Azul */
+            --hover-item: rgba(99, 99, 99, 0.1); /* Hover gris suave modo claro */
             --font-size: 16px;
         }
-        
+
         [data-theme="dark"] {
             --bg-color: #cacacaff;
             --text-colorcrd: #000000ff;
             --text-colorsdb: #ffffffff;
+            --text-colorhd: #ffffffff;
             --card-bg: #ffffffff;
+            --titledashboard: #ffffffff;
             --sidebar-bg: #2a2240;
             --border-color: #3d3454;
+            --hover-item: rgba(108, 85, 150, 0.35);
+            --item-active: #6c55ba; /* Morado para modo oscuro */
+            --border-color-card: #b4b4b4ff;
         }
-        
+
         body {
             background-color: var(--bg-color);
             color: var(--text-colorcrd);
@@ -31,67 +43,102 @@
             filter: contrast(var(--contrast));
             transition: all 0.3s ease;
         }
-        
+
+        /* ===== SIDEBAR ===== */
         .sidebar {
             transition: width 0.3s ease;
             background-color: var(--sidebar-bg);
             color: var(--text-colorsdb);
             border-right: 1px solid var(--border-color);
         }
-        
+
         .sidebar-collapsed {
             width: 80px;
         }
-        
+
         .sidebar-expanded {
             width: 256px;
         }
-        
+
         .content {
             margin-left: 80px;
             transition: margin-left 0.3s ease;
         }
-        
+
+        /* ===== NAV ITEMS ===== */
         .nav-item {
-            transition: all 0.2s ease;
+            transition: all 0.25s ease;
+            color: var(--text-colorsdb);
+            border-radius: 0.5rem;
         }
-        
+
+        /* Hover */
         .nav-item:hover {
-            background-color: rgba(59, 130, 246, 0.1);
+            background-color: var(--hover-item);
+            color: #111827;
         }
-        
+
+        /* Hover oscuro */
+        [data-theme="dark"] .nav-item:hover {
+            background-color: var(--hover-item);
+            color: #ffffff;
+            box-shadow: inset 0 0 6px rgba(180, 160, 255, 0.2);
+            transform: translateX(2px);
+        }
+
+        /* Ítem activo (modo claro y oscuro) */
         .nav-item.active {
-            background-color: #3b82f6;
-            color: white;
+            background-color: var(--item-active);
+            color: #ffffff;
+            box-shadow: inset 0 0 8px rgba(255, 255, 255, 0.1);
         }
-        
+
+        /* Ítem activo sin hover */
+        .nav-item.active:hover {
+            background-color: var(--item-active);
+            color: #ffffff;
+            box-shadow: inset 0 0 8px rgba(255, 255, 255, 0.1);
+            transform: none;
+        }
+
         .nav-item svg {
             min-width: 20px;
         }
-        
+
+        /* ===== CARDS ===== */
         .card {
             background-color: var(--card-bg);
-            border: 1px solid var(--border-color);
-            transition: all 0.3s ease;
+            border: 1px solid var(--border-color-card);
+            border-radius: 0.5rem;
+            transition: all 0.3s ease, transform 0.2s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
         }
-        
+
+        /* Hover más sutil */
+        .card:hover {
+            transform: translateY(-2px) scale(1.01); /* Efecto más suave */
+            border-color: rgb(108, 85, 150);
+            box-shadow: 0 6px 12px rgba(161, 161, 161, 0.8);
+            background: linear-gradient(145deg, rgba(255, 255, 255, 1), rgba(255, 255, 255, 1));
+        }
+
+        /* ===== HEADER ===== */
         .header-bg {
             background-color: var(--sidebar-bg);
             border-bottom: 1px solid var(--border-color);
-            color: var(--text-colorsdb);
+            color: var(--text-colorhd);
         }
-        
-        input[type="range"] {
-            accent-color: #9333ea;
-        }
-        
+
+        /* ===== INPUTS ===== */
+        input[type="range"],
         input[type="radio"] {
             accent-color: #9333ea;
         }
-        
+
         .hidden {
             display: none;
         }
+
     </style>
 </head>
 <body>
@@ -152,7 +199,6 @@
         <header class="header-bg sticky top-0 z-30">
             <div class="px-4 py-4 flex items-center justify-between">
                 <div class="flex items-center gap-4">
-                    <h1 class="text-2xl font-bold">Configuración</h1>
                 </div>
                 
                 <div class="flex items-center gap-4">
@@ -169,6 +215,10 @@
 
         <!-- Dashboard Content -->
         <main class="p-6">
+            <div class="mb-6">
+                <h1 class="titledashboard text-3xl font-bold mb-2">Configuración
+                </h1>
+            </div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <!-- Modo de tema -->
                 <div class="card rounded-xl p-6 shadow">
