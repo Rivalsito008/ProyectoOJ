@@ -23,12 +23,12 @@
         }
 
         [data-theme="dark"] {
-            --bg-color: #cacacaff;
+            --titledashboard: #000000ff;
+            --bg-color: #e4e4e4ff;
             --text-colorcrd: #000000ff;
             --text-colorsdb: #ffffffff;
             --text-colorhd: #ffffffff;
             --card-bg: #ffffffff;
-            --titledashboard: #ffffffff;
             --sidebar-bg: #2a2240;
             --border-color: #3d3454;
             --hover-item: rgba(108, 85, 150, 0.35);
