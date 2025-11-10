@@ -139,6 +139,10 @@
             display: none;
         }
 
+        .titledashboard {
+            color: var(--titledashboard);
+            transition: color 0.3s ease;
+        }
     </style>
 </head>
 <body>
