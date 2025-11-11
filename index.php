@@ -129,11 +129,6 @@
         Iniciar Sesión
       </button>
     </form>
-
-    <div class="mt-6 flex items-center justify-center">
-      <div class="border-t border-gray-500 w-1/4"></div>
-      <div class="border-t border-gray-500 w-1/4"></div>
-    </div>
   </div>
 
   <script>
