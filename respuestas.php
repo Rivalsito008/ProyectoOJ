@@ -63,7 +63,6 @@
             background-color: var(--bg-color);
             color: var(--text-colorcrd);
             font-size: var(--font-size);
-            filter: contrast(var(--contrast));
             transition: all 0.3s ease;
         }
 

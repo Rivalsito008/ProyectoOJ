@@ -4,45 +4,141 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SIGEN - Sistema de Gestion Notarial</title>
+    <script>
+    (function(){
+      // Aplicar tema
+      const t = localStorage.getItem('theme-preference') || 'auto';
+      let f = t;
+      if(t === 'auto'){
+        f = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      }
+      document.documentElement.setAttribute('data-theme', f);
+      
+      // Aplicar tamaño de fuente
+      const fontSize = localStorage.getItem('font-size') || '16';
+      document.documentElement.style.setProperty('--font-size', fontSize + 'px');
+      
+      // Aplicar contraste
+      const contrast = localStorage.getItem('contrast') || '1';
+      document.documentElement.style.setProperty('--contrast', contrast);
+    })();
+    </script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
+        :root {
+        --bg-color: #f9fafb;
+        --text-color: #111827;
+        --card-bg: #ffffff;
+        --border-color: #e5e7eb;
+        --sidebar-bg: #ffffff;
+        --text-colorsdb: #3d444d;
+        --titledashboard: #000000ff;
+        --border-color-card: #d8d8d8ff;
+        --contrast: 1;
+        --item-active: #3b82f6;
+        --hover-item: rgba(99, 99, 99, 0.1);
+        --font-size: 16px;
+        --text-colorcrd: #111827;
+        --text-colorhd: #111827;
+        }
+
+        [data-theme="dark"] {
+        --titledashboard: #000000ff;
+        --bg-color: #e4e4e4ff;
+        --text-colorcrd: #000000ff;
+        --text-colorsdb: #ffffffff;
+        --text-colorhd: #ffffffff;
+        --card-bg: #ffffffff;
+        --sidebar-bg: #2a2240;
+        --border-color: #3d3454;
+        --hover-item: rgba(108, 85, 150, 0.35);
+        --item-active: #6c55ba; /* Morado para modo oscuro */
+        --border-color-card: #b4b4b4ff;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-size: var(--font-size);
+            transition: all 0.3s ease;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* SIDEBAR STYLES */
         .sidebar {
             transition: width 0.3s ease;
+            background-color: var(--sidebar-bg);
+            color: var(--text-colorsdb);
+            border-right: 1px solid var(--border-color);
         }
+        
         .sidebar-collapsed {
             width: 80px;
         }
+        
         .sidebar-expanded {
             width: 256px;
         }
+        
         .content {
             margin-left: 80px;
             transition: margin-left 0.3s ease;
+            background-color: var(--bg-color);
+            min-height: 100vh;
         }
+        
         .hide-on-collapse {
             display: none;
-        }
-        .show-on-expand {
-            display: inline-block;
         }
         
         .nav-item {
             transition: all 0.2s ease;
-            color: #3d444dff;
+            color: var(--text-colorsdb);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
         }
         
         .nav-item:hover {
-            background-color: rgba(99, 99, 99, 0.1);
+            background-color: var(--hover-item);
         }
         
         .nav-item.active {
-            background-color: #3b82f6;
+            background-color: var(--item-active);
             color: white;
         }
         
         .nav-item svg {
             min-width: 20px;
+        }
+
+        [data-theme="dark"] .nav-item:hover {
+            background-color: var(--hover-item);
+            box-shadow: inset 0 0 6px rgba(180, 160, 255, 0.2);
+            transform: translateX(2px);
+        }
+
+        /* HEADER STYLES */
+        .header-bg {
+            background-color: var(--sidebar-bg);
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-colorhd);
+        }
+
+        .titledashboard {
+            color: var(--titledashboard);
+            transition: color 0.3s ease;
+        }
+
+        .hide-on-collapse { display: none; }
+        .hidden { display: none; }
+
+        /* CARD STYLES - Manteniendo los estilos originales de Tailwind */
+        .card-theme {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
         }
 
         @keyframes slideDown {
@@ -59,9 +155,20 @@
         .modal-animate {
             animation: slideDown 0.2s ease-out;
         }
+
+        /* DROPDOWN STYLES */
+        .dropdown-custom {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+        }
+
+        /* Asegurar que los textos mantengan sus colores originales */
+        .text-preserve {
+            color: inherit;
+        }
     </style>
 </head>
-<body class="bg-gray-50">
+<body>
     <?php
     // Datos de ejemplo para el dashboard
     $stats = [
@@ -80,11 +187,11 @@
     ?>
 
     <!-- Sidebar -->
-    <aside id="sidebar" class="sidebar sidebar-collapsed fixed top-0 left-0 z-40 h-screen bg-white border-r border-gray-200">
+    <aside id="sidebar" class="sidebar sidebar-collapsed fixed top-0 left-0 z-40 h-screen">
         <div class="h-full px-3 py-4 overflow-y-auto">
             <div class="flex items-center justify-center mb-6 px-2 h-10">
                 <div id="logo-compact" class="w-8 h-8 rounded-lg bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold">SG</div>
-                <h2 id="logo-full" class="hide-on-collapse text-2xl font-bold bg-gradient-to-r from-blue-500 to-purple-600 bg-clip-text text-transparent">SIGEN</h2>
+                <h2 id="logo-full" class="hide-on-collapse text-2xl font-bold bg-gradient-to-r from-blue-500 to-purple-600 bg-clip-text text-transparent ml-3">SIGEN</h2>
             </div>
             
             <nav class="space-y-2">
@@ -96,9 +203,7 @@
                 </a>
                 <a href="form.php" class="nav-item flex items-center px-3 py-3 rounded-lg justify-center">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
-                    </path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                     </svg>
                     <span class="nav-label hide-on-collapse font-medium whitespace-nowrap ml-3">Formulario</span>
                 </a>
@@ -116,9 +221,7 @@
                 </a>
                 <a href="usuarios.php" class="nav-item flex items-center px-3 py-3 rounded-lg justify-center">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                            d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z">
-                        </path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
                     </svg>
                     <span class="nav-label hide-on-collapse font-medium whitespace-nowrap ml-3">Usuarios</span>
                 </a>                
@@ -136,65 +239,54 @@
     <!-- Main Content -->
     <div class="content">
         <!-- Header -->
-        <header class="bg-white border-b border-gray-200 sticky top-0 z-30">
+        <header class="header-bg border-b border-gray-200 sticky top-0 z-30">
             <div class="px-4 py-4 flex items-center justify-between">
+                    <!-- Título alineado a la izquierda -->
+                    <h1 class="titledashboard text-2xl font-bold">Configuración</h1>
                 <div class="flex items-center gap-4">
                     <div class="relative hidden md:block">
                     </div>
                 </div>
-                
-                <div class="flex items-center gap-4">
+                <div class="header flex items-center gap-4">
+                    <!--Botón de perfil -->
                     <div class="relative">
-                        <button id="profileButton" class="flex items-center gap-2 hover:bg-gray-50 rounded-lg px-3 py-2 transition-colors">
-                            <img src="https://ui-avatars.com/api/?name=<?php echo urlencode($usuario['nombre']); ?>&background=3b82f6&color=fff" alt="User" class="w-8 h-8 rounded-full">
-                            <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                            </svg>
-                        </button>
+                    <!-- Botón del perfil -->
+                    <button id="profileButton" class="flex items-center gap-2 rounded-xl px-3 py-2 transition-colors">
+                        <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Perfil" class="w-8 h-8 rounded-full">
+                        <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path class="flecha" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </button>
 
-                        <!-- Dropdown Menu (aparece debajo del botón) -->
-                        <div id="profileDropdown" class="hidden absolute right-0 mt-2 w-80 bg-white rounded-xl shadow-2xl border border-gray-200 overflow-hidden z-50 modal-animate">
-                            <!-- Header compacto con gradiente -->
-                            <div class="bg-gradient-to-r from-blue-500 to-purple-600 px-4 py-3 text-white">
-                                <div class="flex items-center gap-3">
-                                    <img src="https://ui-avatars.com/api/?name=<?php echo urlencode($usuario['nombre']); ?>&background=ffffff&color=3b82f6&size=48" alt="User" class="w-12 h-12 rounded-full border-2 border-white shadow-md">
-                                    <div class="flex-1 min-w-0">
-                                        <h3 class="text-base font-bold truncate"><?php echo $usuario['nombre']; ?></h3>
-                                        <p class="text-xs text-blue-100 truncate"><?php echo $usuario['email']; ?></p>
-                                    </div>
-                                    <button onclick="cerrarDropdown()" class="text-white hover:bg-white hover:bg-opacity-20 rounded-lg p-1 transition-colors flex-shrink-0">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                                        </svg>
-                                    </button>
-                                </div>
+                        <!-- Dropdown del perfil -->
+                        <div id="profileDropdown"
+                        class="dropdown hidden absolute right-0 mt-3 w-80 rounded-2xl shadow-xl border border-gray-200 dark:border-transparent overflow-hidden z-50 transition-all duration-300">
+
+                        <!-- Encabezado -->
+                        <div class="p-4 bg-[var(--dropdown-color)] dark:bg-[#2b2343] backdrop-blur-xl">
+                            <div class="flex items-center space-x-4">
+                            <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png"
+                                alt="Usuario"
+                                class="w-12 h-12 rounded-full border border-gray-300 dark:border-gray-600 shadow-sm">
+                            <div>
+                                <p class="text-base font-semibold text-gray-900 dark:text-gray-100">Nombre del Usuario</p>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">Administrador</p>
                             </div>
-
-                            <!-- Contenido -->
-                            <div class="p-4">
-                                <!-- Rol -->
-                                <div class="mb-3">
-                                    <span class="inline-flex items-center px-3 py-1.5 bg-blue-100 text-blue-800 text-xs font-bold rounded-lg">
-                                        <svg class="w-3.5 h-3.5 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
-                                        </svg>
-                                        <?php echo strtoupper($usuario['rol']); ?>
-                                    </span>
-                                </div>
-
-                                <!-- Divider -->
-                                <div class="border-t border-gray-200 my-3"></div>
-
-                                <!-- Botón Cerrar Sesión -->
-                                <button onclick="cerrarSesion()" class="w-full flex items-center justify-center gap-2 bg-red-500 hover:bg-red-600 text-white font-semibold py-2.5 px-4 rounded-lg transition-colors shadow-md hover:shadow-lg">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
-                                    </svg>
-                                    Cerrar Sesión
-                                </button>
                             </div>
                         </div>
-                    </div>
+
+                        <!-- Opciones -->
+                        <div class="bg-[var(--dropdown-color)] dark:bg-[#241c37] transition-colors duration-300">
+                            <a href="logout.php"
+                            class="flex items-center gap-3 px-5 py-3 text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-[#3c2a4b] transition-all duration-200">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a2 2 0 11-4 0v-1m0-8V7a2 2 0 114 0v1"></path>
+                            </svg>
+                            Cerrar sesión
+                            </a>
+                        </div>
+                        </div>
                 </div>
             </div>
         </header>
@@ -202,25 +294,25 @@
         <!-- Dashboard Content -->
         <main class="p-6">
             <div class="mb-6">
-                <h1 class="text-3xl font-bold mb-2">Dashboard</h1>
-                <p class="text-gray-600">Bienvenido de vuelta, aquí está tu resumen</p>
+                <h1 class="text-3xl font-bold mb-2 text-preserve">Dashboard</h1>
+                <p class="text-gray-600 text-preserve">Bienvenido de vuelta, aquí está tu resumen</p>
             </div>
 
             <!-- Stats Cards -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
                 <?php foreach ($stats as $stat): ?>
-                <div class="bg-white rounded-xl p-6 border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
-                    <p class="text-sm text-gray-600 mb-1"><?php echo $stat['title']; ?></p>
-                    <p class="text-3xl font-bold mb-2"><?php echo $stat['value']; ?></p>
-                    <p class="text-sm text-green-500 font-medium"><?php echo $stat['change']; ?></p>
+                <div class="card rounded-xl p-6 shadow">
+                    <p class="text-sm text-gray-600 mb-1 text-preserve"><?php echo $stat['title']; ?></p>
+                    <p class="text-3xl font-bold mb-2 text-preserve"><?php echo $stat['value']; ?></p>
+                    <p class="text-sm text-green-500 font-medium text-preserve"><?php echo $stat['change']; ?></p>
                 </div>
                 <?php endforeach; ?>
             </div>
-                <div class="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
-                    <h3 class="text-lg font-semibold mb-4">Niveles de Riesgo en Zonas Geograficas</h3>
-                    <div style="position: relative; height: 300px;">
-                        <canvas id="pieChart"></canvas>
-                    </div>
+            
+            <div class="card rounded-xl p-6 shadow">
+                <h3 class="text-lg font-semibold mb-4 text-preserve">Niveles de Riesgo en Zonas Geograficas</h3>
+                <div style="position: relative; height: 300px;">
+                    <canvas id="pieChart"></canvas>
                 </div>
             </div>
         </main>
@@ -314,6 +406,15 @@
                         position: 'bottom'
                     }
                 }
+            }
+        });
+
+        // Detectar cambios en preferencia de sistema (para modo auto)
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+            const temaActual = localStorage.getItem('theme-preference') || 'auto';
+            if (temaActual === 'auto') {
+                const nuevoTema = e.matches ? 'dark' : 'light';
+                document.documentElement.setAttribute('data-theme', nuevoTema);
             }
         });
     </script>

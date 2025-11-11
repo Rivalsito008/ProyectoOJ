@@ -28,41 +28,46 @@
 
   <style>
     :root {
-      --bg-color: #f9fafb;
-      --text-color: #111827;
-      --card-bg: #ffffff;
-      --border-color: #e5e7eb;
-      --sidebar-bg: #ffffff;
-      --text-colorsdb: #3d444d;
-      --titledashboard: #000000ff;
-      --border-color-card: #d8d8d8ff;
-      --contrast: 1;
-      --item-active: #3b82f6;
-      --hover-item: rgba(99, 99, 99, 0.1);
-      --font-size: 16px;
-      --text-colorcrd: #111827;
-      --text-colorhd: #111827;
+        --bg-color: #f9fafb;
+        --text-color: #111827;
+        --card-bg: #ffffff;
+        --border-color: #e5e7eb;
+        --sidebar-bg: #ffffff;
+        --text-colorsdb: #3d444d;
+        --titledashboard: #000000ff;
+        --border-color-card: #d8d8d8ff;
+        --contrast: 1;
+        --item-active: #3b82f6;
+        --hover-item: rgba(99, 99, 99, 0.1);
+        --hover-hd: rgba(99, 99, 99, 0.1);
+        --font-size: 16px;
+        --text-colorcrd: #111827;
+        --text-colorhd: #111827;
+        --text-colorhd: #111827;
+        --dropdown-color: #ffffff;
     }
 
     [data-theme="dark"] {
-      --titledashboard: #000000ff;
-      --bg-color: #e4e4e4ff;
-      --text-colorcrd: #000000ff;
-      --text-colorsdb: #ffffffff;
-      --text-colorhd: #ffffffff;
-      --card-bg: #ffffffff;
-      --sidebar-bg: #2a2240;
-      --border-color: #3d3454;
-      --hover-item: rgba(108, 85, 150, 0.35);
-      --item-active: #6c55ba; /* Morado para modo oscuro */
-      --border-color-card: #b4b4b4ff;
+        --titledashboard: #ffffffff;
+        --bg-color: #e4e4e4ff;
+        --text-colorcrd: #000000ff;
+        --text-colorsdb: #ffffffff;
+        --text-colorhd: #ffffffff;
+        --card-bg: #ffffffff;
+        --sidebar-bg: #2a2240;
+        --border-color: #3d3454;
+        --hover-hd: rgba(108, 85, 150, 0.35);
+        --flecha-color: #ffffffff;
+        --hover-item: rgba(108, 85, 150, 0.35);
+        --item-active: #6c55ba;
+        --border-color-card: #b4b4b4ff;
+        --dropdown-color: #ffffffff;
     }
 
     body {
       background-color: var(--bg-color);
       color: var(--text-colorcrd);
       font-size: var(--font-size);
-      filter: contrast(var(--contrast));
       transition: all 0.3s ease;
     }
 
@@ -109,13 +114,38 @@
       transform: none;
     }
 
+    .flecha {
+      stroke: var(--flecha-color);
+      transition: stroke 0.3s ease;
+    }
     .nav-item svg { min-width: 20px; }
 
+    /* ===== DROPDOWN ===== */
+    .dropdown {
+        background-color: var(--dropdown-color);
+        border-radius: 0.75rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .dropdown:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+        border-color: rgba(108, 85, 150, 0.3); /* leve cambio al pasar el mouse */
+    }
     /* ===== HEADER ===== */
     .header-bg {
-      background-color: var(--sidebar-bg);
-      border-bottom: 1px solid var(--border-color);
-      color: var(--text-colorhd);
+        background-color: var(--sidebar-bg);
+        border-bottom: 1px solid var(--border-color);
+        color: var(--text-colorhd);
+    }
+
+    .header:hover {
+        background-color: var(--hover-hd);
+        border-radius: 0.75rem;
+        color: #ffffff;
+        box-shadow: inset 0 0 8px rgba(255, 255, 255, 0.1);
+        transform: none;
     }
 
     .titledashboard {
@@ -257,6 +287,14 @@
       ring: 2px;
       ring-color: #10b981;
     }
+
+    .modal-animate {
+        animation: slideDown 0.2s ease-out;
+    }
+
+    #profileButton:hover {
+        background-color: var(--hover-hd);
+    }
   </style>
 </head>
 
@@ -313,25 +351,60 @@
 
   <!-- Main Content -->
   <div class="content">
-    <header class="header-bg sticky top-0 z-30">
+  <!--HEADER-->
+  <header class="header-bg border-b border-gray-200 sticky top-0 z-30">
       <div class="px-4 py-4 flex items-center justify-between">
-        <div class="flex items-center gap-4">
-          <div class="relative hidden md:block"></div>
-        </div>
-        <div class="flex items-center gap-4">
-          <div class="flex items-center gap-2">
-            <img src="https://ui-avatars.com/api/?name=Admin+User&background=3b82f6&color=fff" alt="User" class="w-8 h-8 rounded-full">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-            </svg>
+              <!-- Título alineado a la izquierda -->
+              <h1 class="titledashboard text-2xl font-bold">Usuarios</h1>
+          <div class="flex items-center gap-4">
+              <div class="relative hidden md:block">
+              </div>
           </div>
-        </div>
+          <div class="header flex items-center gap-4">
+              <!--Botón de perfil -->
+              <div class="relative">
+              <!-- Botón del perfil -->
+              <button id="profileButton" class="flex items-center gap-2 rounded-xl px-3 py-2 transition-colors">
+                  <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Perfil" class="w-8 h-8 rounded-full">
+                  <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path class="flecha" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                  </svg>
+              </button>
+
+                  <!-- Dropdown del perfil -->
+                  <div id="profileDropdown"
+                  class="dropdown hidden absolute right-0 mt-3 w-80 rounded-2xl shadow-xl border border-gray-200 dark:border-transparent overflow-hidden z-50 transition-all duration-300">
+
+                  <!-- Encabezado -->
+                  <div class="p-4 bg-[var(--dropdown-color)] dark:bg-[#2b2343] backdrop-blur-xl">
+                      <div class="flex items-center space-x-4">
+                      <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png"
+                          alt="Usuario"
+                          class="w-12 h-12 rounded-full border border-gray-300 dark:border-gray-600 shadow-sm">
+                      <div>
+                          <p class="text-base font-semibold text-gray-900 dark:text-gray-100">Nombre del Usuario</p>
+                          <p class="text-sm text-gray-500 dark:text-gray-400">Administrador</p>
+                      </div>
+                      </div>
+                  </div>
+
+                  <!-- Opciones -->
+                  <div class="bg-[var(--dropdown-color)] dark:bg-[#241c37] transition-colors duration-300">
+                      <a href="logout.php"
+                      class="flex items-center gap-3 px-5 py-3 text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-[#3c2a4b] transition-all duration-200">
+                      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a2 2 0 11-4 0v-1m0-8V7a2 2 0 114 0v1"></path>
+                      </svg>
+                      Cerrar sesión
+                      </a>
+                  </div>
+                  </div>
+          </div>
       </div>
-    </header>
+  </header>
 
     <main class="p-6">
-      <h1 class="titledashboard text-3xl font-bold mb-6">Usuarios</h1>
-      
       <div class="tabs-container">
         <div class="tabs-wrapper">
           <div class="browser-tab active" data-tab="Todo">
@@ -535,7 +608,25 @@
       navLabels.forEach(l => l.style.display = 'none');
       navItems.forEach(i => i.classList.add('justify-center'));
     });
+    // Dropdown de perfil
+    const profileButton = document.getElementById('profileButton');
+    const profileDropdown = document.getElementById('profileDropdown');
 
+    profileButton.addEventListener('click', (e) => {
+        e.stopPropagation();
+        profileDropdown.classList.toggle('hidden');
+    });
+
+    // Cerrar dropdown al hacer clic fuera
+    document.addEventListener('click', (e) => {
+        if (!profileButton.contains(e.target) && !profileDropdown.contains(e.target)) {
+            profileDropdown.classList.add('hidden');
+        }
+    });
+
+    function cerrarDropdown() {
+        profileDropdown.classList.add('hidden');
+    }
     // Tabs
     const tabs = document.querySelectorAll('.browser-tab');
     const contents = document.querySelectorAll('.tab-content');
