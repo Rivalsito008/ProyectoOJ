@@ -19,9 +19,12 @@
             --back-ground-color: #3b82f6; /* Azul para el activo en modo claro */
             --item-active: #3b82f6;       /* Azul */
             --hover-item: rgba(99, 99, 99, 0.1); /* Hover gris suave modo claro */
+            --hover-hd: rgba(99, 99, 99, 0.1);
             --font-size: 16px;
+            --flecha-color: #525252ff;
             --text-colorcrd: #111827;
             --text-colorhd: #111827;
+            --dropdown-color: #ffffff;
         }
 
         [data-theme="dark"] {
@@ -34,8 +37,11 @@
             --sidebar-bg: #2a2240;
             --border-color: #3d3454;
             --hover-item: rgba(108, 85, 150, 0.35);
+            --hover-hd: rgba(108, 85, 150, 0.35);
+            --flecha-color: #ffffffff;
             --item-active: #6c55ba; /* Morado para modo oscuro */
             --border-color-card: #b4b4b4ff;
+            --dropdown-color: #2a2240;
         }
 
         body {
@@ -107,6 +113,13 @@
             min-width: 20px;
         }
 
+        /* ===== DROPDOWN ===== */
+        .dropdown {
+        background-color: var(--dropdown-color);
+        border-radius: 0.75rem;
+        transition: all 0.3s ease;
+        }
+
         /* ===== CARDS ===== */
         .card {
             background-color: var(--card-bg);
@@ -116,6 +129,10 @@
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
         }
 
+        .flecha {
+            stroke: var(--flecha-color);
+            transition: stroke 0.3s ease;
+        }
         /* Hover más sutil */
         .card:hover {
             transform: translateY(-2px) scale(1.01); /* Efecto más suave */
@@ -131,6 +148,13 @@
             color: var(--text-colorhd);
         }
 
+        .header:hover {
+            background-color: var(--hover-hd);
+            border-radius: 0.75rem;
+            color: #ffffff;
+            box-shadow: inset 0 0 8px rgba(255, 255, 255, 0.1);
+            transform: none;
+        }
         /* ===== INPUTS ===== */
         input[type="range"],
         input[type="radio"] {
@@ -145,10 +169,39 @@
             color: var(--titledashboard);
             transition: color 0.3s ease;
         }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-animate {
+            animation: slideDown 0.2s ease-out;
+        }
+
+        #profileButton:hover {
+            background-color: var(--hover-hd);
+        }
+
+            #profileButton:hover {
+                background-color: var(--hover-hd);
+            }
     </style>
 </head>
 <body>
-
+    <?php
+    $usuario = [
+        'nombre' => 'Admin User',
+        'rol' => 'Administrador',
+        'email' => 'admin@sigen.com'
+    ];
+    ?>
     <!-- Sidebar -->
     <aside id="sidebar" class="sidebar sidebar-collapsed fixed top-0 left-0 z-40 h-screen">
         <div class="h-full px-3 py-4 overflow-y-auto">
@@ -202,20 +255,51 @@
     <!-- Main Content -->
     <div class="content">
         <!-- Header -->
-        <header class="header-bg sticky top-0 z-30">
+        <header class="header-bg border-b border-gray-200 sticky top-0 z-30">
             <div class="px-4 py-4 flex items-center justify-between">
                 <div class="flex items-center gap-4">
                     <div class="relative hidden md:block">
                     </div>
                 </div>
                 
-                <div class="flex items-center gap-4">
-                    <div class="flex items-center gap-2">
-                        <img src="https://ui-avatars.com/api/?name=Admin+User&background=3b82f6&color=fff" alt="User" class="w-8 h-8 rounded-full">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                <div class="header flex items-center gap-4">
+                    <!--Botón de perfil -->
+                    <div class="relative">
+                    <!-- Botón del perfil -->
+                    <button id="profileButton" class="flex items-center gap-2 rounded-xl px-3 py-2 transition-colors">
+                        <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Perfil" class="w-8 h-8 rounded-full">
+                        <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path class="flecha" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                         </svg>
+                    </button>
+
+                    <!-- Dropdown del perfil -->
+                    <div id="profileDropdown"
+                        class="dropdown hidden absolute right-0 mt-2 w-80 rounded-xl shadow-2xl border border-gray-200 overflow-hidden z-50 modal-animate">
+                        
+                        <div class="p-4 border-b border-gray-200 bg-white dark:bg-[#1e1e2f]">
+                        <div class="flex items-center space-x-3">
+                            <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Usuario" class="w-10 h-10 rounded-full">
+                            <div>
+                            <p class="text-sm font-semibold text-gray-900 dark:text-white">Nombre del Usuario</p>
+                            <p class="text-xs text-gray-500 dark:text-gray-300">Administrador</p>
+                            </div>
+                        </div>
+                        </div>
+
+                        <div class="bg-white dark:bg-[#2a2a3b]">
+                            <a href="logout.php"
+                                class="flex items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-[#4a2a2a] transition-colors">
+                                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a2 2 0 11-4 0v-1m0-8V7a2 2 0 114 0v1"></path>
+                                </svg>
+                                Cerrar sesión
+                            </a>
+                        </div>
                     </div>
+                    </div>
+
                 </div>
             </div>
         </header>
@@ -376,6 +460,40 @@
             document.documentElement.style.setProperty('--contrast', contrasteGuardado);
             contrastValue.textContent = contrasteGuardado;
         }
+
+        // Dropdown de perfil
+        const profileButton = document.getElementById('profileButton');
+        const profileDropdown = document.getElementById('profileDropdown');
+
+        profileButton.addEventListener('click', (e) => {
+            e.stopPropagation();
+            profileDropdown.classList.toggle('hidden');
+        });
+
+        // Cerrar dropdown al hacer clic fuera
+        document.addEventListener('click', (e) => {
+            if (!profileButton.contains(e.target) && !profileDropdown.contains(e.target)) {
+                profileDropdown.classList.add('hidden');
+            }
+        });
+
+        function cerrarDropdown() {
+            profileDropdown.classList.add('hidden');
+        }
+
+        // Función para cerrar sesión
+        function cerrarSesion() {
+            if (confirm('¿Estás seguro que deseas cerrar sesión?')) {
+                window.location.href = 'logout.php';
+            }
+        }
+
+        // Cerrar dropdown con tecla ESC
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                cerrarDropdown();
+            }
+        });
 
         // Botones de cuenta
         document.getElementById('btnEditarPerfil').onclick = () => {

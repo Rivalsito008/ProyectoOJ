@@ -44,6 +44,21 @@
         .nav-item svg {
             min-width: 20px;
         }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-animate {
+            animation: slideDown 0.2s ease-out;
+        }
     </style>
 </head>
 <body class="bg-gray-50">
@@ -54,6 +69,13 @@
         ['title' => 'Victimas Totales', 'value' => '300', 'change' => '--'],
         ['title' => 'Casos Totales del Mes', 'value' => '25', 'change' => '+5.2% desde el mes pasado'],
         ['title' => 'Promedio de Puntajes Finales', 'value' => '50', 'change' => '--'],
+    ];
+    
+    // Datos del usuario (ejemplo - normalmente vendrían de la sesión)
+    $usuario = [
+        'nombre' => 'Admin User',
+        'rol' => 'Administrador',
+        'email' => 'admin@sigen.com'
     ];
     ?>
 
@@ -122,11 +144,56 @@
                 </div>
                 
                 <div class="flex items-center gap-4">
-                    <div class="flex items-center gap-2">
-                        <img src="https://ui-avatars.com/api/?name=Admin+User&background=3b82f6&color=fff" alt="User" class="w-8 h-8 rounded-full">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                        </svg>
+                    <div class="relative">
+                        <button id="profileButton" class="flex items-center gap-2 hover:bg-gray-50 rounded-lg px-3 py-2 transition-colors">
+                            <img src="https://ui-avatars.com/api/?name=<?php echo urlencode($usuario['nombre']); ?>&background=3b82f6&color=fff" alt="User" class="w-8 h-8 rounded-full">
+                            <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </button>
+
+                        <!-- Dropdown Menu (aparece debajo del botón) -->
+                        <div id="profileDropdown" class="hidden absolute right-0 mt-2 w-80 bg-white rounded-xl shadow-2xl border border-gray-200 overflow-hidden z-50 modal-animate">
+                            <!-- Header compacto con gradiente -->
+                            <div class="bg-gradient-to-r from-blue-500 to-purple-600 px-4 py-3 text-white">
+                                <div class="flex items-center gap-3">
+                                    <img src="https://ui-avatars.com/api/?name=<?php echo urlencode($usuario['nombre']); ?>&background=ffffff&color=3b82f6&size=48" alt="User" class="w-12 h-12 rounded-full border-2 border-white shadow-md">
+                                    <div class="flex-1 min-w-0">
+                                        <h3 class="text-base font-bold truncate"><?php echo $usuario['nombre']; ?></h3>
+                                        <p class="text-xs text-blue-100 truncate"><?php echo $usuario['email']; ?></p>
+                                    </div>
+                                    <button onclick="cerrarDropdown()" class="text-white hover:bg-white hover:bg-opacity-20 rounded-lg p-1 transition-colors flex-shrink-0">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Contenido -->
+                            <div class="p-4">
+                                <!-- Rol -->
+                                <div class="mb-3">
+                                    <span class="inline-flex items-center px-3 py-1.5 bg-blue-100 text-blue-800 text-xs font-bold rounded-lg">
+                                        <svg class="w-3.5 h-3.5 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                                        </svg>
+                                        <?php echo strtoupper($usuario['rol']); ?>
+                                    </span>
+                                </div>
+
+                                <!-- Divider -->
+                                <div class="border-t border-gray-200 my-3"></div>
+
+                                <!-- Botón Cerrar Sesión -->
+                                <button onclick="cerrarSesion()" class="w-full flex items-center justify-center gap-2 bg-red-500 hover:bg-red-600 text-white font-semibold py-2.5 px-4 rounded-lg transition-colors shadow-md hover:shadow-lg">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                                    </svg>
+                                    Cerrar Sesión
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -192,6 +259,41 @@
                 item.classList.add('justify-center');
             });
         });
+
+        // Dropdown de perfil
+        const profileButton = document.getElementById('profileButton');
+        const profileDropdown = document.getElementById('profileDropdown');
+
+        profileButton.addEventListener('click', (e) => {
+            e.stopPropagation();
+            profileDropdown.classList.toggle('hidden');
+        });
+
+        // Cerrar dropdown al hacer clic fuera
+        document.addEventListener('click', (e) => {
+            if (!profileButton.contains(e.target) && !profileDropdown.contains(e.target)) {
+                profileDropdown.classList.add('hidden');
+            }
+        });
+
+        function cerrarDropdown() {
+            profileDropdown.classList.add('hidden');
+        }
+
+        // Función para cerrar sesión
+        function cerrarSesion() {
+            if (confirm('¿Estás seguro que deseas cerrar sesión?')) {
+                window.location.href = 'logout.php';
+            }
+        }
+
+        // Cerrar dropdown con tecla ESC
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                cerrarDropdown();
+            }
+        });
+
         // Pie Chart
         const pieCtx = document.getElementById('pieChart').getContext('2d');
         new Chart(pieCtx, {
