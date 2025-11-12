@@ -1,23 +1,24 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SIGEN - Sistema de Gestión Notarial</title>
   <script>
-    (function(){
+    (function() {
       // Aplicar tema
       const t = localStorage.getItem('theme-preference') || 'auto';
       let f = t;
-      if(t === 'auto'){
+      if (t === 'auto') {
         f = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
       }
       document.documentElement.setAttribute('data-theme', f);
-      
+
       // Aplicar tamaño de fuente
       const fontSize = localStorage.getItem('font-size') || '16';
       document.documentElement.style.setProperty('--font-size', fontSize + 'px');
-      
+
       // Aplicar contraste
       const contrast = localStorage.getItem('contrast') || '1';
       document.documentElement.style.setProperty('--contrast', contrast);
@@ -28,40 +29,40 @@
 
   <style>
     :root {
-        --bg-color: #f9fafb;
-        --text-color: #111827;
-        --card-bg: #ffffff;
-        --border-color: #e5e7eb;
-        --sidebar-bg: #ffffff;
-        --text-colorsdb: #3d444d;
-        --titledashboard: #000000ff;
-        --border-color-card: #d8d8d8ff;
-        --contrast: 1;
-        --item-active: #3b82f6;
-        --hover-item: rgba(99, 99, 99, 0.1);
-        --hover-hd: rgba(99, 99, 99, 0.1);
-        --font-size: 16px;
-        --text-colorcrd: #111827;
-        --text-colorhd: #111827;
-        --text-colorhd: #111827;
-        --dropdown-color: #ffffff;
+      --bg-color: #f9fafb;
+      --text-color: #111827;
+      --card-bg: #ffffff;
+      --border-color: #e5e7eb;
+      --sidebar-bg: #ffffff;
+      --text-colorsdb: #3d444d;
+      --titledashboard: #000000ff;
+      --border-color-card: #d8d8d8ff;
+      --contrast: 1;
+      --item-active: #3b82f6;
+      --hover-item: rgba(99, 99, 99, 0.1);
+      --hover-hd: rgba(99, 99, 99, 0.1);
+      --font-size: 16px;
+      --text-colorcrd: #111827;
+      --text-colorhd: #111827;
+      --text-colorhd: #111827;
+      --dropdown-color: #ffffff;
     }
 
     [data-theme="dark"] {
-        --titledashboard: #ffffffff;
-        --bg-color: #e4e4e4ff;
-        --text-colorcrd: #000000ff;
-        --text-colorsdb: #ffffffff;
-        --text-colorhd: #ffffffff;
-        --card-bg: #ffffffff;
-        --sidebar-bg: #2a2240;
-        --border-color: #3d3454;
-        --hover-hd: rgba(108, 85, 150, 0.35);
-        --flecha-color: #ffffffff;
-        --hover-item: rgba(108, 85, 150, 0.35);
-        --item-active: #6c55ba;
-        --border-color-card: #b4b4b4ff;
-        --dropdown-color: #ffffffff;
+      --titledashboard: #ffffffff;
+      --bg-color: #e4e4e4ff;
+      --text-colorcrd: #000000ff;
+      --text-colorsdb: #ffffffff;
+      --text-colorhd: #ffffffff;
+      --card-bg: #ffffffff;
+      --sidebar-bg: #2a2240;
+      --border-color: #3d3454;
+      --hover-hd: rgba(108, 85, 150, 0.35);
+      --flecha-color: #ffffffff;
+      --hover-item: rgba(108, 85, 150, 0.35);
+      --item-active: #6c55ba;
+      --border-color-card: #b4b4b4ff;
+      --dropdown-color: #ffffffff;
     }
 
     body {
@@ -79,9 +80,18 @@
       border-right: 1px solid var(--border-color);
     }
 
-    .sidebar-collapsed { width: 80px; }
-    .sidebar-expanded { width: 256px; }
-    .content { margin-left: 80px; transition: margin-left 0.3s ease; }
+    .sidebar-collapsed {
+      width: 80px;
+    }
+
+    .sidebar-expanded {
+      width: 256px;
+    }
+
+    .content {
+      margin-left: 80px;
+      transition: margin-left 0.3s ease;
+    }
 
     /* ===== NAV ITEMS ===== */
     .nav-item {
@@ -118,34 +128,39 @@
       stroke: var(--flecha-color);
       transition: stroke 0.3s ease;
     }
-    .nav-item svg { min-width: 20px; }
+
+    .nav-item svg {
+      min-width: 20px;
+    }
 
     /* ===== DROPDOWN ===== */
     .dropdown {
-        background-color: var(--dropdown-color);
-        border-radius: 0.75rem;
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      background-color: var(--dropdown-color);
+      border-radius: 0.75rem;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
     }
 
     .dropdown:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-        border-color: rgba(108, 85, 150, 0.3); /* leve cambio al pasar el mouse */
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+      border-color: rgba(108, 85, 150, 0.3);
+      /* leve cambio al pasar el mouse */
     }
+
     /* ===== HEADER ===== */
     .header-bg {
-        background-color: var(--sidebar-bg);
-        border-bottom: 1px solid var(--border-color);
-        color: var(--text-colorhd);
+      background-color: var(--sidebar-bg);
+      border-bottom: 1px solid var(--border-color);
+      color: var(--text-colorhd);
     }
 
     .header:hover {
-        background-color: var(--hover-hd);
-        border-radius: 0.75rem;
-        color: #ffffff;
-        box-shadow: inset 0 0 8px rgba(255, 255, 255, 0.1);
-        transform: none;
+      background-color: var(--hover-hd);
+      border-radius: 0.75rem;
+      color: #ffffff;
+      box-shadow: inset 0 0 8px rgba(255, 255, 255, 0.1);
+      transform: none;
     }
 
     .titledashboard {
@@ -153,8 +168,13 @@
       transition: color 0.3s ease;
     }
 
-    .hide-on-collapse { display: none; }
-    .hidden { display: none; }
+    .hide-on-collapse {
+      display: none;
+    }
+
+    .hidden {
+      display: none;
+    }
 
     /* ===== TABS ===== */
     .tabs-container {
@@ -176,7 +196,7 @@
       background: transparent;
       border-radius: 8px 8px 0 0;
       cursor: pointer;
-      transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       display: flex;
       align-items: center;
       gap: 10px;
@@ -199,7 +219,7 @@
 
     .browser-tab.active {
       background: var(--card-bg);
-      box-shadow: 0 -2px 4px rgba(0,0,0,0.05);
+      box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.05);
     }
 
     .tab-indicator {
@@ -223,7 +243,7 @@
       white-space: nowrap;
       opacity: 0;
       transform: translateX(-10px);
-      transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     .browser-tab:hover .tab-label,
@@ -237,12 +257,27 @@
       min-height: 500px;
       padding: 40px;
       border-radius: 12px;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     }
 
-    .tab-content { display: none; }
-    .tab-content.active { display: block; animation: fadeIn 0.3s ease; }
-    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+
+      to {
+        opacity: 1;
+      }
+    }
 
     /* ===== TABLES ===== */
     table {
@@ -276,24 +311,19 @@
       border-top: 1px solid var(--border-color);
     }
 
-    input, select {
+    input,
+    select {
       background-color: var(--card-bg);
       color: var(--text-colorcrd);
       border-color: var(--border-color);
     }
 
-    input:focus, select:focus {
-      outline: none;
-      ring: 2px;
-      ring-color: #10b981;
-    }
-
     .modal-animate {
-        animation: slideDown 0.2s ease-out;
+      animation: slideDown 0.2s ease-out;
     }
 
     #profileButton:hover {
-        background-color: var(--hover-hd);
+      background-color: var(--hover-hd);
     }
   </style>
 </head>
@@ -306,7 +336,7 @@
         <div id="logo-compact" class="w-8 h-8 rounded-lg bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold">SG</div>
         <h2 id="logo-full" class="hide-on-collapse text-2xl font-bold bg-gradient-to-r from-blue-500 to-purple-600 bg-clip-text text-transparent ml-3">SIGEN</h2>
       </div>
-      
+
       <nav class="space-y-2">
         <a href="inicio.php" class="nav-item flex items-center px-3 py-3 rounded-lg justify-center">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -337,7 +367,7 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
           </svg>
           <span class="nav-label hide-on-collapse font-medium whitespace-nowrap ml-3">Usuarios</span>
-        </a>                
+        </a>
         <a href="configuracion.php" class="nav-item flex items-center px-3 py-3 rounded-lg justify-center">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
@@ -351,58 +381,58 @@
 
   <!-- Main Content -->
   <div class="content">
-  <!--HEADER-->
-  <header class="header-bg border-b border-gray-200 sticky top-0 z-30">
+    <!--HEADER-->
+    <header class="header-bg border-b border-gray-200 sticky top-0 z-30">
       <div class="px-4 py-4 flex items-center justify-between">
-              <!-- Título alineado a la izquierda -->
-              <h1 class="titledashboard text-2xl font-bold">Usuarios</h1>
-          <div class="flex items-center gap-4">
-              <div class="relative hidden md:block">
+        <!-- Título alineado a la izquierda -->
+        <h1 class="titledashboard text-2xl font-bold">Usuarios</h1>
+        <div class="flex items-center gap-4">
+          <div class="relative hidden md:block">
+          </div>
+        </div>
+        <div class="header flex items-center gap-4">
+          <!--Botón de perfil -->
+          <div class="relative">
+            <!-- Botón del perfil -->
+            <button id="profileButton" class="flex items-center gap-2 rounded-xl px-3 py-2 transition-colors">
+              <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Perfil" class="w-8 h-8 rounded-full">
+              <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path class="flecha" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+              </svg>
+            </button>
+
+            <!-- Dropdown del perfil -->
+            <div id="profileDropdown"
+              class="dropdown hidden absolute right-0 mt-3 w-80 rounded-2xl shadow-xl border border-gray-200 dark:border-transparent overflow-hidden z-50 transition-all duration-300">
+
+              <!-- Encabezado -->
+              <div class="p-4 bg-[var(--dropdown-color)] dark:bg-[#2b2343] backdrop-blur-xl">
+                <div class="flex items-center space-x-4">
+                  <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png"
+                    alt="Usuario"
+                    class="w-12 h-12 rounded-full border border-gray-300 dark:border-gray-600 shadow-sm">
+                  <div>
+                    <p class="text-base font-semibold text-gray-900 dark:text-gray-100">Nombre del Usuario</p>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">Administrador</p>
+                  </div>
+                </div>
               </div>
-          </div>
-          <div class="header flex items-center gap-4">
-              <!--Botón de perfil -->
-              <div class="relative">
-              <!-- Botón del perfil -->
-              <button id="profileButton" class="flex items-center gap-2 rounded-xl px-3 py-2 transition-colors">
-                  <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Perfil" class="w-8 h-8 rounded-full">
-                  <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path class="flecha" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+
+              <!-- Opciones -->
+              <div class="bg-[var(--dropdown-color)] dark:bg-[#241c37] transition-colors duration-300">
+                <a href="logout.php"
+                  class="flex items-center gap-3 px-5 py-3 text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-[#3c2a4b] transition-all duration-200">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a2 2 0 11-4 0v-1m0-8V7a2 2 0 114 0v1"></path>
                   </svg>
-              </button>
-
-                  <!-- Dropdown del perfil -->
-                  <div id="profileDropdown"
-                  class="dropdown hidden absolute right-0 mt-3 w-80 rounded-2xl shadow-xl border border-gray-200 dark:border-transparent overflow-hidden z-50 transition-all duration-300">
-
-                  <!-- Encabezado -->
-                  <div class="p-4 bg-[var(--dropdown-color)] dark:bg-[#2b2343] backdrop-blur-xl">
-                      <div class="flex items-center space-x-4">
-                      <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png"
-                          alt="Usuario"
-                          class="w-12 h-12 rounded-full border border-gray-300 dark:border-gray-600 shadow-sm">
-                      <div>
-                          <p class="text-base font-semibold text-gray-900 dark:text-gray-100">Nombre del Usuario</p>
-                          <p class="text-sm text-gray-500 dark:text-gray-400">Administrador</p>
-                      </div>
-                      </div>
-                  </div>
-
-                  <!-- Opciones -->
-                  <div class="bg-[var(--dropdown-color)] dark:bg-[#241c37] transition-colors duration-300">
-                      <a href="logout.php"
-                      class="flex items-center gap-3 px-5 py-3 text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-[#3c2a4b] transition-all duration-200">
-                      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                              d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a2 2 0 11-4 0v-1m0-8V7a2 2 0 114 0v1"></path>
-                      </svg>
-                      Cerrar sesión
-                      </a>
-                  </div>
-                  </div>
+                  Cerrar sesión
+                </a>
+              </div>
+            </div>
           </div>
-      </div>
-  </header>
+        </div>
+    </header>
 
     <main class="p-6">
       <div class="tabs-container">
@@ -613,24 +643,24 @@
     const profileDropdown = document.getElementById('profileDropdown');
 
     profileButton.addEventListener('click', (e) => {
-        e.stopPropagation();
-        profileDropdown.classList.toggle('hidden');
+      e.stopPropagation();
+      profileDropdown.classList.toggle('hidden');
     });
 
     // Cerrar dropdown al hacer clic fuera
     document.addEventListener('click', (e) => {
-        if (!profileButton.contains(e.target) && !profileDropdown.contains(e.target)) {
-            profileDropdown.classList.add('hidden');
-        }
+      if (!profileButton.contains(e.target) && !profileDropdown.contains(e.target)) {
+        profileDropdown.classList.add('hidden');
+      }
     });
 
     function cerrarDropdown() {
-        profileDropdown.classList.add('hidden');
+      profileDropdown.classList.add('hidden');
     }
     // Tabs
     const tabs = document.querySelectorAll('.browser-tab');
     const contents = document.querySelectorAll('.tab-content');
-    
+
     tabs.forEach(tab => {
       tab.addEventListener('click', () => {
         tabs.forEach(t => t.classList.remove('active'));
@@ -650,4 +680,5 @@
     });
   </script>
 </body>
+
 </html>

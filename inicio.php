@@ -1,130 +1,165 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SIGEN - Sistema de Gestion Notarial</title>
+    <title>SIGEN - Sistema de Gestión Notarial</title>
     <script>
-    (function(){
-      // Aplicar tema
-      const t = localStorage.getItem('theme-preference') || 'auto';
-      let f = t;
-      if(t === 'auto'){
-        f = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-      }
-      document.documentElement.setAttribute('data-theme', f);
-      
-      // Aplicar tamaño de fuente
-      const fontSize = localStorage.getItem('font-size') || '16';
-      document.documentElement.style.setProperty('--font-size', fontSize + 'px');
-      
-      // Aplicar contraste
-      const contrast = localStorage.getItem('contrast') || '1';
-      document.documentElement.style.setProperty('--contrast', contrast);
-    })();
+        (function() {
+            // Aplicar tema
+            const t = localStorage.getItem('theme-preference') || 'auto';
+            let f = t;
+            if (t === 'auto') {
+                f = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+            }
+            document.documentElement.setAttribute('data-theme', f);
+
+            // Aplicar tamaño de fuente
+            const fontSize = localStorage.getItem('font-size') || '16';
+            document.documentElement.style.setProperty('--font-size', fontSize + 'px');
+
+            // Aplicar contraste
+            const contrast = localStorage.getItem('contrast') || '1';
+            document.documentElement.style.setProperty('--contrast', contrast);
+        })();
     </script>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <style>
         :root {
-        --bg-color: #f9fafb;
-        --text-color: #111827;
-        --card-bg: #ffffff;
-        --border-color: #e5e7eb;
-        --sidebar-bg: #ffffff;
-        --text-colorsdb: #3d444d;
-        --titledashboard: #000000ff;
-        --border-color-card: #d8d8d8ff;
-        --contrast: 1;
-        --item-active: #3b82f6;
-        --hover-item: rgba(99, 99, 99, 0.1);
-        --font-size: 16px;
-        --text-colorcrd: #111827;
-        --text-colorhd: #111827;
+            --bg-color: #f9fafb;
+            --text-color: #111827;
+            --card-bg: #ffffff;
+            --border-color: #e5e7eb;
+            --sidebar-bg: #ffffff;
+            --text-colorsdb: #3d444d;
+            --titledashboard: #000000ff;
+            --border-color-card: #d8d8d8ff;
+            --contrast: 1;
+            --item-active: #3b82f6;
+            --hover-item: rgba(99, 99, 99, 0.1);
+            --hover-hd: rgba(99, 99, 99, 0.1);
+            --font-size: 16px;
+            --text-colorcrd: #111827;
+            --text-colorhd: #111827;
+            --text-colorhd: #111827;
+            --dropdown-color: #ffffff;
         }
 
         [data-theme="dark"] {
-        --titledashboard: #000000ff;
-        --bg-color: #e4e4e4ff;
-        --text-colorcrd: #000000ff;
-        --text-colorsdb: #ffffffff;
-        --text-colorhd: #ffffffff;
-        --card-bg: #ffffffff;
-        --sidebar-bg: #2a2240;
-        --border-color: #3d3454;
-        --hover-item: rgba(108, 85, 150, 0.35);
-        --item-active: #6c55ba; /* Morado para modo oscuro */
-        --border-color-card: #b4b4b4ff;
+            --titledashboard: #ffffffff;
+            --bg-color: #e4e4e4ff;
+            --text-colorcrd: #000000ff;
+            --text-colorsdb: #ffffffff;
+            --text-colorhd: #ffffffff;
+            --card-bg: #ffffffff;
+            --sidebar-bg: #2a2240;
+            --border-color: #3d3454;
+            --hover-hd: rgba(108, 85, 150, 0.35);
+            --flecha-color: #ffffffff;
+            --hover-item: rgba(108, 85, 150, 0.35);
+            --item-active: #6c55ba;
+            --border-color-card: #b4b4b4ff;
+            --dropdown-color: #ffffffff;
         }
 
         body {
             background-color: var(--bg-color);
-            color: var(--text-color);
+            color: var(--text-colorcrd);
             font-size: var(--font-size);
             transition: all 0.3s ease;
-            margin: 0;
-            padding: 0;
         }
 
-        /* SIDEBAR STYLES */
+        /* ===== SIDEBAR ===== */
         .sidebar {
             transition: width 0.3s ease;
             background-color: var(--sidebar-bg);
             color: var(--text-colorsdb);
             border-right: 1px solid var(--border-color);
         }
-        
+
         .sidebar-collapsed {
             width: 80px;
         }
-        
+
         .sidebar-expanded {
             width: 256px;
         }
-        
+
         .content {
             margin-left: 80px;
             transition: margin-left 0.3s ease;
-            background-color: var(--bg-color);
-            min-height: 100vh;
         }
-        
-        .hide-on-collapse {
-            display: none;
-        }
-        
+
+        /* ===== NAV ITEMS ===== */
         .nav-item {
-            transition: all 0.2s ease;
+            transition: all 0.25s ease;
             color: var(--text-colorsdb);
-            text-decoration: none;
-            display: flex;
-            align-items: center;
+            border-radius: 0.5rem;
         }
-        
+
         .nav-item:hover {
             background-color: var(--hover-item);
-        }
-        
-        .nav-item.active {
-            background-color: var(--item-active);
-            color: white;
-        }
-        
-        .nav-item svg {
-            min-width: 20px;
+            color: var(--text-colorsdb);
         }
 
         [data-theme="dark"] .nav-item:hover {
             background-color: var(--hover-item);
+            color: #ffffff;
             box-shadow: inset 0 0 6px rgba(180, 160, 255, 0.2);
             transform: translateX(2px);
         }
 
-        /* HEADER STYLES */
+        .nav-item.active {
+            background-color: var(--item-active);
+            color: #ffffff;
+            box-shadow: inset 0 0 8px rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-item.active:hover {
+            background-color: var(--item-active);
+            color: #ffffff;
+            transform: none;
+        }
+
+        .flecha {
+            stroke: var(--flecha-color);
+            transition: stroke 0.3s ease;
+        }
+
+        .nav-item svg {
+            min-width: 20px;
+        }
+
+        /* ===== DROPDOWN ===== */
+        .dropdown {
+            background-color: var(--dropdown-color);
+            border-radius: 0.75rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .dropdown:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+            border-color: rgba(108, 85, 150, 0.3);
+            /* leve cambio al pasar el mouse */
+        }
+
+        /* ===== HEADER ===== */
         .header-bg {
             background-color: var(--sidebar-bg);
             border-bottom: 1px solid var(--border-color);
             color: var(--text-colorhd);
+        }
+
+        .header:hover {
+            background-color: var(--hover-hd);
+            border-radius: 0.75rem;
+            color: #ffffff;
+            box-shadow: inset 0 0 8px rgba(255, 255, 255, 0.1);
+            transform: none;
         }
 
         .titledashboard {
@@ -132,60 +167,315 @@
             transition: color 0.3s ease;
         }
 
-        .hide-on-collapse { display: none; }
-        .hidden { display: none; }
-
-        /* CARD STYLES - Manteniendo los estilos originales de Tailwind */
-        .card-theme {
-            background-color: var(--card-bg);
-            border: 1px solid var(--border-color);
+        .hide-on-collapse {
+            display: none;
         }
 
-        @keyframes slideDown {
+        .hidden {
+            display: none;
+        }
+
+        /* ===== TABS ===== */
+        .tabs-container {
+            background: transparent;
+            padding-top: 8px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .tabs-wrapper {
+            display: flex;
+            gap: 8px;
+            padding: 0 8px;
+        }
+
+        .browser-tab {
+            position: relative;
+            padding: 12px 20px;
+            background: transparent;
+            border-radius: 8px 8px 0 0;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 50px;
+            width: 50px;
+            border: none;
+            overflow: hidden;
+        }
+
+        .browser-tab:hover,
+        .browser-tab.active {
+            width: 160px;
+            min-width: 160px;
+            padding: 12px 20px;
+        }
+
+        .browser-tab:hover:not(.active) {
+            background: var(--hover-item);
+        }
+
+        .browser-tab.active {
+            background: var(--card-bg);
+            box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .tab-indicator {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            transition: transform 0.3s ease;
+        }
+
+        .browser-tab:hover .tab-indicator,
+        .browser-tab.active .tab-indicator {
+            transform: scale(1.1);
+        }
+
+        .tab-label {
+            font-weight: 500;
+            color: var(--text-colorcrd);
+            font-size: 14px;
+            user-select: none;
+            white-space: nowrap;
+            opacity: 0;
+            transform: translateX(-10px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .browser-tab:hover .tab-label,
+        .browser-tab.active .tab-label {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .tab-content-wrapper {
+            background: var(--card-bg);
+            min-height: 500px;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
             from {
                 opacity: 0;
-                transform: translateY(-10px);
             }
+
             to {
                 opacity: 1;
-                transform: translateY(0);
             }
+        }
+
+        /* ===== TABLES ===== */
+        table {
+            background-color: var(--card-bg);
+            color: var(--text-colorcrd);
+        }
+
+        thead {
+            background-color: var(--bg-color);
+            color: var(--text-colorcrd);
+        }
+
+        tbody tr {
+            background-color: var(--card-bg);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        /* ===== MODAL ===== */
+        .modal-content {
+            background-color: var(--card-bg);
+            color: var(--text-colorcrd);
+        }
+
+        .modal-header {
+            background-color: var(--bg-color);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .modal-footer {
+            background-color: var(--bg-color);
+            border-top: 1px solid var(--border-color);
+        }
+
+        input,
+        select {
+            background-color: var(--card-bg);
+            color: var(--text-colorcrd);
+            border-color: var(--border-color);
         }
 
         .modal-animate {
             animation: slideDown 0.2s ease-out;
         }
 
-        /* DROPDOWN STYLES */
-        .dropdown-custom {
-            background-color: var(--card-bg);
-            border: 1px solid var(--border-color);
+        #profileButton:hover {
+            background-color: var(--hover-hd);
         }
 
-        /* Asegurar que los textos mantengan sus colores originales */
-        .text-preserve {
-            color: inherit;
+        /* ===== MAPA - DISEÑO COMPACTO ===== */
+        .map-card {
+            background-color: var(--card-bg);
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--border-color);
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .map-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .map-card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-colorcrd);
+        }
+
+        .map-card-content {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 1.5rem;
+            align-items: start;
+        }
+
+        .map-wrapper {
+            position: relative;
+            background-color: var(--card-bg);
+            border-radius: 0.75rem;
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .map-info-panel {
+            background-color: var(--bg-color);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            border: 1px solid var(--border-color);
+            height: fit-content;
+        }
+
+        .map-info-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--text-colorcrd);
+        }
+
+        .map-info-content {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .map-info-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .map-info-item:last-child {
+            border-bottom: none;
+        }
+
+        .map-info-label {
+            font-size: 0.875rem;
+            color: #6b7280;
+        }
+
+        .map-info-value {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--item-active);
+        }
+
+        /* Controles del mapa */
+        .map-control-btn:hover {
+            background-color: var(--hover-item);
+            transform: scale(1.1);
+        }
+
+        .map-reset-btn:hover {
+            background-color: var(--hover-item);
+            transform: scale(1.1);
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .map-card-content {
+                grid-template-columns: 1fr;
+            }
+
+            .map-info-panel {
+                order: 2;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .map-wrapper {
+                height: 400px;
+            }
+        }
+
+        /* ESTILO DEL MAPA */
+        .container {
+            height: 100%;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container svg {
+            height: 100%;
+            width: 100%;
+            max-height: none;
+            /* Eliminar límites máximos */
+            max-width: none;
+            object-fit: contain;
+            /* Mantener proporciones */
+        }
+
+        /* Asegurar que los paths del mapa tengan el estilo correcto */
+        .container path {
+            fill: #60a5fa;
+            stroke: black;
+            stroke-width: 2px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        /* Hover para los paths individuales */
+        .container path:hover {
+            fill: #0077ffff;
+            stroke-width: 2.5;
         }
     </style>
 </head>
-<body>
-    <?php
-    // Datos de ejemplo para el dashboard
-    $stats = [
-        ['title' => 'Tribunales Activos', 'value' => '11', 'change' => '--'],
-        ['title' => 'Victimas Totales', 'value' => '300', 'change' => '--'],
-        ['title' => 'Casos Totales del Mes', 'value' => '25', 'change' => '+5.2% desde el mes pasado'],
-        ['title' => 'Promedio de Puntajes Finales', 'value' => '50', 'change' => '--'],
-    ];
-    
-    // Datos del usuario (ejemplo - normalmente vendrían de la sesión)
-    $usuario = [
-        'nombre' => 'Admin User',
-        'rol' => 'Administrador',
-        'email' => 'admin@sigen.com'
-    ];
-    ?>
 
+<body>
     <!-- Sidebar -->
     <aside id="sidebar" class="sidebar sidebar-collapsed fixed top-0 left-0 z-40 h-screen">
         <div class="h-full px-3 py-4 overflow-y-auto">
@@ -193,7 +483,7 @@
                 <div id="logo-compact" class="w-8 h-8 rounded-lg bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold">SG</div>
                 <h2 id="logo-full" class="hide-on-collapse text-2xl font-bold bg-gradient-to-r from-blue-500 to-purple-600 bg-clip-text text-transparent ml-3">SIGEN</h2>
             </div>
-            
+
             <nav class="space-y-2">
                 <a href="inicio.php" class="nav-item active flex items-center px-3 py-3 rounded-lg justify-center">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -224,7 +514,7 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
                     </svg>
                     <span class="nav-label hide-on-collapse font-medium whitespace-nowrap ml-3">Usuarios</span>
-                </a>                
+                </a>
                 <a href="configuracion.php" class="nav-item flex items-center px-3 py-3 rounded-lg justify-center">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
@@ -238,11 +528,11 @@
 
     <!-- Main Content -->
     <div class="content">
-        <!-- Header -->
+        <!--HEADER-->
         <header class="header-bg border-b border-gray-200 sticky top-0 z-30">
             <div class="px-4 py-4 flex items-center justify-between">
-                    <!-- Título alineado a la izquierda -->
-                    <h1 class="titledashboard text-2xl font-bold">Configuración</h1>
+                <!-- Título alineado a la izquierda -->
+                <h1 class="titledashboard text-2xl font-bold">Dashboard</h1>
                 <div class="flex items-center gap-4">
                     <div class="relative hidden md:block">
                     </div>
@@ -250,72 +540,206 @@
                 <div class="header flex items-center gap-4">
                     <!--Botón de perfil -->
                     <div class="relative">
-                    <!-- Botón del perfil -->
-                    <button id="profileButton" class="flex items-center gap-2 rounded-xl px-3 py-2 transition-colors">
-                        <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Perfil" class="w-8 h-8 rounded-full">
-                        <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path class="flecha" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                        </svg>
-                    </button>
+                        <!-- Botón del perfil -->
+                        <button id="profileButton" class="flex items-center gap-2 rounded-xl px-3 py-2 transition-colors">
+                            <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Perfil" class="w-8 h-8 rounded-full">
+                            <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path class="flecha" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </button>
 
                         <!-- Dropdown del perfil -->
                         <div id="profileDropdown"
-                        class="dropdown hidden absolute right-0 mt-3 w-80 rounded-2xl shadow-xl border border-gray-200 dark:border-transparent overflow-hidden z-50 transition-all duration-300">
+                            class="dropdown hidden absolute right-0 mt-3 w-80 rounded-2xl shadow-xl border border-gray-200 dark:border-transparent overflow-hidden z-50 transition-all duration-300">
 
-                        <!-- Encabezado -->
-                        <div class="p-4 bg-[var(--dropdown-color)] dark:bg-[#2b2343] backdrop-blur-xl">
-                            <div class="flex items-center space-x-4">
-                            <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png"
-                                alt="Usuario"
-                                class="w-12 h-12 rounded-full border border-gray-300 dark:border-gray-600 shadow-sm">
-                            <div>
-                                <p class="text-base font-semibold text-gray-900 dark:text-gray-100">Nombre del Usuario</p>
-                                <p class="text-sm text-gray-500 dark:text-gray-400">Administrador</p>
+                            <!-- Encabezado -->
+                            <div class="p-4 bg-[var(--dropdown-color)] dark:bg-[#2b2343] backdrop-blur-xl">
+                                <div class="flex items-center space-x-4">
+                                    <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png"
+                                        alt="Usuario"
+                                        class="w-12 h-12 rounded-full border border-gray-300 dark:border-gray-600 shadow-sm">
+                                    <div>
+                                        <p class="text-base font-semibold text-gray-900 dark:text-gray-100">Nombre del Usuario</p>
+                                        <p class="text-sm text-gray-500 dark:text-gray-400">Administrador</p>
+                                    </div>
+                                </div>
                             </div>
-                            </div>
-                        </div>
 
-                        <!-- Opciones -->
-                        <div class="bg-[var(--dropdown-color)] dark:bg-[#241c37] transition-colors duration-300">
-                            <a href="logout.php"
-                            class="flex items-center gap-3 px-5 py-3 text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-[#3c2a4b] transition-all duration-200">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a2 2 0 11-4 0v-1m0-8V7a2 2 0 114 0v1"></path>
-                            </svg>
-                            Cerrar sesión
-                            </a>
+                            <!-- Opciones -->
+                            <div class="bg-[var(--dropdown-color)] dark:bg-[#241c37] transition-colors duration-300">
+                                <a href="logout.php"
+                                    class="flex items-center gap-3 px-5 py-3 text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-[#3c2a4b] transition-all duration-200">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a2 2 0 11-4 0v-1m0-8V7a2 2 0 114 0v1"></path>
+                                    </svg>
+                                    Cerrar sesión
+                                </a>
+                            </div>
                         </div>
-                        </div>
+                    </div>
                 </div>
-            </div>
         </header>
 
-        <!-- Dashboard Content -->
+        <!-- Content -->
         <main class="p-6">
-            <div class="mb-6">
-                <h1 class="text-3xl font-bold mb-2 text-preserve">Dashboard</h1>
-                <p class="text-gray-600 text-preserve">Bienvenido de vuelta, aquí está tu resumen</p>
-            </div>
+            <!-- Tarjetas de estadísticas-->
+            <section class="card grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <!-- Riesgo Bajo -->
+                <div class="bg-white rounded-2xl shadow-md p-5 flex flex-col justify-between border border-gray-200 hover:shadow-lg transition">
+                    <div>
+                        <h2 class="text-lg font-semibold text-gray-800">Casos de Riesgo Bajo</h2>
+                        <p class="text-3xl font-bold text-green-500 mt-2">12</p>
+                    </div>
+                    <p class="text-sm text-gray-500 mt-3">
+                        Desde el mes pasado
+                    </p>
+                </div>
 
-            <!-- Stats Cards -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-                <?php foreach ($stats as $stat): ?>
-                <div class="card rounded-xl p-6 shadow">
-                    <p class="text-sm text-gray-600 mb-1 text-preserve"><?php echo $stat['title']; ?></p>
-                    <p class="text-3xl font-bold mb-2 text-preserve"><?php echo $stat['value']; ?></p>
-                    <p class="text-sm text-green-500 font-medium text-preserve"><?php echo $stat['change']; ?></p>
+                <!-- Riesgo Moderado -->
+                <div class="bg-white rounded-2xl shadow-md p-5 flex flex-col justify-between border border-gray-200 hover:shadow-lg transition">
+                    <div>
+                        <h2 class="text-lg font-semibold text-gray-800">Casos de Riesgo Moderado</h2>
+                        <p class="text-3xl font-bold text-yellow-500 mt-2">96</p>
+                    </div>
+                    <p class="text-sm text-gray-500 mt-3">
+                        Desde el mes pasado
+                    </p>
                 </div>
-                <?php endforeach; ?>
-            </div>
-            
-            <div class="card rounded-xl p-6 shadow">
-                <h3 class="text-lg font-semibold mb-4 text-preserve">Niveles de Riesgo en Zonas Geograficas</h3>
-                <div style="position: relative; height: 300px;">
-                    <canvas id="pieChart"></canvas>
+
+                <!-- Riesgo Alto -->
+                <div class="bg-white rounded-2xl shadow-md p-5 flex flex-col justify-between border border-gray-200 hover:shadow-lg transition">
+                    <div>
+                        <h2 class="text-lg font-semibold text-gray-800">Casos de Riesgo Alto</h2>
+                        <p class="text-3xl font-bold text-orange-500 mt-2">54</p>
+                    </div>
+                    <p class="text-sm text-gray-500 mt-3">
+                        desde el mes pasado
+                    </p>
                 </div>
-            </div>
+
+                <!-- Riesgo Extremo -->
+                <div class="bg-white rounded-2xl shadow-md p-5 flex flex-col justify-between border border-gray-200 hover:shadow-lg transition">
+                    <div>
+                        <h2 class="text-lg font-semibold text-gray-800">Casos de Riesgo Extremo</h2>
+                        <p class="text-3xl font-bold text-red-500 mt-2">22</p>
+                    </div>
+                    <p class="text-sm text-gray-500 mt-3">
+                        Desde el mes pasado
+                    </p>
+                </div>
+            </section>
+
+            <!-- Sección del Mapa Compacta -->
+            <section class="map-card">
+                <div class="map-card-header">
+                    <h2 class="map-card-title">Mapa de Casos por Departamento</h2>
+                </div>
+
+                <div class="map-card-content">
+                    <!-- Mapa -->
+                    <div class="map-wrapper">
+                        <div class="container">
+                            <svg version="1.2" viewBox="0 0 1000 891" xmlns="http://www.w3.org/2000/svg" id="interactive-map">
+                                <g id="features">
+                                    <path d="M183.1 180l3.2 1.3 6.8 4.3 1.3 1.2 0.7 0.8 0.4 0.8 0.8 3.2 0.4 0.9 0.6 0.9 1.3 1.3 1.6 1.2 1.3 1.4 0.1 0.1 0.8 1.5 0.3 0.9-1.1 6.9-7.5 25.9-6.7 2.8-8.2 2.3-4.6 0.7-1 0.7-0.8 1.1-0.4 2.5-0.1 1.6 0.9 7.2 0.6 2.3 0.7 1.7 0.9 1.8 0.3 0.9-0.2 1.3-7.6 11.7-0.7 2.1-0.2 1.6 3.1 10 0.4 2.2-0.5 1.5-1.1 1.8-2.8 3.4-1.1 2.1-0.6 1.6-0.3 3.6-0.3 1-4.8 8.6-0.7 1.9-2.1 8.6-1.9 0.8-3.1 0.4-11.3-0.7-2.3-0.5-0.8-0.5-2.7-2.6-4.9-5.7-0.8-0.6-1.5-1.1-0.9-0.4-1-0.4-1.4-0.1-1.5 0-2.1 0.4-1.3 0.4-1.1 0.5-0.9 0.6-1.1 0.9-2.8 3.4-5.9 9.4-0.9 1.4-25.4-11.6-29-14-6-25.1-0.1-6 0.9-6.3 2-6.1 3-5.6 4.5-4.6 10.3-5.5 4.6-3.8 3.4-5.4 2.5-5.6 3.2-5.5 5.6-4.9 36.1-25.3 7.9-8 4-2.7 16.7-6.3 5.5-0.4 6.8 1.8 9.8 7.6 5.5 2.3 5.5-3 0.1-2.2-0.3-0.6z" id="SVAH" name="Ahuachapán">
+                                    </path>
+                                    <path d="M194.1 232.6l7.5-25.9 1.1-6.9-0.3-0.9-0.8-1.5-0.1-0.1-1.3-1.4-1.6-1.2-1.3-1.3-0.6-0.9-0.4-0.9-0.8-3.2-0.4-0.8-0.7-0.8-1.3-1.2-6.8-4.3-3.2-1.3-2.4-5.6-0.3-3 1-3.2 16.1-28.4 7.5-8.2 9.4-7.3 9.9-4.6 40.3-9.7 2.5-2.4-0.1-6-1.2-1.6-4.8-2.4-1.6-1.6-0.7-2.5-0.7-5.9-0.5-1.8-2.2-4.2-1-1.5-2.2-2-2.6-1.2-7.9-1-2.3-5.5 2.2-3.3 3.8-2.7 2.4-3.8-1.1-4.5-2.7-3.8-1.7-4.4 2.5-6.1 5.3-4 5.5 0.5 4.1 4.1 1.1 7.2 5.1-3.7 9.3-11.2 2.6-1.1 4.1-1.8 5.9 0.8 4.3 2.3 4.2 1.5 5.9-1.2 8.6-8.8 3.8-1.5 0.5 7.5 1.9-3 0.4-0.9 10.8 7.9 0.1 0.1 5.8 0.9 14.3 13.4 2.5 2.8 0.5 0.7 1.2 2.9 1.7 2.9 0.8 0.8 1.3 1.1 5.6 2.9 0.8 0.7 1.8 2.4 6.9 4.4-4.8 14-1.5 7.8-3.3 3.7-14 5.7 0 7.7 0.3 4.3-0.1 1.5-0.7 1.8-7.3 10.1-1.3 1.3-0.8 0.6-0.8 0.5-1 0.3-1 0.3-1.2 0.2-3.8 0.2-1 0.2-1 0.3-0.9 0.4-0.8 0.5-0.7 0.6-4.4 8.1-0.9 1.2-0.7 0.7-0.9 0.5-0.9 0.4-7.1-0.5-7.2 24.8 1.1 8.4 4.2 3.8 5.6 1.1 5.6 0 4.4-1.2-4 21.4-0.7 5.5 0.1 1.2-0.6 7.5-0.4 1.2-0.8 1-1.9 0.9-1.4 0-1.3 0-1 0.1-0.8 0.4-3 4.9-1.2 0.8-1.1 0.1-0.9-0.3-1-0.1-0.9 0.3-0.8 0.5-0.6 0.8-0.5 2.1-0.5 10.4 0.4 6.9-0.7 8.3-6.6 18-1.8 10.7-17.9-3.4-4.7-1.6-0.6-0.8-0.6-0.8-2.2-5.6-5-4.7-8-5.9-3.6-2.2-2.5-1.1-1 0.2-0.8 0.6-0.6 0.7-1 1.6-1.2 2.8-0.5 2.1 0 3.5-0.3 0.9-0.8 0.9-1.4 0.7-2.7 0.6-1.7-0.4-1.2-0.4-0.9-0.7-0.6-0.7-0.5-0.9-0.4-1.2-0.9-1.3-1.7-1.8-2.4-0.4-1.2-0.8-0.5-0.8 0.2-1 0.4-0.8 0.7-0.8 1.4-1.2 0.6-0.6 0.5-0.9 0.3-1.1 0.1-1-0.4-2-1.7-2.8-2.3-2.1-1.2-1.3-0.8-1.1-1.2-2.8-1.1-1.5-6.1-6-2.2-1.6-1.7-0.8-1.2 0-1.1 0.1-2.1 0.6-3.4 0.1-8.7-2.2z" id="SVSA" name="Santa Ana">
+                                    </path>
+                                    <path d="M324.5 181.7l-4.4 1.2-5.6 0-5.6-1.1-4.2-3.8-1.1-8.4 7.2-24.8 7.1 0.5 0.9-0.4 0.9-0.5 0.7-0.7 0.9-1.2 4.4-8.1 0.7-0.6 0.8-0.5 0.9-0.4 1-0.3 1-0.2 3.8-0.2 1.2-0.2 1-0.3 1-0.3 0.8-0.5 0.8-0.6 1.3-1.3 7.3-10.1 0.7-1.8 0.1-1.5-0.3-4.3 0-7.7 14-5.7 3.3-3.7 1.5-7.8 4.8-14-6.9-4.4-1.8-2.4-0.8-0.7-5.6-2.9-1.3-1.1-0.8-0.8-1.7-2.9-1.2-2.9-0.5-0.7-2.5-2.8-14.3-13.4 14.5 2.3 11.6 5.6 19.2 4.1 9.5 6.7 17.3 5.2 3.6-3.2 5.4-10.5 3-3.1 3.3-0.9 2.2 0.4 1.9 1.7 2.1 3 1.9 3.5 0.8 3.9-0.3 3.9-1.5 3.8 4.3 3.7 12.8 1.5 6 3 2.4 4.8 1.5 11.9 1.7 3.5 9.5 7.2 3.4 4.2 3.4 5.7 1.4 4.9 0.2 1.8 0.4 3.2 1.2 4.1 3.3 2.4 3.7-0.8 4.4-2.6 5.3-2.3 5.8 0.1 9.3 6 7.9 9.9 5.6 11.6 2.5 10.9 6.6-1 16.4 1.3 4.5-1.8 3.9-2.4 3.3-0.3 2.7 4.4-0.4 6.5-2.2 6.4-0.2 5.5 5.9 3.8 8 1.1 1.8 0.6 2.7 2.4 1.8 2.6 0.9 3.2-0.2 2-17.3 2.6-7.7 3.8-2.9 3.8-2.5 2-4.5 2.1-23.1 7.6-5.6 2.1-5.2 1.3-9.8-0.9-11.1 0.3-6.2-0.7-5.8-2.2-6.8 0.5-8-3.8-1.4-0.9-1.7-1.6-2-2.9-1-2.1-0.6-1.8-0.3-1-0.1-0.9 0-1.1 0.3-1.6 0-0.1-0.2-0.7-0.7-1-8.2-9.8-1.7-3-0.6-0.8-6.3-4.5-2.7-2.4-1.9-1.1-9.7-3.5-4.7-2.4-1.3-0.1-1.2 0-6.6 3.4-10.4 4.8-4.2-1-5.3-4.2-2.4 4.8-5.2-0.1-7.8-3.4-2.9 1-4.9 3.5-1.5 0.8-2.7-0.4-3.6-1.7-1.2-0.3-6.1-0.9-6.8-3.9-3.9-0.8-3.6 2.8-3.5 1.9-4.4 0.9-3.1 1.2-1.2 2.6-1.7 2.7z" id="SVCH" name="Chalatenango">
+                                    </path>
+                                    <path d="M490.3 217.5l11.1-0.3 9.8 0.9 5.2-1.3 5.6-2.1 23.1-7.6 4.5-2.1 2.5-2 2.9-3.8 7.7-3.8 17.3-2.6 0 0.7 2.3-0.9 9.5-1.5 9.6 0.7 28.4 9.1 16.6 1.2 3.6 1.6 3.4 3.3-0.3 1.2-0.1 0.9-0.2 0.2-0.4 0.3-0.1 0-1.5-0.2 0.4 0.9 1.9 4.2-0.2 4.5-1.3 4.7-0.8 5.7 1 3.7 4.1 10.2 0.3 6.1-3.3 5.5-0.7 0.6-1.7 1.5 2.4 4.8-0.6 4.6-2.6 3.9-4.1 2.6 0.8 5.3-3.5 5.4-3.4 6.7 0 0.1-6.1 4.1-3.5-0.9-9.5-1.2-1.4-0.5-0.7-0.6-0.5-0.8-0.3-1-0.4-2.1-0.6-0.9-1-0.5-2.6-0.7-0.9-0.4-2.6-1.5-3.9-1.4-0.9-0.5-6.9-5.1-0.9-0.4-4.1-0.8-5.2-0.3-2.4-0.4-12 0.1-2.7-0.2-1.8-0.5-5.4-3.9-1.2 0.1-1.4 0.7-1.9 2.5-1.2 1.3-1.3 0.8-2.2-0.2-2.7-0.6-2.5 0.6-11.7 5.2-3.6 1.2-2.6 0.4-3.9-1.3-2.2-0.5-2.4-0.1-1 1.4-0.7 1.2-0.5 11.1-13-3.6-3.4-1.9-0.4-1-2.4-3.7-3.6-3.9-1.5-2-0.9-1.7-0.5-2.5-0.5-1.5-1.9-3.4-0.4-1.6-0.3-1.7-1.4-3-1.8-2.1-3.1-2.1-2.3-2.4-7.3-10.4-1.8-3.3-0.9-2.5 0.2-1.2 0.3-1 0.3-0.9 0.6-0.9 0.6-0.6 0.8-0.6 5-2.9 1.4-1.2 1.3-1.4 1.1-1.6 0.4-0.9 5.5-8.8z" id="SVCA" name="Cabañas">
+                                    </path>
+                                    <path d="M736.4 228.6l1.5-2.6 2.5-2.8 4.5-1.9 3.3 0.5 2.4-0.5 1.8-5.3-0.6-1-3.4-3.1-0.8-1.4-0.3-7.7 0.1-1.3 3.7-1.4 5.7 0.6 0.9 0.2 9 2 6 0.2 19.6-2.4 9.9 0.6 4.3 3.6 5.5 14.3 5.4 6.6 7 6.3 6.1 7.4 3.1 9.5 17.1-8.5 5.6-1.5 0.9 0.1 1.2 7.6 1.6 6.3 0.7 10.9-1.5 23.5 0.1 1.3 0.2 1 0.5 0.8 1.7 2.2 0.5 0.9 0.4 0.9 0.3 0.9 0.4 2.4-0.2 7.4-1.1 8.9-2.2 10.4-8.6 22.3-0.7 7.3-2.7 4.2-11.6 12.4-8.1-1.3-3.9 0.2-14.7 4.6-2.8 0.3-1.8-0.3-0.6-0.6-0.6-1.1-0.3-0.8-0.9-1-1.3-1.2-5.5-3.3-0.8-0.6-0.6-0.8-0.4-0.8-1.1-6.9-0.6-2.1-1.4-2.6-1.6-2.1-1.3-0.8-1.4-0.5-14.6 1.2-2.1 0.4-1.9 0.8-3 1.8-2.1 0.6-0.6-0.5-0.1-0.6 0.5-0.9 2.2-3 0.4-0.9 0.1-1-0.6-1-0.9-0.9-2.7-1.7-0.8-0.7-0.6-0.7-0.3-0.9-0.3-1.1-0.2-1.1-0.8-1.5-1.4-1.9-3.5-2.6-1.4-1.4-0.7-2.3-1.2-1.9-4.8-4.3-1.9-2.3-1.2-1.8-0.6-9.7 0-1 0.4-0.8 0.7-0.7 12.3-8.9 1.7-1 2.9-1 0.9-0.5 0.7-0.7 0.6-0.7 0.3-1.1 0-1.4-0.7-2.3-1-1.5-0.8-1-14.2-9.7-2.1-1.9-1.4-1.5-0.3-1-0.3-1-0.1-3.8 0.3-2.1 0.2-0.7 0.2-0.7 0.5-0.8 1.1-1.4 0.7-0.6 0.8-0.5 0.6-0.7 0.6-0.8 0.4-0.8 0.4-1 0.2-1.1 0-2.3-1.2-3.2-1.5-2.9-0.6-1.7-0.1-1.3-0.7-3.1-4.4-10.4-2.1-2.9z" id="SVMO" name="Morazán">
+                                    </path>
+                                    <path d="M639.5 290.4l0-0.1 3.4-6.7 3.5-5.4-0.8-5.3 4.1-2.6 2.6-3.9 0.6-4.6-2.4-4.8 1.7-1.5 0.7-0.6 10-0.5 7-4.3 6.8-2.9 15.2-3.3 3.5 0.2 6 2.3 2.8 0.3 0.4-1.1 0-2.3 0.3-2.4 1.2-1.4 2.4-0.1 3 0.5 3 0.9 2.4 1 2.6-4.8 4.1-1.5 4.5-0.4 4.1-1.4 3-2.8 1.2-2.3 2.1 2.9 4.4 10.4 0.7 3.1 0.1 1.3 0.6 1.7 1.5 2.9 1.2 3.2 0 2.3-0.2 1.1-0.4 1-0.4 0.8-0.6 0.8-0.6 0.7-0.8 0.5-0.7 0.6-1.1 1.4-0.5 0.8-0.2 0.7-0.2 0.7-0.3 2.1 0.1 3.8 0.3 1 0.3 1 1.4 1.5 2.1 1.9 14.2 9.7 0.8 1 1 1.5 0.7 2.3 0 1.4-0.3 1.1-0.6 0.7-0.7 0.7-0.9 0.5-2.9 1-1.7 1-12.3 8.9-0.7 0.7-0.4 0.8 0 1 0.6 9.7 1.2 1.8 1.9 2.3 4.8 4.3 1.2 1.9 0.7 2.3 1.4 1.4 3.5 2.6 1.4 1.9 0.8 1.5 0.2 1.1 0.3 1.1 0.3 0.9 0.6 0.7 0.8 0.7 2.7 1.7 0.9 0.9 0.6 1-0.1 1-0.4 0.9-2.2 3-0.5 0.9 0.1 0.6 0.6 0.5 2.1-0.6 3-1.8 1.9-0.8 2.1-0.4 14.6-1.2 1.4 0.5 1.3 0.8 1.6 2.1 1.4 2.6 0.6 2.1 1.1 6.9 0.4 0.8 0.6 0.8 0.8 0.6 5.5 3.3 1.3 1.2 0.9 1 0.3 0.8 0.6 1.1 0.6 0.6 1.8 0.3 2.8-0.3 14.7-4.6 3.9-0.2 8.1 1.3-2.5 3.3-0.8 4.9 0.2 11.7 1.5 5.6 0 1.2-0.4 1.3-1.4 1.7-1.1 0.9-1 0.8-1.6 0.9-0.7 0.6-0.6 1.5-0.3 2.5 0.2 9.9 1.1 6.8 0.3 1 0.5 0.9 3.5 5.6 0.4 0.9 0.4 1 0.1 0.9-4.8 27.8 0.1 1.6 0.6 2.2-0.3 2.4-4.9 16.1-0.8 0.9-1.8 0.5-1.2 0-1.3-0.3-3.9-1.4-3.2-1.9-3.1-2.3-0.8-0.3-1 3.8-0.5 2.9-2.1 30.2 0 0.1-2.6-0.5-2.5 0-2.8 1.1-23-26.8-1-0.4-1-0.2-1.2-0.1-10.2 1.6-0.9-0.2-0.7-0.8-0.1-1.9 0.2-1.2 0.4-1.3 2.8-5.1-0.2-1.1-0.9-1.2-2.5-1.3-1.4-1.2-0.9-1.4 0-5.7-0.2-1.1-0.3-1.2-0.7-1.1-1.2-1.4-1.6-0.2-1.2 0.1-3.5 1.9-1.9 0.8-1.1 0.3-1 0-1.1-0.1-0.9-0.4-0.8-0.5-1.5-1.2-0.8-0.5-0.9-0.4-1.1-0.1-0.9 0.1-1.1-0.8-1.6-1.4-3.3-4-1.9-1.6-1.7-1-7.4-0.8-2-0.5-2.8-1.3-0.8-0.5-0.7-0.5-2.6-3.4-3.8-6.1-2-4.1-2-6.9-0.6-3-0.2-2.3 0.1-2.5-0.2-1.2-0.6-1-1.5-0.5-1.8 0.7-0.6-0.1-0.6-0.4-0.4-1.2-1.2-7.1-0.1-2.5-0.6-5.2-0.1-1.1 0.1-1.2 0.3-1 0.6-0.7 0.7-0.2 0.6 0.2 0.4 0.4 0.5 0.6 0.6 0.5 0.7 0 0.5-0.6 0.4-1 0.2-2.4-0.1-2.3 0.1-1.2 0.3-1 0.5-0.9 0.6-0.7 2-1.9 0.1-0.1 0.5-1 0.1-0.8-0.2-1.5-1.5-5.1-0.3-2 0-1.6 0.8-3 0-0.9-0.5-1.5-4.5-9.6-0.3-1-0.2-1.1 0-2.3 0.1-1.2 0.3-1 0.5-0.8 0.6-0.7 0.8-0.5 2.1-0.7 0.8-0.4 0.6-0.7 0.6-0.8 0.3-1 0.2-1-0.2-1.4-0.5-1.6-1.1-2.7-0.7-3.2 0-1.2 0.2-1.1 1.8-5 0-1.1-1.2-1-2.3-0.7-9.2-1.2-2.9-1-3.3-2.3-2.5-2.4-3.2-5-2.3-2.9-4.4-0.3-15.4 1.8-4.3-6.8-11.6-11.6-1-9.1z" id="SVSM" name="San Miguel">
+                                    </path>
+                                    <path d="M836.2 370.7l11.6-12.4 2.7-4.2 0.7-7.3 8.6-22.3 2.2-10.4 1.1-8.9 0.2-7.4-0.4-2.4-0.3-0.9-0.4-0.9-0.5-0.9-1.7-2.2-0.5-0.8-0.2-1-0.1-1.3 1.5-23.5-0.7-10.9-1.6-6.3-1.2-7.6 2.1 0.5 5.5 3.6 2.6 0.7 1.7-0.8 4.8-3.8 3-1 3.7 0.2 7.4 1.6 3.6-0.3 3.6-2.6 3.1-3.9 3.8-3.2 5.6-0.2 3.6 2.8 3.6 10.2 3.1 4.6 1.9 1.1 5.3 2.1 2.3 1.2 5.9 5.2 10.6 9.1 6.6 2.7-3.3 5.6-7.6 17.6-1.9 6.3 2.4 6.4-1.8 4.1-3.8 3.6-3.3 4.7-1.3 6.9 0.3 14.3-0.9 7-9 21.9-2.2 10.6 4 8.8 3.8 1.4 8-2.6 5.4 2.1 2.9 3.4 2 4.6 0.6 5.2-0.9 4.9-6.4 7.4-29.6 13.6-0.3-0.1-2.9-1.8-1.9-3.1-2.8-8.3-10.6 18.4-2.7 10.8 6.9 4.8 4.4 1.7 12.4 12 7.1 4.8 0.6 2.2 0 4.7-3 8.2-7.5 5.9-27.9 14.1-7.6 6.1-1.3 6.1 8.7 6-13.3 3.1-51.7-3.6-9.6-1.8 0-0.1 2.1-30.2 0.5-2.9 1-3.8 0.8 0.3 3.1 2.3 3.2 1.9 3.9 1.4 1.3 0.3 1.2 0 1.8-0.5 0.8-0.9 4.9-16.1 0.3-2.4-0.6-2.2-0.1-1.6 4.8-27.8-0.1-0.9-0.4-1-0.4-0.9-3.5-5.6-0.5-0.9-0.3-1-1.1-6.8-0.2-9.9 0.3-2.5 0.6-1.5 0.7-0.6 1.6-0.9 1-0.8 1.1-0.9 1.4-1.7 0.4-1.3 0-1.2-1.5-5.6-0.2-11.7 0.8-4.9 2.5-3.3z m105.9 136.3l-0.3-4.9 2.7-2 5.2 1.7 3.2 7.1 0.2 5.9 1.4 3.9-3.1 1.8-4.9-1.8-3.2 1.5 0-4.2-2-4.1 0.8-4.9z m-14.8-19.2l2.9 1.8 2.5 5.6-2.2 3.2-2.5 2.4-4.9-4.4-1.2-6.1 2.2-2.2 3.2-0.3z" id="SVUN" name="La Unión">
+                                    </path>
+                                    <path d="M106 326.8l0.9-1.4 5.9-9.4 2.8-3.4 1.1-0.9 0.9-0.6 1.1-0.5 1.3-0.4 2.1-0.4 1.5 0 1.4 0.1 1 0.4 0.9 0.4 1.5 1.1 0.8 0.6 4.9 5.7 2.7 2.6 0.8 0.5 2.3 0.5 11.3 0.7 3.1-0.4 1.9-0.8 2.1-8.6 0.7-1.9 4.8-8.6 0.3-1 0.3-3.6 0.6-1.6 1.1-2.1 2.8-3.4 1.1-1.8 0.5-1.5-0.4-2.2-3.1-10 0.2-1.6 0.7-2.1 7.6-11.7 0.2-1.3-0.3-0.9-0.9-1.8-0.7-1.7-0.6-2.3-0.9-7.2 0.1-1.6 0.4-2.5 0.8-1.1 1-0.7 4.6-0.7 8.2-2.3 6.7-2.8 8.7 2.2 3.4-0.1 2.1-0.6 1.1-0.1 1.2 0 1.7 0.8 2.2 1.6 6.1 6 1.1 1.5 1.2 2.8 0.8 1.1 1.2 1.3 2.3 2.1 1.7 2.8 0.4 2-0.1 1-0.3 1.1-0.5 0.9-0.6 0.6-1.4 1.2-0.7 0.8-0.4 0.8-0.2 1 0.5 0.8 1.2 0.8 2.4 0.4 1.7 1.8 0.9 1.3 0.4 1.2 0.5 0.9 0.6 0.7 0.9 0.7 1.2 0.4 1.7 0.4 2.7-0.6 1.4-0.7 0.8-0.9 0.3-0.9 0-3.5 0.5-2.1 1.2-2.8 1-1.6 0.6-0.7 0.8-0.6 1-0.2 2.5 1.1 3.6 2.2 8 5.9 5 4.7 2.2 5.6 0.6 0.8 0.6 0.8 4.7 1.6 17.9 3.4 4.3 1.4 0.9 0.4 0.8 0.6 0.7 0.6 0.5 0.8 0.3 1 0.2 1-0.5 1.5-1 1.5-2.7 2.4-2.4 1.7-5.5 3.2-2.1 1.9-4.4 5.5-1.5 1.2-1.5 0.6-2.6 0.3-0.9 0.2-1.5 0.9-0.8 0.7-0.8 1.4-0.8 2.1-1.1 4.6-0.6 4.5 0.5 8.5-0.1 1.3-1 1.8-1.9 2.6-8.2 8.2-0.7 0.5-0.8 0.8-0.9 1.2-0.8 1.9-0.7 3.2-0.5 4.7-1.1 1.5-1.6 1.9-9.5 8.4-2 3.2-4 9.1-1 2.5-2.6-0.6-23.8-7.8-12.6 2.6-35.6 0.4-5.7-3.9-3.8-14.2-1.4-8.9-4.7-3.9-7.8-4.8-30.4-17.3-0.8-0.4z" id="SVSO" name="Sonsonate">
+                                    </path>
+                                    <path d="M292.5 284.3l1.8-10.7 6.6-18 0.7-8.3-0.4-6.9 0.5-10.4 0.5-2.1 0.6-0.8 0.8-0.5 0.9-0.3 1 0.1 0.9 0.3 1.1-0.1 1.2-0.8 3-4.9 0.8-0.4 1-0.1 1.3 0 1.4 0 1.9-0.9 0.8-1 0.4-1.2 0.6-7.5-0.1-1.2 0.7-5.5 4-21.4 1.7-2.7 1.2-2.6 3.1-1.2 4.4-0.9 3.5-1.9 3.6-2.8 3.9 0.8 6.8 3.9 6.1 0.9 1.2 0.3 3.6 1.7-0.4 13-2 8.3-0.1 2.1 0.2 1.4 2.3 1.8 0.9 1.3 1.1 2 1.9 4.4 1.1 2.1 1 1.4 1.6 1 1.8 0.9 3 0.9 1.1 0.1 3.5-0.3 1.2 0 1.1 0.2 1.1 0.2 1 0.4 1.2 0.7 1.4 1.1 2 1.1 0.6 0.8 0.1 0.6-1 2.6-0.5 2.2-0.1 0.4-0.3 0.3-2.8-0.1-1 0.3-0.7 0.7-0.4 1.2-1.9 21.6-0.5 2.2-0.4 0.9-0.8 0.5-1.9 0.7-0.9 0.5-0.7 0.6-1.2 1.4-0.7 1.9-0.5 1.8-0.7 6.8-0.8 3-1.2 2.8-0.7 3.6-0.4 6.2-0.3 1.6-0.3 1-2.6 4.9-1.7 4.8 0.2 1.5 0.6 0.8 1 0.3 1.2 0.1 1.9 2.5-0.4 3.8 0.3 3.7 0.4 1 0.5 0.8 0.6 0.7 1.5 1.1 0.7 0.9 0.4 1.3 0.7 3 0.6 1.7 0.7 1.1 0.8 0.6 5.4 2.9 0.7 0.5 1.6 1.4 2.5 3.4 0.4 1.4-0.2 1.2-1.2 2.3-0.9 2.2 0.1 1.2 0.8 0.8 2.9 1.4 0.4 0.9-0.2 0.9-0.6 0.7-0.7 0.6-0.6 2.2-0.2 3.7 0.7 15.9-0.2 1.2-2.4 6.1-0.8 3.4-0.1 1.8 0.2 1.4 6 9.8 2.1 4.6 0.6 0.7 0.8 0.4 1.1 0.2 1.2-0.1 2.1-0.5 3.9-1.3 2.2-0.3 1.4 0.2 1 0.3 2.8 1.2 1.3 6.3 1.1 1.6 0.9 0 1.6 0.1 2 0.5 3.7 1.5 1.3 1.3 0.3 1.1-1 1.7-1.8 2.2-0.5 0.8-0.6 0.7-2.9 5.2-1 2.3-1.2 3.6-17.9-11-25.5-11.3-27.6-6.6-12.8 0-9.8-2.3-53.3 0.5-22.8-5.8-8.1-1.5 1-2.5 4-9.1 2-3.2 9.5-8.4 1.6-1.9 1.1-1.5 0.5-4.7 0.7-3.2 0.8-1.9 0.9-1.2 0.8-0.8 0.7-0.5 8.2-8.2 1.9-2.6 1-1.8 0.1-1.3-0.5-8.5 0.6-4.5 1.1-4.6 0.8-2.1 0.8-1.4 0.8-0.7 1.5-0.9 0.9-0.2 2.6-0.3 1.5-0.6 1.5-1.2 4.4-5.5 2.1-1.9 5.5-3.2 2.4-1.7 2.7-2.4 1-1.5 0.5-1.5-0.2-1-0.3-1-0.5-0.8-0.7-0.6-0.8-0.6-0.9-0.4-4.3-1.4z" id="SVLI" name="La Libertad">
+                                    </path>
+                                    <path d="M413 423.6l1.2-3.6 1-2.3 2.9-5.2 0.6-0.7 0.5-0.8 1.8-2.2 1-1.7-0.3-1.1-1.3-1.3-3.7-1.5-2-0.5-1.6-0.1-0.9 0-1.1-1.6-1.3-6.3 0.8-3.2 1.1-0.7 2.7-3 1.9-4.1 3.2-9.6 0.8-4.2 0.2-2.7-0.7-1.9-2.9-5.1-1.1-3.1-0.7-3.3 0.2-1.8 0.5-1.2 0.9-0.5 1-0.2 1.2 0 1.1 0.2 6 1.9 1.2 0.2 1.1 0.1 1.9-1.5 11.3-14.4 13.6-12.8 16.5 6.1 6.5 3.5 7.1 2.2 1.3 0 1.7-0.3 0.7-0.2 0.8-0.4 0.6-0.7 0.8-1.8 0.7-0.8 0.8-0.4 1-0.3 4.7-0.6 2.1-0.7 2.6-1.6 2.8 7.6 0.1 6.3-0.4 6.6 0.4 2.6 0.7 1.6 1.2 0.1 1.2 0 1.2-0.2 8.9-2.8 1.6-0.1 1.7 0.3 2.9 1.1 1 1.3 9.3 19.8 0.3 1.1 0.1 1.1-0.1 2.5-0.4 2.2-2.9 7.9-0.2 0.9-0.3 0.9-0.3 1.3 0 0.6 0 0.1-1.6 8.4 0 1.8 0.5 6.7 0.5 2.2 0.6 1.6 2.4 2.7 2.3 1.8 3.3 2 2.6 2.5 2.4 3.2 0.9 2 0.4 1.6-0.2 1.2-0.5 2.2-0.3 0.9-0.5 0.9-2.3 1.7-0.6 0.7-0.5 0.8-0.3 1-0.1 1.2-0.1 1.2 1.7 15.8-0.1 2.2-0.5 0.8-0.6 0.7-0.7 0.8-0.8 0.5-3.5 1.7-2.7 1.1-1.7 1-1.5 1.2-0.6 0.7-0.5 0.8-0.5 1-0.3 0.9-0.3 1.1-0.9 11.6 0 0.1-87.6-40.9-26.6-16.4z" id="SVPA" name="La Paz">
+                                    </path>
+                                    <path d="M520.2 293.8l0.5-11.1 0.7-1.2 1-1.4 2.4 0.1 2.2 0.5 3.9 1.3 2.6-0.4 3.6-1.2 11.7-5.2 2.5-0.6 2.7 0.6 2.2 0.2 1.3-0.8 1.2-1.3 1.9-2.5 1.4-0.7 1.2-0.1 5.4 3.9 1.8 0.5 2.7 0.2 12-0.1 2.4 0.4 5.2 0.3 4.1 0.8 0.9 0.4 6.9 5.1 0.9 0.5 3.9 1.4 2.6 1.5 0.9 0.4 2.6 0.7 1 0.5 0.6 0.9 0.4 2.1 0.3 1 0.5 0.8 0.7 0.6 1.4 0.5 9.5 1.2 3.5 0.9 6.1-4.1 1 9.1 11.6 11.6 4.3 6.8-23.6 17.2-2.1 6.8-5.6 7.7-7.5 4.8-8.3-1.9-10.8 13.4-0.5 2.4-6.2 1.1-2.1 3-0.9 11.7-3.2 11.5-17.1 32.6-1.6 4.1-0.9 4.9-0.5 12-0.9 2.6-6.6 6.4-3.5 5.2-2.2 4.2-3.6 2.9-7.3 1.1-4.5 1.7-2.8 3.8-1.5 5.5 0 0.8 0.2 0.1-5.6-2.6 0-0.1 0.9-11.6 0.3-1.1 0.3-0.9 0.5-1 0.5-0.8 0.6-0.7 1.5-1.2 1.7-1 2.7-1.1 3.5-1.7 0.8-0.5 0.7-0.8 0.6-0.7 0.5-0.8 0.1-2.2-1.7-15.8 0.1-1.2 0.1-1.2 0.3-1 0.5-0.8 0.6-0.7 2.3-1.7 0.5-0.9 0.3-0.9 0.5-2.2 0.2-1.2-0.4-1.6-0.9-2-2.4-3.2-2.6-2.5-3.3-2-2.3-1.8-2.4-2.7-0.6-1.6-0.5-2.2-0.5-6.7 0-1.8 1.6-8.4 0-0.1 0-0.6 0.3-1.3 0.3-0.9 0.2-0.9 2.9-7.9 0.4-2.2 0.1-2.5-0.1-1.1-0.3-1.1-9.3-19.8-1-1.3-2.9-1.1-1.7-0.3-1.6 0.1-8.9 2.8-1.2 0.2-1.2 0-1.2-0.1-0.7-1.6-0.4-2.6 0.4-6.6-0.1-6.3-2.8-7.6 7.3-7.2 0.8-1.3 0.9-1.8 1.3-5.4 6.9-18.3z" id="SVSV" name="San Vicente">
+                                    </path>
+                                    <path d="M656.4 317.9l15.4-1.8 4.4 0.3 2.3 2.9 3.2 5 2.5 2.4 3.3 2.3 2.9 1 9.2 1.2 2.3 0.7 1.2 1 0 1.1-1.8 5-0.2 1.1 0 1.2 0.7 3.2 1.1 2.7 0.5 1.6 0.2 1.4-0.2 1-0.3 1-0.6 0.8-0.6 0.7-0.8 0.4-2.1 0.7-0.8 0.5-0.6 0.7-0.5 0.8-0.3 1-0.1 1.2 0 2.3 0.2 1.1 0.3 1 4.5 9.6 0.5 1.5 0 0.9-0.8 3 0 1.6 0.3 2 1.5 5.1 0.2 1.5-0.1 0.8-0.5 1-0.1 0.1-2 1.9-0.6 0.7-0.5 0.9-0.3 1-0.1 1.2 0.1 2.3-0.2 2.4-0.4 1-0.5 0.6-0.7 0-0.6-0.5-0.5-0.6-0.4-0.4-0.6-0.2-0.7 0.2-0.6 0.7-0.3 1-0.1 1.2 0.1 1.1 0.6 5.2 0.1 2.5 1.2 7.1 0.4 1.2 0.6 0.4 0.6 0.1 1.8-0.7 1.5 0.5 0.6 1 0.2 1.2-0.1 2.5 0.2 2.3 0.6 3 2 6.9 2 4.1 3.8 6.1 2.6 3.4 0.7 0.5 0.8 0.5 2.8 1.3 2 0.5 7.4 0.8 1.7 1 1.9 1.6 3.3 4 1.6 1.4 1.1 0.8 0.9-0.1 1.1 0.1 0.9 0.4 0.8 0.5 1.5 1.2 0.8 0.5 0.9 0.4 1.1 0.1 1 0 1.1-0.3 1.9-0.8 3.5-1.9 1.2-0.1 1.6 0.2 1.2 1.4 0.7 1.1 0.3 1.2 0.2 1.1 0 5.7 0.9 1.4 1.4 1.2 2.5 1.3 0.9 1.2 0.2 1.1-2.8 5.1-0.4 1.3-0.2 1.2 0.1 1.9 0.7 0.8 0.9 0.2 10.2-1.6 1.2 0.1 1 0.2 1 0.4 23 26.8-3.5 1.4-32.4 2.7-34.8-5.3-9 2.9-4.8-1.6-5.5-1.2 0-2.4 8.5-0.6 0.6-5.9-4.5-7.4-6.9-4.8 1.5 3 4.5 6.3 1.7 3.9-13.6-0.5-6.6 0.7-5.7 2.4 3.7 1.6 2.9-0.5 3.5-1 5.3-0.1 0 2.9-8.7 3.6-9.7-0.3-7.5-4.6-2.3-9.5 3.7 1.7 1.4 0.9 5.2-5.2 0-2.4-6.5-2.9-7-10-4.7-2.9 1.2 5.5 2.2 4.6 1.1 4.1-1.7 4-5.5-3.2-15.9-4-6.8-3.6-6.2-11.1-2.9-1.8-4.4-0.4-12.4-2.5-5.5 0-15.2 2.9-21.2 0.5-4.7 2.1 2.6 2 2.7 1.5 2.8 0.5 2.4-1.1 10.6 2.4 30.2-3.2 3.3 0.5 4.9 2.7 2.6 2.4 4.7 5.7 3.1 2.4 0 2.9-7-1.2-5.1-1-11.2-3.3 0 2.6 30.8 6.3 16.1 5.3 7.2 7.1-2.7 4.6-6.7-1.1-7.5-4-4.9-3.7-5.5-2.8-97-18.1-11.6-5.4-0.2-0.1 0-0.8 1.5-5.5 2.8-3.8 4.5-1.7 7.3-1.1 3.6-2.9 2.2-4.2 3.5-5.2 6.6-6.4 0.9-2.6 0.5-12 0.9-4.9 1.6-4.1 17.1-32.6 3.2-11.5 0.9-11.7 2.1-3 6.2-1.1 0.5-2.4 10.8-13.4 8.3 1.9 7.5-4.8 5.6-7.7 2.1-6.8 23.6-17.2z" id="SVUS" name="Usulután">
+                                    </path>
+                                    <path d="M410.9 171.4l6.6-3.4 1.2 0 1.3 0.1 4.7 2.4 9.7 3.5 1.9 1.1 2.7 2.4 6.3 4.5 0.6 0.8 1.7 3 8.2 9.8 0.7 1 0.2 0.7 0 0.1-0.3 1.6 0 1.1 0.1 0.9 0.3 1 0.6 1.8 1 2.1 2 2.9 1.7 1.6 1.4 0.9 8 3.8 6.8-0.5 5.8 2.2 6.2 0.7-5.5 8.8-0.4 0.9-1.1 1.6-1.3 1.4-1.4 1.2-5 2.9-0.8 0.6-0.6 0.6-0.6 0.9-0.3 0.9-0.3 1-0.2 1.2 0.9 2.5 1.8 3.3 7.3 10.4 2.3 2.4 3.1 2.1 1.8 2.1 1.4 3 0.3 1.7 0.4 1.6 1.9 3.4 0.5 1.5 0.5 2.5 0.9 1.7 1.5 2 3.6 3.9 2.4 3.7 0.4 1 3.4 1.9 13 3.6-6.9 18.3-1.3 5.4-0.9 1.8-0.8 1.3-7.3 7.2-2.6 1.6-2.1 0.7-4.7 0.6-1 0.3-0.8 0.4-0.7 0.8-0.8 1.8-0.6 0.7-0.8 0.4-0.7 0.2-1.7 0.3-1.3 0-7.1-2.2-6.5-3.5-16.5-6.1-0.3-11.6-0.8-2-0.7-2-1.8-2.3-6.6-12.5-0.5-1.8 0.6-8.3-0.3-1.7-0.7-1.1-1-0.3-1.4-1-1.6-1.6-4.7-7-0.7-0.6-1-0.4-1.1-0.2-2.4-0.1-2.6-2.1-3.4-4-10-15.7-1.1-3 0.7-0.6 2.7-1.2 1-0.7 0.7-0.8 0.7-1.5-0.4-0.8-2.3-3-7.8-12.8-3.5-7.4-0.8-2.9-0.4-3.3 0.2-0.6 0.6-0.5 0.7-0.6 0.7-0.6 1-1.6 0.3-0.9 0.3-1.1 0.3-2.3 0.5-2.1 0.2-1.6 0-0.4 0.1-0.7-0.3-3.7-1.2-6.4-0.1-1.7 0.3-1.2 1.8-3.7 1.7-4.6 0.2-3.8z" id="SVCU" name="Cuscatlán">
+                                    </path>
+                                    <path d="M363.6 177.2l2.7 0.4 1.5-0.8 4.9-3.5 2.9-1 7.8 3.4 5.2 0.1 2.4-4.8 5.3 4.2 4.2 1 10.4-4.8-0.2 3.8-1.7 4.6-1.8 3.7-0.3 1.2 0.1 1.7 1.2 6.4 0.3 3.7-0.1 0.7 0 0.4-0.2 1.6-0.5 2.1-0.3 2.3-0.3 1.1-0.3 0.9-1 1.6-0.7 0.6-0.7 0.6-0.6 0.5-0.2 0.6 0.4 3.3 0.8 2.9 3.5 7.4 7.8 12.8 2.3 3 0.4 0.8-0.7 1.5-0.7 0.8-1 0.7-2.7 1.2-0.7 0.6 1.1 3 10 15.7 3.4 4 2.6 2.1 2.4 0.1 1.1 0.2 1 0.4 0.7 0.6 4.7 7 1.6 1.6 1.4 1 1 0.3 0.7 1.1 0.3 1.7-0.6 8.3 0.5 1.8 6.6 12.5 1.8 2.3 0.7 2 0.8 2 0.3 11.6-13.6 12.8-11.3 14.4-1.9 1.5-1.1-0.1-1.2-0.2-6-1.9-1.1-0.2-1.2 0-1 0.2-0.9 0.5-0.5 1.2-0.2 1.8 0.7 3.3 1.1 3.1 2.9 5.1 0.7 1.9-0.2 2.7-0.8 4.2-3.2 9.6-1.9 4.1-2.7 3-1.1 0.7-0.8 3.2-2.8-1.2-1-0.3-1.4-0.2-2.2 0.3-3.9 1.3-2.1 0.5-1.2 0.1-1.1-0.2-0.8-0.4-0.6-0.7-2.1-4.6-6-9.8-0.2-1.4 0.1-1.8 0.8-3.4 2.4-6.1 0.2-1.2-0.7-15.9 0.2-3.7 0.6-2.2 0.7-0.6 0.6-0.7 0.2-0.9-0.4-0.9-2.9-1.4-0.8-0.8-0.1-1.2 0.9-2.2 1.2-2.3 0.2-1.2-0.4-1.4-2.5-3.4-1.6-1.4-0.7-0.5-5.4-2.9-0.8-0.6-0.7-1.1-0.6-1.7-0.7-3-0.4-1.3-0.7-0.9-1.5-1.1-0.6-0.7-0.5-0.8-0.4-1-0.3-3.7 0.4-3.8-1.9-2.5-1.2-0.1-1-0.3-0.6-0.8-0.2-1.5 1.7-4.8 2.6-4.9 0.3-1 0.3-1.6 0.4-6.2 0.7-3.6 1.2-2.8 0.8-3 0.7-6.8 0.5-1.8 0.7-1.9 1.2-1.4 0.7-0.6 0.9-0.5 1.9-0.7 0.8-0.5 0.4-0.9 0.5-2.2 1.9-21.6 0.4-1.2 0.7-0.7 1-0.3 2.8 0.1 0.3-0.3 0.1-0.4 0.5-2.2 1-2.6-0.1-0.6-0.6-0.8-2-1.1-1.4-1.1-1.2-0.7-1-0.4-1.1-0.2-1.1-0.2-1.2 0-3.5 0.3-1.1-0.1-3-0.9-1.8-0.9-1.6-1-1-1.4-1.1-2.1-1.9-4.4-1.1-2-0.9-1.3-2.3-1.8-0.2-1.4 0.1-2.1 2-8.3 0.4-13z" id="SVSS" name="San Salvador">
+                                    </path>
+                                </g>
+                                <g id="points">
+                                    <circle class="13.222973684790423|-89.99369975031595" cx="90.9" cy="497.5" id="0">
+                                    </circle>
+                                    <circle class="13.737667945092843|-88.78290699198428" cx="545.5" cy="298.8" id="1">
+                                    </circle>
+                                    <circle class="14.381035770470868|-87.81427278531893" cx="909.1" cy="49.8" id="2">
+                                    </circle>
+                                </g>
+                                <g id="label_points">
+                                    <circle class="Ahuachapán" cx="124.3" cy="249.3" id="SVAH">
+                                    </circle>
+                                    <circle class="Santa Ana" cx="251.3" cy="168.8" id="SVSA">
+                                    </circle>
+                                    <circle class="Chalatenango" cx="413.2" cy="117.2" id="SVCH">
+                                    </circle>
+                                    <circle class="Cabañas" cx="580.5" cy="233.6" id="SVCA">
+                                    </circle>
+                                    <circle class="Morazán" cx="808.4" cy="292.1" id="SVMO">
+                                    </circle>
+                                    <circle class="San Miguel" cx="753.2" cy="407.8" id="SVSM">
+                                    </circle>
+                                    <circle class="La Unión" cx="879.7" cy="380.1" id="SVUN">
+                                    </circle>
+                                    <circle class="Sonsonate" cx="208.7" cy="323.8" id="SVSO">
+                                    </circle>
+                                    <circle class="La Libertad" cx="325.4" cy="339.5" id="SVLI">
+                                    </circle>
+                                    <circle class="La Paz" cx="478.8" cy="400" id="SVPA">
+                                    </circle>
+                                    <circle class="San Vicente" cx="567.9" cy="326.5" id="SVSV">
+                                    </circle>
+                                    <circle class="Usulután" cx="635.8" cy="419.6" id="SVUS">
+                                    </circle>
+                                    <circle class="Cuscatlán" cx="446.2" cy="245.2" id="SVCU">
+                                    </circle>
+                                    <circle class="San Salvador" cx="406.6" cy="297.7" id="SVSS">
+                                    </circle>
+                                </g>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <!-- Panel de información -->
+                    <div class="map-info-panel">
+                        <h3 class="map-info-title">Información del Departamento</h3>
+                        <div class="map-info-content">
+                            <div class="map-info-item">
+                                <span class="map-info-label">Departamento:</span>
+                                <span class="map-info-value" id="dept-name">Seleccione un departamento</span>
+                            </div>
+                            <div class="map-info-item">
+                                <span class="map-info-label">Casos activos:</span>
+                                <span class="map-info-value" id="dept-cases">-</span>
+                            </div>
+                            <div class="map-info-item">
+                                <span class="map-info-label">Nivel de riesgo:</span>
+                                <span class="map-info-value" id="dept-risk">-</span>
+                            </div>
+                            <div class="map-info-item">
+                                <span class="map-info-label">Última actualización:</span>
+                                <span class="map-info-value" id="dept-update">-</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
         </main>
+
     </div>
 
     <script>
@@ -351,7 +775,6 @@
                 item.classList.add('justify-center');
             });
         });
-
         // Dropdown de perfil
         const profileButton = document.getElementById('profileButton');
         const profileDropdown = document.getElementById('profileDropdown');
@@ -385,28 +808,28 @@
                 cerrarDropdown();
             }
         });
+        // Tab functionality
+        const browserTabs = document.querySelectorAll('.browser-tab');
+        const tabContents = document.querySelectorAll('.tab-content');
 
-        // Pie Chart
-        const pieCtx = document.getElementById('pieChart').getContext('2d');
-        new Chart(pieCtx, {
-            type: 'pie',
-            data: {
-                labels: ['Nivel Bajo', 'Nivel Moderado', 'Nivel Alto', 'Nivel Extremo'],
-                datasets: [{
-                    data: [400, 300, 300, 200],
-                    backgroundColor: ['#2ECC40', '#FFDC00', '#ff0d00ff', '#a12222ff']
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: true,
-                aspectRatio: 1.5,
-                plugins: {
-                    legend: {
-                        position: 'bottom'
-                    }
-                }
-            }
+        browserTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const tabName = tab.getAttribute('data-tab');
+
+                // Remove active class from all tabs
+                browserTabs.forEach(t => t.classList.remove('active'));
+
+                // Add active class to clicked tab
+                tab.classList.add('active');
+
+                // Remove active class from all contents
+                tabContents.forEach(content => {
+                    content.classList.remove('active');
+                });
+
+                // Add active class to selected content
+                document.getElementById(tabName).classList.add('active');
+            });
         });
 
         // Detectar cambios en preferencia de sistema (para modo auto)
@@ -419,4 +842,5 @@
         });
     </script>
 </body>
+
 </html>

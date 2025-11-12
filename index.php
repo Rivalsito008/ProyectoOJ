@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -13,8 +14,8 @@
       --tam-escudo: 60px;
       --espaciado: 220px;
 
-      background-image: 
-        radial-gradient(transparent 70%, transparent 70%), 
+      background-image:
+        radial-gradient(transparent 70%, transparent 70%),
         var(--escudo);
       background-repeat: repeat;
       background-position: center;
@@ -30,11 +31,9 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background: linear-gradient(
-        135deg,
-        rgba(30, 27, 75, 0.85) 0%,
-        rgba(55, 48, 163, 0.65) 100%
-      );
+      background: linear-gradient(135deg,
+          rgba(30, 27, 75, 0.85) 0%,
+          rgba(55, 48, 163, 0.65) 100%);
       z-index: -1;
     }
 
@@ -58,8 +57,13 @@
     }
 
     @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
+      0% {
+        transform: rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
     }
 
     /* Pantalla de carga */
@@ -96,7 +100,7 @@
 
   <!-- Contenedor del Login -->
   <div class="login-container bg-white/10 backdrop-blur-md shadow-2xl rounded-2xl p-8 w-[90%] max-w-md border border-white/20">
-    
+
     <!-- Encabezado -->
     <div class="text-center mb-6">
       <h1 class="text-3xl font-bold text-white">Bienvenido a <span class="text-indigo-300">SIGEN</span></h1>
@@ -124,7 +128,7 @@
         </label>
       </div>
 
-      <button type="submit" 
+      <button type="submit"
         class="w-full py-2 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-lg font-semibold shadow-lg hover:opacity-90 transition duration-300 transform hover:scale-[1.02]">
         Iniciar Sesión
       </button>
@@ -145,4 +149,5 @@
   </script>
 
 </body>
+
 </html>
