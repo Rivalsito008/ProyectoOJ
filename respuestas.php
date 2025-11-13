@@ -469,12 +469,6 @@
                         <div class="tab-indicator bg-red-700"></div>
                         <span class="tab-label">Extremo</span>
                     </div>
-
-                    <!-- Activador Automático -->
-                    <div class="browser-tab" data-tab="activadorAutomatico">
-                        <div class="tab-indicator bg-red-900"></div>
-                        <span class="tab-label">Activador</span>
-                    </div>
                 </div>
 
                 <!-- Contenido de las pestañas -->
@@ -487,6 +481,8 @@
                                     <tr>
                                         <th scope="col" class="px-6 py-3">Víctima</th>
                                         <th scope="col" class="px-6 py-3">Riesgo</th>
+                                        <th scope="col" class="px-6 py-3">Fecha</th>
+                                        <th scope="col" class="px-6 py-3">Estado</th>
                                         <th scope="col" class="px-6 py-3">Acciones</th>
                                     </tr>
                                 </thead>
@@ -570,26 +566,6 @@
                                 <tbody>
                                     <tr>
                                         <td class="px-6 py-4" colspan="3">Casos de riesgo extremo</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                    <!-- Tab: Activador Automático -->
-                    <div class="tab-content" id="activadorAutomatico">
-                        <div class="relative overflow-x-auto">
-                            <table class="w-full text-sm text-left">
-                                <thead class="text-xs uppercase">
-                                    <tr>
-                                        <th scope="col" class="px-6 py-3">Víctima</th>
-                                        <th scope="col" class="px-6 py-3">Riesgo</th>
-                                        <th scope="col" class="px-6 py-3">Acciones</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td class="px-6 py-4" colspan="3">Casos con activador automático</td>
                                     </tr>
                                 </tbody>
                             </table>

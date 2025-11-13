@@ -610,7 +610,7 @@
 
             <!-- Botón flotante -->
             <div class="fixed bottom-8 right-8 z-50">
-                <button class="floating-btn group w-12 h-12 rounded-full transition-all duration-300 ease-in-out flex items-center justify-center overflow-hidden hover:w-48 hover:rounded-full">
+                <button class="floating-btn group w-12 h-12 rounded-full bg-green-600 text-white shadow-lg transition-all duration-300 ease-in-out flex items-center justify-center overflow-hidden hover:w-48 hover:bg-green-700 hover:rounded-full">
                     <span class="text-2xl font-semibold absolute group-hover:opacity-0 transition-opacity duration-150">+</span>
                     <span class="text-sm font-medium absolute opacity-0 group-hover:opacity-100 transition-opacity duration-150 delay-100 whitespace-nowrap px-4">Agregar pregunta</span>
                 </button>
