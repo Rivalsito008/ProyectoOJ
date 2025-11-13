@@ -43,8 +43,10 @@
             --font-size: 16px;
             --text-colorcrd: #111827;
             --text-colorhd: #111827;
-            --text-colorhd: #111827;
             --dropdown-color: #ffffff;
+            --accent-color: #3b82f6;
+            --button-bg: #3b82f6;
+            --button-hover: #2563eb;
         }
 
         [data-theme="dark"] {
@@ -62,6 +64,9 @@
             --item-active: #6c55ba;
             --border-color-card: #b4b4b4ff;
             --dropdown-color: #ffffffff;
+            --accent-color: #9333ea;
+            --button-bg: #9333ea;
+            --button-hover: #7c3aed;
         }
 
         body {
@@ -69,6 +74,25 @@
             color: var(--text-colorcrd);
             font-size: var(--font-size);
             transition: all 0.3s ease;
+        }
+
+        /* ===== ELEMENTOS INTERACTIVOS CON COLORES DINÁMICOS ===== */
+        input[type="range"] {
+            accent-color: var(--accent-color);
+        }
+
+        input[type="radio"] {
+            accent-color: var(--accent-color);
+        }
+
+        .btn-primary {
+            background-color: var(--button-bg);
+            color: white;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--button-hover);
         }
 
         /* ===== SIDEBAR ===== */
@@ -157,7 +181,7 @@
 
         .card:hover {
             transform: translateY(-2px) scale(1.01);
-            border-color: rgb(108, 85, 150);
+            border-color: var(--accent-color);
             box-shadow: 0 6px 12px rgba(161, 161, 161, 0.8);
             background: linear-gradient(145deg, #fff, #fff);
         }
@@ -354,7 +378,7 @@
 
         .map-card:hover {
             transform: translateY(-2px) scale(1.01);
-            border-color: rgb(108, 85, 150);
+            border-color: var(--accent-color);
             box-shadow: 0 6px 12px rgba(161, 161, 161, 0.8);
             background: linear-gradient(145deg, #fff, #fff);
         }
@@ -389,7 +413,6 @@
             max-height: 380px;
             overflow-y: auto;
             overflow-x: hidden;
-            /* NUEVAS PROPIEDADES PARA CENTRAR */
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -803,7 +826,7 @@
             <!-- Sección del Mapa Compacta -->
             <section class="map-card">
                 <div class="map-card-header">
-                    <h2 class="map-card-title">Mapa de Casos por Departamento</h2>
+                    <h2 class="text-lg font-semibold text-gray-800">Mapa de Casos por Departamento</h2>
                 </div>
 
                 <div class="map-card-content">
