@@ -144,7 +144,22 @@
             transform: translateY(-2px);
             box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
             border-color: rgba(108, 85, 150, 0.3);
-            /* leve cambio al pasar el mouse */
+        }
+
+        /* ===== CARDS ===== */
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color-card);
+            border-radius: 0.5rem;
+            transition: all 0.3s ease, transform 0.2s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .card:hover {
+            transform: translateY(-2px) scale(1.01);
+            border-color: rgb(108, 85, 150);
+            box-shadow: 0 6px 12px rgba(161, 161, 161, 0.8);
+            background: linear-gradient(145deg, #fff, #fff);
         }
 
         /* ===== HEADER ===== */
@@ -328,71 +343,85 @@
         /* ===== MAPA - DISEÑO COMPACTO ===== */
         .map-card {
             background-color: var(--card-bg);
-            border-radius: 1rem;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-            border: 1px solid var(--border-color);
-            padding: 1.5rem;
-            margin-top: 1.5rem;
+            border: 1px solid var(--border-color-card);
+            border-radius: 0.5rem;
+            transition: all 0.3s ease, transform 0.2s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            padding: 1rem;
+            margin-top: 1rem;
+            width: 100%;
+        }
+
+        .map-card:hover {
+            transform: translateY(-2px) scale(1.01);
+            border-color: rgb(108, 85, 150);
+            box-shadow: 0 6px 12px rgba(161, 161, 161, 0.8);
+            background: linear-gradient(145deg, #fff, #fff);
         }
 
         .map-card-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 1.5rem;
+            margin-bottom: 0.75rem;
         }
 
         .map-card-title {
-            font-size: 1.25rem;
+            font-size: 1rem;
             font-weight: 600;
             color: var(--text-colorcrd);
         }
 
         .map-card-content {
             display: grid;
-            grid-template-columns: 1fr 400px;
-            gap: 1.5rem;
+            grid-template-columns: 1fr 320px;
+            gap: 1rem;
             align-items: start;
-        }
-
-        .map-wrapper {
-            position: relative;
-            background-color: var(--card-bg);
-            border-radius: 0.75rem;
-            border: 1px solid var(--border-color);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
+            height: 450px;
         }
 
         .map-info-panel {
             background-color: var(--bg-color);
             border-radius: 0.75rem;
-            padding: 1.5rem;
+            padding: 1.25rem;
             border: 1px solid var(--border-color);
             height: fit-content;
+            max-height: 380px;
+            overflow-y: auto;
+            overflow-x: hidden;
+            /* NUEVAS PROPIEDADES PARA CENTRAR */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-self: center;
         }
 
         .map-info-title {
-            font-size: 1.125rem;
+            font-size: 1.1rem;
             font-weight: 600;
-            margin-bottom: 1rem;
+            margin-bottom: 0.75rem;
             color: var(--text-colorcrd);
+            position: sticky;
+            top: 0;
+            background-color: var(--bg-color);
+            padding-bottom: 0.5rem;
+            z-index: 1;
         }
 
         .map-info-content {
             display: flex;
             flex-direction: column;
-            gap: 1rem;
+            gap: 0.75rem;
         }
 
         .map-info-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 0.75rem 0;
+            padding: 0.5rem 0;
             border-bottom: 1px solid var(--border-color);
+            min-height: auto;
+            flex-wrap: wrap;
         }
 
         .map-info-item:last-child {
@@ -400,65 +429,169 @@
         }
 
         .map-info-label {
-            font-size: 0.875rem;
+            font-size: 0.8rem;
             color: #6b7280;
+            flex-shrink: 0;
+            margin-right: 0.5rem;
         }
 
         .map-info-value {
-            font-size: 0.875rem;
+            font-size: 0.8rem;
             font-weight: 600;
             color: var(--item-active);
+            text-align: right;
+            flex: 1;
+            word-break: break-word;
+        }
+
+        .dept-name {
+            font-size: 1rem !important;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+
+        /* Colores para niveles de riesgo en el panel */
+        .riesgo-bajo {
+            color: #10b935ff !important;
+            font-weight: 700;
+        }
+
+        .riesgo-moderado {
+            color: #f59e0b !important;
+            font-weight: 700;
+        }
+
+        .riesgo-alto {
+            color: #ef4444 !important;
+            font-weight: 700;
+        }
+
+        .riesgo-extremo {
+            color: #7f1d1d !important;
+            font-weight: 700;
+            text-shadow: 0 0 2px rgba(127, 29, 29, 0.3);
         }
 
         /* Controles del mapa */
+        .map-controls {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .map-control-btn {
+            padding: 0.4rem 0.8rem;
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            background-color: var(--card-bg);
+            color: var(--text-colorcrd);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.75rem;
+            flex: 1;
+            min-width: 120px;
+        }
+
         .map-control-btn:hover {
             background-color: var(--hover-item);
-            transform: scale(1.1);
+            transform: scale(1.05);
+        }
+
+        .map-reset-btn {
+            background-color: #ef4444;
+            color: white;
+            border-color: #dc2626;
         }
 
         .map-reset-btn:hover {
-            background-color: var(--hover-item);
-            transform: scale(1.1);
+            background-color: #dc2626;
         }
 
         /* Responsive */
         @media (max-width: 1024px) {
             .map-card-content {
                 grid-template-columns: 1fr;
+                height: auto;
             }
 
             .map-info-panel {
                 order: 2;
+                max-height: 300px;
             }
         }
 
         @media (max-width: 768px) {
-            .map-wrapper {
-                height: 400px;
+            .map-card-content {
+                grid-template-columns: 1fr;
+                gap: 0.75rem;
             }
+
+            .map-info-panel {
+                padding: 1rem;
+                max-height: 250px;
+            }
+
+            .map-info-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.25rem;
+            }
+
+            .map-info-value {
+                text-align: left;
+                width: 100%;
+            }
+
+            .map-controls {
+                flex-direction: column;
+            }
+
+            .map-control-btn {
+                min-width: 100%;
+            }
+        }
+
+        /* Scrollbar personalizado para el panel */
+        .map-info-panel::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .map-info-panel::-webkit-scrollbar-track {
+            background: var(--bg-color);
+            border-radius: 3px;
+        }
+
+        .map-info-panel::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 3px;
+        }
+
+        .map-info-panel::-webkit-scrollbar-thumb:hover {
+            background: var(--item-active);
         }
 
         /* ESTILO DEL MAPA */
         .container {
             height: 100%;
             width: 100%;
+            max-height: 400px;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
+            overflow: hidden;
         }
 
         .container svg {
             height: 100%;
             width: 100%;
             max-height: none;
-            /* Eliminar límites máximos */
             max-width: none;
             object-fit: contain;
-            /* Mantener proporciones */
         }
 
-        /* Asegurar que los paths del mapa tengan el estilo correcto */
+        /* Estilos base para los departamentos */
         .container path {
             fill: #60a5fa;
             stroke: black;
@@ -467,10 +600,48 @@
             cursor: pointer;
         }
 
-        /* Hover para los paths individuales */
+        /* Hover AZUL para todos los departamentos */
         .container path:hover {
-            fill: #0077ffff;
-            stroke-width: 2.5;
+            fill: #3b82f6 !important;
+            stroke: #1d4ed8 !important;
+            stroke-width: 2.5px;
+            filter: drop-shadow(0 0 6px rgba(59, 130, 246, 0.4));
+        }
+
+        /* Colores de selección según el riesgo */
+        .container path.selected.riesgo-bajo {
+            fill: #10b910ff !important;
+            stroke: #0e922fff !important;
+            stroke-width: 3px;
+            filter: drop-shadow(0 0 8px rgba(16, 185, 129, 0.6));
+        }
+
+        .container path.selected.riesgo-moderado {
+            fill: #f59e0b !important;
+            stroke: #d97706 !important;
+            stroke-width: 3px;
+            filter: drop-shadow(0 0 8px rgba(245, 158, 11, 0.6));
+        }
+
+        .container path.selected.riesgo-alto {
+            fill: #ef4444 !important;
+            stroke: #dc2626 !important;
+            stroke-width: 3px;
+            filter: drop-shadow(0 0 8px rgba(239, 68, 68, 0.6));
+        }
+
+        .container path.selected.riesgo-extremo {
+            fill: #7f1d1d !important;
+            stroke: #450a0a !important;
+            stroke-width: 3px;
+            filter: drop-shadow(0 0 8px rgba(127, 29, 29, 0.6));
+        }
+
+        /* Highlight temporal al pasar el mouse */
+        .container path.highlighted:not(.selected) {
+            fill: #3b82f6 !important;
+            stroke: #1d4ed8 !important;
+            stroke-width: 2.5px;
         }
     </style>
 </head>
@@ -583,10 +754,9 @@
 
         <!-- Content -->
         <main class="p-6">
-            <!-- Tarjetas de estadísticas-->
-            <section class="card grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                 <!-- Riesgo Bajo -->
-                <div class="bg-white rounded-2xl shadow-md p-5 flex flex-col justify-between border border-gray-200 hover:shadow-lg transition">
+                <div class="card rounded-2xl p-5 flex flex-col justify-between">
                     <div>
                         <h2 class="text-lg font-semibold text-gray-800">Casos de Riesgo Bajo</h2>
                         <p class="text-3xl font-bold text-green-500 mt-2">12</p>
@@ -597,7 +767,7 @@
                 </div>
 
                 <!-- Riesgo Moderado -->
-                <div class="bg-white rounded-2xl shadow-md p-5 flex flex-col justify-between border border-gray-200 hover:shadow-lg transition">
+                <div class="card rounded-2xl p-5 flex flex-col justify-between">
                     <div>
                         <h2 class="text-lg font-semibold text-gray-800">Casos de Riesgo Moderado</h2>
                         <p class="text-3xl font-bold text-yellow-500 mt-2">96</p>
@@ -608,7 +778,7 @@
                 </div>
 
                 <!-- Riesgo Alto -->
-                <div class="bg-white rounded-2xl shadow-md p-5 flex flex-col justify-between border border-gray-200 hover:shadow-lg transition">
+                <div class="card rounded-2xl p-5 flex flex-col justify-between">
                     <div>
                         <h2 class="text-lg font-semibold text-gray-800">Casos de Riesgo Alto</h2>
                         <p class="text-3xl font-bold text-orange-500 mt-2">54</p>
@@ -619,7 +789,7 @@
                 </div>
 
                 <!-- Riesgo Extremo -->
-                <div class="bg-white rounded-2xl shadow-md p-5 flex flex-col justify-between border border-gray-200 hover:shadow-lg transition">
+                <div class="card rounded-2xl p-5 flex flex-col justify-between">
                     <div>
                         <h2 class="text-lg font-semibold text-gray-800">Casos de Riesgo Extremo</h2>
                         <p class="text-3xl font-bold text-red-500 mt-2">22</p>
@@ -638,9 +808,9 @@
 
                 <div class="map-card-content">
                     <!-- Mapa -->
-                    <div class="map-wrapper">
+                    <div>
                         <div class="container">
-                            <svg version="1.2" viewBox="0 0 1000 891" xmlns="http://www.w3.org/2000/svg" id="interactive-map">
+                            <svg version="1.2" viewBox="0 -50 1000 600" xmlns="http://www.w3.org/2000/svg" id="interactive-map">
                                 <g id="features">
                                     <path d="M183.1 180l3.2 1.3 6.8 4.3 1.3 1.2 0.7 0.8 0.4 0.8 0.8 3.2 0.4 0.9 0.6 0.9 1.3 1.3 1.6 1.2 1.3 1.4 0.1 0.1 0.8 1.5 0.3 0.9-1.1 6.9-7.5 25.9-6.7 2.8-8.2 2.3-4.6 0.7-1 0.7-0.8 1.1-0.4 2.5-0.1 1.6 0.9 7.2 0.6 2.3 0.7 1.7 0.9 1.8 0.3 0.9-0.2 1.3-7.6 11.7-0.7 2.1-0.2 1.6 3.1 10 0.4 2.2-0.5 1.5-1.1 1.8-2.8 3.4-1.1 2.1-0.6 1.6-0.3 3.6-0.3 1-4.8 8.6-0.7 1.9-2.1 8.6-1.9 0.8-3.1 0.4-11.3-0.7-2.3-0.5-0.8-0.5-2.7-2.6-4.9-5.7-0.8-0.6-1.5-1.1-0.9-0.4-1-0.4-1.4-0.1-1.5 0-2.1 0.4-1.3 0.4-1.1 0.5-0.9 0.6-1.1 0.9-2.8 3.4-5.9 9.4-0.9 1.4-25.4-11.6-29-14-6-25.1-0.1-6 0.9-6.3 2-6.1 3-5.6 4.5-4.6 10.3-5.5 4.6-3.8 3.4-5.4 2.5-5.6 3.2-5.5 5.6-4.9 36.1-25.3 7.9-8 4-2.7 16.7-6.3 5.5-0.4 6.8 1.8 9.8 7.6 5.5 2.3 5.5-3 0.1-2.2-0.3-0.6z" id="SVAH" name="Ahuachapán">
                                     </path>
@@ -719,7 +889,6 @@
                         <div class="map-info-content">
                             <div class="map-info-item">
                                 <span class="map-info-label">Departamento:</span>
-                                <span class="map-info-value" id="dept-name">Seleccione un departamento</span>
                             </div>
                             <div class="map-info-item">
                                 <span class="map-info-label">Casos activos:</span>
@@ -775,6 +944,7 @@
                 item.classList.add('justify-center');
             });
         });
+
         // Dropdown de perfil
         const profileButton = document.getElementById('profileButton');
         const profileDropdown = document.getElementById('profileDropdown');
@@ -808,6 +978,7 @@
                 cerrarDropdown();
             }
         });
+
         // Tab functionality
         const browserTabs = document.querySelectorAll('.browser-tab');
         const tabContents = document.querySelectorAll('.tab-content');
@@ -839,6 +1010,206 @@
                 const nuevoTema = e.matches ? 'dark' : 'light';
                 document.documentElement.setAttribute('data-theme', nuevoTema);
             }
+        });
+
+        // Datos de ejemplo para los departamentos
+        const departamentosData = {
+            "Ahuachapán": {
+                casos: 15,
+                riesgo: "Moderado",
+                actualizacion: "2024-01-15",
+            },
+            "Santa Ana": {
+                casos: 28,
+                riesgo: "Alto",
+                actualizacion: "2024-01-14",
+            },
+            "Sonsonate": {
+                casos: 12,
+                riesgo: "Bajo",
+                actualizacion: "2024-01-16",
+            },
+            "Chalatenango": {
+                casos: 8,
+                riesgo: "Bajo",
+                actualizacion: "2024-01-13",
+            },
+            "La Libertad": {
+                casos: 35,
+                riesgo: "Alto",
+                actualizacion: "2024-01-15",
+            },
+            "San Salvador": {
+                casos: 42,
+                riesgo: "Extremo",
+                actualizacion: "2024-01-16",
+            },
+            "Cuscatlán": {
+                casos: 18,
+                riesgo: "Moderado",
+                actualizacion: "2024-01-14",
+            },
+            "La Paz": {
+                casos: 22,
+                riesgo: "Moderado",
+                actualizacion: "2024-01-15",
+            },
+            "Cabañas": {
+                casos: 6,
+                riesgo: "Bajo",
+                actualizacion: "2024-01-12",
+            },
+            "San Vicente": {
+                casos: 14,
+                riesgo: "Moderado",
+                actualizacion: "2024-01-14",
+            },
+            "Usulután": {
+                casos: 25,
+                riesgo: "Alto",
+                actualizacion: "2024-01-15",
+            },
+            "San Miguel": {
+                casos: 31,
+                riesgo: "Alto",
+                actualizacion: "2024-01-16",
+            },
+            "Morazán": {
+                casos: 9,
+                riesgo: "Bajo",
+                actualizacion: "2024-01-13",
+            },
+            "La Unión": {
+                casos: 19,
+                riesgo: "Moderado",
+                actualizacion: "2024-01-14",
+            }
+        };
+
+        // Variables globales
+        let departamentoSeleccionado = null;
+
+        // Función para inicializar el mapa interactivo
+        function inicializarMapa() {
+            const paths = document.querySelectorAll('#interactive-map path');
+
+            paths.forEach(path => {
+                // Agregar evento click a cada departamento
+                path.addEventListener('click', function() {
+                    const nombreDepto = this.getAttribute('name');
+                    seleccionarDepartamento(nombreDepto, this);
+                });
+
+                // Agregar eventos hover
+                path.addEventListener('mouseenter', function() {
+                    if (!this.classList.contains('selected')) {
+                        this.classList.add('highlighted');
+                    }
+                });
+
+                path.addEventListener('mouseleave', function() {
+                    this.classList.remove('highlighted');
+                });
+            });
+        }
+
+        // Función para seleccionar/deseleccionar un departamento - CORREGIDA
+        function seleccionarDepartamento(nombre, elemento) {
+            const paths = document.querySelectorAll('#interactive-map path');
+
+            // Si ya está seleccionado, deseleccionar
+            if (departamentoSeleccionado === nombre) {
+                paths.forEach(path => {
+                    path.classList.remove('selected', 'riesgo-bajo', 'riesgo-moderado', 'riesgo-alto', 'riesgo-extremo');
+                });
+                departamentoSeleccionado = null;
+                return;
+            }
+
+            // Deseleccionar todos y seleccionar el nuevo
+            paths.forEach(path => {
+                path.classList.remove('selected', 'riesgo-bajo', 'riesgo-moderado', 'riesgo-alto', 'riesgo-extremo');
+            });
+
+            // Obtener datos del departamento para aplicar clase de riesgo
+            const deptData = departamentosData[nombre];
+
+            // Aplicar clases al elemento seleccionado
+            elemento.classList.add('selected');
+
+            // Aplicar clase de riesgo según el nivel
+            if (deptData) {
+                switch (deptData.riesgo.toLowerCase()) {
+                    case 'bajo':
+                        elemento.classList.add('riesgo-bajo');
+                        break;
+                    case 'moderado':
+                        elemento.classList.add('riesgo-moderado');
+                        break;
+                    case 'alto':
+                        elemento.classList.add('riesgo-alto');
+                        break;
+                    case 'extremo':
+                        elemento.classList.add('riesgo-extremo');
+                        break;
+                }
+            }
+
+            departamentoSeleccionado = nombre;
+
+            // Actualizar información del panel
+            actualizarInformacionDepartamento(nombre);
+        }
+
+        // Función para actualizar la información del departamento
+        function actualizarInformacionDepartamento(nombre) {
+            const deptData = departamentosData[nombre];
+
+            if (deptData) {
+                // Actualizar el nombre del departamento
+                const deptNameElement = document.querySelector('.map-info-item:first-child');
+                deptNameElement.innerHTML = `<span class="map-info-label">Departamento:</span>
+                                <span class="map-info-value dept-name">${nombre}</span>`;
+
+                // Actualizar los demás datos con clases de color según el riesgo
+                document.getElementById('dept-cases').textContent = deptData.casos;
+
+                const riesgoElement = document.getElementById('dept-risk');
+                riesgoElement.textContent = deptData.riesgo;
+
+                // Aplicar clase de color según el nivel de riesgo
+                riesgoElement.className = 'map-info-value'; // Reset classes
+                switch (deptData.riesgo.toLowerCase()) {
+                    case 'bajo':
+                        riesgoElement.classList.add('riesgo-bajo');
+                        break;
+                    case 'moderado':
+                        riesgoElement.classList.add('riesgo-moderado');
+                        break;
+                    case 'alto':
+                        riesgoElement.classList.add('riesgo-alto');
+                        break;
+                    case 'extremo':
+                        riesgoElement.classList.add('riesgo-extremo');
+                        break;
+                }
+
+                document.getElementById('dept-update').textContent = deptData.actualizacion;
+            }
+        }
+
+        // Función para resetear la selección
+        function resetearSeleccion() {
+            const paths = document.querySelectorAll('#interactive-map path');
+            paths.forEach(path => {
+                path.classList.remove('selected', 'riesgo-bajo', 'riesgo-moderado', 'riesgo-alto', 'riesgo-extremo');
+            });
+            departamentoSeleccionado = null;
+        }
+
+        // Inicializar el mapa cuando el DOM esté listo
+        document.addEventListener('DOMContentLoaded', function() {
+            inicializarMapa();
         });
     </script>
 </body>
