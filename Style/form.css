@@ -7,6 +7,7 @@
     --text-colorsdb: #3d444d;
     --titledashboard: #000000ff;
     --border-color-card: #d8d8d8ff;
+    --border-modal: #3d444d;
     --contrast: 1;
     --item-active: #3b82f6;
     --hover-item: rgba(99, 99, 99, 0.1);
@@ -31,6 +32,7 @@
     --card-bg: #ffffffff;
     --sidebar-bg: #2a2240;
     --border-color: #3d3454;
+    --border-modal: #bebdbd;
     --hover-hd: rgba(108, 85, 150, 0.35);
     --flecha-color: #ffffffff;
     --hover-item: rgba(108, 85, 150, 0.35);
@@ -230,7 +232,7 @@ input[type="email"],
 select {
     background-color: var(--card-bg);
     color: var(--text-colorcrd);
-    border: 1px solid var(--border-color);
+    border: 1px solid var(--border-modal);
     border-radius: 0.5rem;
     padding: 0.75rem;
     transition: all 0.3s ease;
@@ -254,7 +256,7 @@ select:focus {
 
 /* Preguntas del cuestionario */
 #preguntasForm .border {
-    border-color: var(--border-color);
+    border-color: var(--border-modal);
     background-color: var(--card-bg);
     transition: all 0.3s ease;
 }
