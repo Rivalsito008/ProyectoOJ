@@ -5,326 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SIGEN - Sistema de Gestión Notarial</title>
-    <script>
-        (function() {
-            // Aplicar tema
-            const t = localStorage.getItem('theme-preference') || 'auto';
-            let f = t;
-            if (t === 'auto') {
-                f = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-            }
-            document.documentElement.setAttribute('data-theme', f);
 
-            // Aplicar tamaño de fuente
-            const fontSize = localStorage.getItem('font-size') || '16';
-            document.documentElement.style.setProperty('--font-size', fontSize + 'px');
-
-            // Aplicar contraste
-            const contrast = localStorage.getItem('contrast') || '1';
-            document.documentElement.style.setProperty('--contrast', contrast);
-        })();
-    </script>
     <script src="https://cdn.tailwindcss.com"></script>
-
-    <style>
-        :root {
-            --bg-color: #f9fafb;
-            --text-color: #111827;
-            --card-bg: #ffffff;
-            --border-color: #e5e7eb;
-            --sidebar-bg: #ffffff;
-            --text-colorsdb: #3d444d;
-            --titledashboard: #000000ff;
-            --border-color-card: #d8d8d8ff;
-            --contrast: 1;
-            --item-active: #3b82f6;
-            --hover-item: rgba(99, 99, 99, 0.1);
-            --hover-hd: rgba(99, 99, 99, 0.1);
-            --font-size: 16px;
-            --text-colorcrd: #111827;
-            --text-colorhd: #111827;
-            --text-colorhd: #111827;
-            --dropdown-color: #ffffff;
-        }
-
-        [data-theme="dark"] {
-            --titledashboard: #ffffffff;
-            --bg-color: #e4e4e4ff;
-            --text-colorcrd: #000000ff;
-            --text-colorsdb: #ffffffff;
-            --text-colorhd: #ffffffff;
-            --card-bg: #ffffffff;
-            --sidebar-bg: #2a2240;
-            --border-color: #3d3454;
-            --hover-hd: rgba(108, 85, 150, 0.35);
-            --flecha-color: #ffffffff;
-            --hover-item: rgba(108, 85, 150, 0.35);
-            --item-active: #6c55ba;
-            --border-color-card: #b4b4b4ff;
-            --dropdown-color: #ffffffff;
-        }
-
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-colorcrd);
-            font-size: var(--font-size);
-            transition: all 0.3s ease;
-        }
-
-        /* ===== SIDEBAR ===== */
-        .sidebar {
-            transition: width 0.3s ease;
-            background-color: var(--sidebar-bg);
-            color: var(--text-colorsdb);
-            border-right: 1px solid var(--border-color);
-        }
-
-        .sidebar-collapsed {
-            width: 80px;
-        }
-
-        .sidebar-expanded {
-            width: 256px;
-        }
-
-        .content {
-            margin-left: 80px;
-            transition: margin-left 0.3s ease;
-        }
-
-        /* ===== NAV ITEMS ===== */
-        .nav-item {
-            transition: all 0.25s ease;
-            color: var(--text-colorsdb);
-            border-radius: 0.5rem;
-        }
-
-        .nav-item:hover {
-            background-color: var(--hover-item);
-            color: var(--text-colorsdb);
-        }
-
-        [data-theme="dark"] .nav-item:hover {
-            background-color: var(--hover-item);
-            color: #ffffff;
-            box-shadow: inset 0 0 6px rgba(180, 160, 255, 0.2);
-            transform: translateX(2px);
-        }
-
-        .nav-item.active {
-            background-color: var(--item-active);
-            color: #ffffff;
-            box-shadow: inset 0 0 8px rgba(255, 255, 255, 0.1);
-        }
-
-        .nav-item.active:hover {
-            background-color: var(--item-active);
-            color: #ffffff;
-            transform: none;
-        }
-
-        .flecha {
-            stroke: var(--flecha-color);
-            transition: stroke 0.3s ease;
-        }
-
-        .nav-item svg {
-            min-width: 20px;
-        }
-
-        /* ===== DROPDOWN ===== */
-        .dropdown {
-            background-color: var(--dropdown-color);
-            border-radius: 0.75rem;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-        }
-
-        .dropdown:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-            border-color: rgba(108, 85, 150, 0.3);
-            /* leve cambio al pasar el mouse */
-        }
-
-        /* ===== HEADER ===== */
-        .header-bg {
-            background-color: var(--sidebar-bg);
-            border-bottom: 1px solid var(--border-color);
-            color: var(--text-colorhd);
-        }
-
-        .header:hover {
-            background-color: var(--hover-hd);
-            border-radius: 0.75rem;
-            color: #ffffff;
-            box-shadow: inset 0 0 8px rgba(255, 255, 255, 0.1);
-            transform: none;
-        }
-
-        .titledashboard {
-            color: var(--titledashboard);
-            transition: color 0.3s ease;
-        }
-
-        .hide-on-collapse {
-            display: none;
-        }
-
-        .hidden {
-            display: none;
-        }
-
-        /* ===== TABS ===== */
-        .tabs-container {
-            background: transparent;
-            padding-top: 8px;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .tabs-wrapper {
-            display: flex;
-            gap: 8px;
-            padding: 0 8px;
-        }
-
-        .browser-tab {
-            position: relative;
-            padding: 12px 20px;
-            background: transparent;
-            border-radius: 8px 8px 0 0;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            min-width: 50px;
-            width: 50px;
-            border: none;
-            overflow: hidden;
-        }
-
-        .browser-tab:hover,
-        .browser-tab.active {
-            width: 160px;
-            min-width: 160px;
-            padding: 12px 20px;
-        }
-
-        .browser-tab:hover:not(.active) {
-            background: var(--hover-item);
-        }
-
-        .browser-tab.active {
-            background: var(--card-bg);
-            box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.05);
-        }
-
-        .tab-indicator {
-            width: 14px;
-            height: 14px;
-            border-radius: 50%;
-            flex-shrink: 0;
-            transition: transform 0.3s ease;
-        }
-
-        .browser-tab:hover .tab-indicator,
-        .browser-tab.active .tab-indicator {
-            transform: scale(1.1);
-        }
-
-        .tab-label {
-            font-weight: 500;
-            color: var(--text-colorcrd);
-            font-size: 14px;
-            user-select: none;
-            white-space: nowrap;
-            opacity: 0;
-            transform: translateX(-10px);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .browser-tab:hover .tab-label,
-        .browser-tab.active .tab-label {
-            opacity: 1;
-            transform: translateX(0);
-        }
-
-        .tab-content-wrapper {
-            background: var(--card-bg);
-            min-height: 500px;
-            padding: 40px;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
-            animation: fadeIn 0.3s ease;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-
-            to {
-                opacity: 1;
-            }
-        }
-
-        /* ===== TABLES ===== */
-        table {
-            background-color: var(--card-bg);
-            color: var(--text-colorcrd);
-        }
-
-        thead {
-            background-color: var(--bg-color);
-            color: var(--text-colorcrd);
-        }
-
-        tbody tr {
-            background-color: var(--card-bg);
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        /* ===== MODAL ===== */
-        .modal-content {
-            background-color: var(--card-bg);
-            color: var(--text-colorcrd);
-        }
-
-        .modal-header {
-            background-color: var(--bg-color);
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .modal-footer {
-            background-color: var(--bg-color);
-            border-top: 1px solid var(--border-color);
-        }
-
-        input,
-        select {
-            background-color: var(--card-bg);
-            color: var(--text-colorcrd);
-            border-color: var(--border-color);
-        }
-
-        .modal-animate {
-            animation: slideDown 0.2s ease-out;
-        }
-
-        #profileButton:hover {
-            background-color: var(--hover-hd);
-        }
-    </style>
+    <link rel="stylesheet" href="Style/preguntas.css">
 </head>
 
 <body>
@@ -608,115 +291,75 @@
                 </div>
             </div>
 
-            <!-- Botón flotante -->
+            <!-- Botón Flotante -->
             <div class="fixed bottom-8 right-8 z-50">
-                <button class="floating-btn group w-12 h-12 rounded-full bg-green-600 text-white shadow-lg transition-all duration-300 ease-in-out flex items-center justify-center overflow-hidden hover:w-48 hover:bg-green-700 hover:rounded-full">
-                    <span class="text-2xl font-semibold absolute group-hover:opacity-0 transition-opacity duration-150">+</span>
-                    <span class="text-sm font-medium absolute opacity-0 group-hover:opacity-100 transition-opacity duration-150 delay-100 whitespace-nowrap px-4">Agregar pregunta</span>
+                <button id="openQuestionBtn" class="group relative w-14 h-14 bg-gradient-to-r from-blue-500 to-purple-600 text-white font-medium rounded-full shadow-lg hover:shadow-2xl transition-all duration-500 ease-out flex items-center justify-center overflow-hidden hover:w-52">
+                    <div class="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 blur-md transition-opacity duration-500"></div>
+                    <span class="absolute text-3xl font-bold transition-all duration-300 transform group-hover:-translate-x-4 group-hover:opacity-0">+</span>
+                    <span class="absolute opacity-0 text-sm tracking-wide font-semibold transition-all duration-500 transform translate-x-4 group-hover:translate-x-0 group-hover:opacity-100">Agregar Pregunta</span>
                 </button>
             </div>
-        </main>
+
+            <!-- Modal de Preguntas -->
+            <div id="questionFormModal" class="fixed inset-0 z-50 bg-black bg-opacity-50 hidden items-center justify-center p-4">
+                <div class="modal-content rounded-2xl shadow-2xl max-w-2xl w-full overflow-y-auto max-h-[90vh]">
+                    <div class="modal-header flex justify-between items-center p-5 rounded-t-2xl">
+                        <h2 class="text-lg font-semibold flex items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            Nueva Pregunta
+                        </h2>
+                        <button id="closeQuestionBtn" class="text-gray-500 hover:text-red-500 transition">✕</button>
+                    </div>
+
+                    <section class="p-6 space-y-6">
+                        <div class="space-y-4">
+                            <!-- Campo: Pregunta -->
+                            <div>
+                                <label class="block font-medium mb-1">Pregunta *</label>
+                                <textarea class="input-field w-full" rows="3" placeholder="Escribe la pregunta aquí..."></textarea>
+
+                            </div>
+
+                            <!-- Campo: Ámbito -->
+                            <div>
+                                <label class="block font-medium mb-1">Ámbito *</label>
+                                <select class="input-field w-full">
+                                    <option>Seleccionar ámbito</option>
+                                    <option value="legal">Legal</option>
+                                    <option value="financiero">Financiero</option>
+                                    <option value="operacional">Operacional</option>
+                                    <option value="tecnologico">Tecnológico</option>
+                                    <option value="compliance">Compliance</option>
+                                    <option value="reputacional">Reputacional</option>
+                                </select>
+                            </div>
+
+                            <!-- Campo: Riesgo -->
+                            <label class="block font-medium mb-1">Nivel de Riesgo *</label>
+                            <select class="input-field w-full">
+                                <option>Seleccionar nivel de riesgo</option>
+                                <option value="bajo" class="text-green-600">Bajo</option>
+                                <option value="moderado" class="text-yellow-600">Moderado</option>
+                                <option value="alto" class="text-orange-600">Alto</option>
+                                <option value="extremo" class="text-red-600">Extremo</option>
+                                <option value="activador" class="text-purple-600">Activador Automático</option>
+                            </select>
+
+                            <div class="px-6 py-4 bg-white flex justify-end">
+                                <button id="btnGuardarPregunta" class="btn-primary px-5 py-2 rounded-lg bg-blue-500 text-white hover:bg-blue-600 transition">Guardar Pregunta</button>
+                            </div>
+                        </div>
+
+                </div>
+                </section>
+            </div>
     </div>
 
-    <script>
-        // Sidebar hover effect
-        const sidebar = document.getElementById('sidebar');
-        const logoCompact = document.getElementById('logo-compact');
-        const logoFull = document.getElementById('logo-full');
-        const navLabels = document.querySelectorAll('.nav-label');
-        const navItems = document.querySelectorAll('.nav-item');
-
-        sidebar.addEventListener('mouseenter', () => {
-            sidebar.classList.remove('sidebar-collapsed');
-            sidebar.classList.add('sidebar-expanded');
-            logoCompact.style.display = 'none';
-            logoFull.style.display = 'block';
-            navLabels.forEach(label => {
-                label.style.display = 'inline-block';
-            });
-            navItems.forEach(item => {
-                item.classList.remove('justify-center');
-            });
-        });
-
-        sidebar.addEventListener('mouseleave', () => {
-            sidebar.classList.remove('sidebar-expanded');
-            sidebar.classList.add('sidebar-collapsed');
-            logoCompact.style.display = 'flex';
-            logoFull.style.display = 'none';
-            navLabels.forEach(label => {
-                label.style.display = 'none';
-            });
-            navItems.forEach(item => {
-                item.classList.add('justify-center');
-            });
-        });
-        // Dropdown de perfil
-        const profileButton = document.getElementById('profileButton');
-        const profileDropdown = document.getElementById('profileDropdown');
-
-        profileButton.addEventListener('click', (e) => {
-            e.stopPropagation();
-            profileDropdown.classList.toggle('hidden');
-        });
-
-        // Cerrar dropdown al hacer clic fuera
-        document.addEventListener('click', (e) => {
-            if (!profileButton.contains(e.target) && !profileDropdown.contains(e.target)) {
-                profileDropdown.classList.add('hidden');
-            }
-        });
-
-        function cerrarDropdown() {
-            profileDropdown.classList.add('hidden');
-        }
-
-        // Función para cerrar sesión
-        function cerrarSesion() {
-            if (confirm('¿Estás seguro que deseas cerrar sesión?')) {
-                window.location.href = 'logout.php';
-            }
-        }
-
-        // Cerrar dropdown con tecla ESC
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                cerrarDropdown();
-            }
-        });
-        // Tab functionality
-        const browserTabs = document.querySelectorAll('.browser-tab');
-        const tabContents = document.querySelectorAll('.tab-content');
-
-        browserTabs.forEach(tab => {
-            tab.addEventListener('click', () => {
-                const tabName = tab.getAttribute('data-tab');
-
-                // Remove active class from all tabs
-                browserTabs.forEach(t => t.classList.remove('active'));
-
-                // Add active class to clicked tab
-                tab.classList.add('active');
-
-                // Remove active class from all contents
-                tabContents.forEach(content => {
-                    content.classList.remove('active');
-                });
-
-                // Add active class to selected content
-                document.getElementById(tabName).classList.add('active');
-            });
-        });
-
-        // Detectar cambios en preferencia de sistema (para modo auto)
-        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
-            const temaActual = localStorage.getItem('theme-preference') || 'auto';
-            if (temaActual === 'auto') {
-                const nuevoTema = e.matches ? 'dark' : 'light';
-                document.documentElement.setAttribute('data-theme', nuevoTema);
-            }
-        });
-    </script>
+    </main>
+    </div>
+    <script src="JS/preguntas.js"></script>
 </body>
 
 </html>
