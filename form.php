@@ -5,445 +5,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>SIGEN - Sistema de Gestión Notarial</title>
-  <script>
-    (function() {
-      // Aplicar tema
-      const t = localStorage.getItem('theme-preference') || 'auto';
-      let f = t;
-      if (t === 'auto') {
-        f = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-      }
-      document.documentElement.setAttribute('data-theme', f);
-
-      // Aplicar tamaño de fuente
-      const fontSize = localStorage.getItem('font-size') || '16';
-      document.documentElement.style.setProperty('--font-size', fontSize + 'px');
-
-      // Aplicar contraste
-      const contrast = localStorage.getItem('contrast') || '1';
-      document.documentElement.style.setProperty('--contrast', contrast);
-    })();
-  </script>
   <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-    :root {
-      --bg-color: #f9fafb;
-      --text-color: #111827;
-      --card-bg: #ffffff;
-      --border-color: #e5e7eb;
-      --sidebar-bg: #ffffff;
-      --text-colorsdb: #3d444d;
-      --titledashboard: #000000ff;
-      --border-color-card: #d8d8d8ff;
-      --contrast: 1;
-      --item-active: #3b82f6;
-      --hover-item: rgba(99, 99, 99, 0.1);
-      --hover-hd: rgba(99, 99, 99, 0.1);
-      --font-size: 16px;
-      --text-colorcrd: #111827;
-      --text-colorhd: #111827;
-      --dropdown-color: #ffffff;
-      --accent-color: #3b82f6;
-      --button-bg: #3b82f6;
-      --button-hover: #2563eb;
-      --progress-bg: #3b82f6;
-    }
-
-    [data-theme="dark"] {
-      --titledashboard: #ffffffff;
-      --bg-color: #e4e4e4ff;
-      --text-colorcrd: #000000ff;
-      --text-colorsdb: #ffffffff;
-      --text-colorhd: #ffffffff;
-      --card-bg: #ffffffff;
-      --sidebar-bg: #2a2240;
-      --border-color: #3d3454;
-      --hover-hd: rgba(108, 85, 150, 0.35);
-      --flecha-color: #ffffffff;
-      --hover-item: rgba(108, 85, 150, 0.35);
-      --item-active: #6c55ba;
-      --border-color-card: #b4b4b4ff;
-      --dropdown-color: #ffffffff;
-      --accent-color: #9333ea;
-      --button-bg: #9333ea;
-      --button-hover: #7c3aed;
-      --progress-bg: #9333ea;
-    }
-
-    body {
-      background-color: var(--bg-color);
-      color: var(--text-colorcrd);
-      font-size: var(--font-size);
-      transition: all 0.3s ease;
-    }
-
-    /* ===== ELEMENTOS INTERACTIVOS CON COLORES DINÁMICOS ===== */
-    input[type="range"] {
-      accent-color: var(--accent-color);
-    }
-
-    input[type="radio"] {
-      accent-color: var(--accent-color);
-    }
-
-    input[type="checkbox"] {
-      accent-color: var(--accent-color);
-    }
-
-    .btn-primary {
-      background-color: var(--button-bg);
-      color: white;
-      transition: all 0.3s ease;
-    }
-
-    .btn-primary:hover {
-      background-color: var(--button-hover);
-    }
-
-    /* ===== SIDEBAR ===== */
-    .sidebar {
-      transition: width 0.3s ease;
-      background-color: var(--sidebar-bg);
-      color: var(--text-colorsdb);
-      border-right: 1px solid var(--border-color);
-    }
-
-    .sidebar-collapsed {
-      width: 80px;
-    }
-
-    .sidebar-expanded {
-      width: 256px;
-    }
-
-    .content {
-      margin-left: 80px;
-      transition: margin-left 0.3s ease;
-    }
-
-    /* ===== DROPDOWN ===== */
-    .dropdown {
-      background-color: var(--dropdown-color);
-      border-radius: 0.75rem;
-      transition: all 0.3s ease;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-    }
-
-    .dropdown:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-      border-color: rgba(108, 85, 150, 0.3);
-    }
-
-    /* ===== NAV ITEMS ===== */
-    .nav-item {
-      transition: all 0.25s ease;
-      color: var(--text-colorsdb);
-      border-radius: 0.5rem;
-    }
-
-    .nav-item:hover {
-      background-color: var(--hover-item);
-      color: var(--text-colorsdb);
-    }
-
-    [data-theme="dark"] .nav-item:hover {
-      background-color: var(--hover-item);
-      color: #ffffff;
-      box-shadow: inset 0 0 6px rgba(180, 160, 255, 0.2);
-      transform: translateX(2px);
-    }
-
-    .nav-item.active {
-      background-color: var(--item-active);
-      color: #ffffff;
-      box-shadow: inset 0 0 8px rgba(255, 255, 255, 0.1);
-    }
-
-    .nav-item.active:hover {
-      background-color: var(--item-active);
-      color: #ffffff;
-      transform: none;
-    }
-
-    .flecha {
-      stroke: var(--flecha-color);
-      transition: stroke 0.3s ease;
-    }
-
-    .nav-item svg {
-      min-width: 20px;
-    }
-
-    /* ===== HEADER ===== */
-    .header-bg {
-      background-color: var(--sidebar-bg);
-      border-bottom: 1px solid var(--border-color);
-      color: var(--text-colorhd);
-    }
-
-    .header:hover {
-      background-color: var(--hover-hd);
-      border-radius: 0.75rem;
-      color: #ffffff;
-      box-shadow: inset 0 0 8px rgba(255, 255, 255, 0.1);
-      transform: none;
-    }
-
-    .titledashboard {
-      color: var(--titledashboard);
-      transition: color 0.3s ease;
-    }
-
-    .hide-on-collapse {
-      display: none;
-    }
-
-    .hidden {
-      display: none;
-    }
-
-    /* ===== TABS ===== */
-    .tabs-container {
-      background: transparent;
-      padding-top: 8px;
-      max-width: 1200px;
-      margin: 0 auto;
-    }
-
-    .tabs-wrapper {
-      display: flex;
-      gap: 8px;
-      padding: 0 8px;
-    }
-
-    .browser-tab {
-      position: relative;
-      padding: 12px 20px;
-      background: transparent;
-      border-radius: 8px 8px 0 0;
-      cursor: pointer;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      min-width: 50px;
-      width: 50px;
-      border: none;
-      overflow: hidden;
-    }
-
-    .browser-tab:hover,
-    .browser-tab.active {
-      width: 160px;
-      min-width: 160px;
-      padding: 12px 20px;
-    }
-
-    .browser-tab:hover:not(.active) {
-      background: var(--hover-item);
-    }
-
-    .browser-tab.active {
-      background: var(--card-bg);
-      box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.05);
-    }
-
-    .tab-indicator {
-      width: 14px;
-      height: 14px;
-      border-radius: 50%;
-      flex-shrink: 0;
-      transition: transform 0.3s ease;
-    }
-
-    .browser-tab:hover .tab-indicator,
-    .browser-tab.active .tab-indicator {
-      transform: scale(1.1);
-    }
-
-    .tab-label {
-      font-weight: 500;
-      color: var(--text-colorcrd);
-      font-size: 14px;
-      user-select: none;
-      white-space: nowrap;
-      opacity: 0;
-      transform: translateX(-10px);
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    .browser-tab:hover .tab-label,
-    .browser-tab.active .tab-label {
-      opacity: 1;
-      transform: translateX(0);
-    }
-
-    .tab-content-wrapper {
-      background: var(--card-bg);
-      min-height: 500px;
-      padding: 40px;
-      border-radius: 12px;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    }
-
-    .tab-content {
-      display: none;
-    }
-
-    .tab-content.active {
-      display: block;
-      animation: fadeIn 0.3s ease;
-    }
-
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
-      }
-
-      to {
-        opacity: 1;
-      }
-    }
-
-    /* ===== TABLES ===== */
-    table {
-      background-color: var(--card-bg);
-      color: var(--text-colorcrd);
-    }
-
-    thead {
-      background-color: var(--bg-color);
-      color: var(--text-colorcrd);
-    }
-
-    tbody tr {
-      background-color: var(--card-bg);
-      border-bottom: 1px solid var(--border-color);
-    }
-
-    /* ===== MODAL ===== */
-    .modal-content {
-      background-color: var(--card-bg);
-      color: var(--text-colorcrd);
-    }
-
-    .modal-header {
-      background-color: var(--bg-color);
-      border-bottom: 1px solid var(--border-color);
-    }
-
-    .modal-footer {
-      background-color: var(--bg-color);
-      border-top: 1px solid var(--border-color);
-    }
-
-    input,
-    select {
-      background-color: var(--card-bg);
-      color: var(--text-colorcrd);
-      border-color: var(--border-color);
-    }
-
-    .modal-animate {
-      animation: slideDown 0.2s ease-out;
-    }
-
-    #profileButton:hover {
-      background-color: var(--hover-hd);
-    }
-
-    /* ===== FORMULARIO ===== */
-    #multiStepForm {
-      background-color: var(--card-bg);
-      border: 1px solid var(--border-color-card);
-      border-radius: 0.5rem;
-      transition: all 0.3s ease, transform 0.2s ease;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-    }
-
-    #multiStepForm:hover {
-      transform: translateY(-2px) scale(1.01);
-      border-color: var(--accent-color);
-      box-shadow: 0 6px 12px rgba(161, 161, 161, 0.8);
-      background: linear-gradient(145deg, #fff, #fff);
-    }
-
-    /* Barra de progreso */
-    #progressBar {
-      background-color: var(--progress-bg);
-    }
-
-    /* Botones del formulario */
-    #nextBtn {
-      background-color: var(--button-bg);
-      color: white;
-      transition: all 0.3s ease;
-    }
-
-    #nextBtn:hover {
-      background-color: var(--button-hover);
-    }
-
-    #prevBtn {
-      background-color: #6b7280;
-      color: white;
-      transition: all 0.3s ease;
-    }
-
-    #prevBtn:hover {
-      background-color: #4b5563;
-    }
-
-    /* Inputs del formulario */
-    input[type="text"],
-    input[type="tel"],
-    input[type="email"],
-    select {
-      background-color: var(--card-bg);
-      color: var(--text-colorcrd);
-      border: 1px solid var(--border-color);
-      border-radius: 0.5rem;
-      padding: 0.75rem;
-      transition: all 0.3s ease;
-    }
-
-    input[type="text"]:focus,
-    input[type="tel"]:focus,
-    input[type="email"]:focus,
-    select:focus {
-      outline: none;
-      border-color: var(--accent-color);
-      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-    }
-
-    [data-theme="dark"] input[type="text"]:focus,
-    [data-theme="dark"] input[type="tel"]:focus,
-    [data-theme="dark"] input[type="email"]:focus,
-    [data-theme="dark"] select:focus {
-      box-shadow: 0 0 0 3px rgba(147, 51, 234, 0.1);
-    }
-
-    /* Preguntas del cuestionario */
-    #preguntasForm .border {
-      border-color: var(--border-color);
-      background-color: var(--card-bg);
-      transition: all 0.3s ease;
-    }
-
-    #preguntasForm .border:hover {
-      border-color: var(--accent-color);
-      transform: translateY(-1px);
-    }
-
-    /* Radio buttons en preguntas */
-    #preguntasForm input[type="radio"] {
-      accent-color: var(--accent-color);
-    }
-  </style>
+  <link rel="stylesheet" href="Style/form.css">
 </head>
 
-<body class="bg-gray-50">
+<body>
   <!-- Sidebar -->
   <aside id="sidebar" class="sidebar sidebar-collapsed fixed top-0 left-0 z-40 h-screen">
     <div class="h-full px-3 py-4 overflow-y-auto">
@@ -502,8 +68,6 @@
         <!-- Título alineado a la izquierda -->
         <h1 class="titledashboard text-2xl font-bold">Formulario</h1>
         <div class="flex items-center gap-4">
-          <div class="relative hidden md:block">
-          </div>
         </div>
         <div class="header flex items-center gap-4">
           <!--Botón de perfil -->
@@ -551,34 +115,35 @@
 
     <main class="p-6">
       <!-- Progreso -->
-      <div class="w-full bg-gray-200 rounded-full h-2 mb-8">
-        <div id="progressBar" class="bg-blue-600 h-2 rounded-full transition-all duration-300" style="width: 25%;"></div>
+      <div class="w-full h-2 mb-8 rounded-full" id="progressContainer">
+        <div id="progressBar" class="h-2 rounded-full transition-all duration-300" style="width: 25%;"></div>
       </div>
+
       <!-- Pasos del Formulario -->
       <form id="multiStepForm" class="max-w-3xl mx-auto bg-white p-8 rounded-xl shadow-lg border border-gray-200">
         <!-- Paso 1: Datos de la Víctima (reemplaza el paso anterior) -->
         <div class="step">
           <h2 class="text-2xl font-semibold mb-4 text-gray-800">Datos de la Víctima</h2>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <input type="text" placeholder="Nombre" class="border border-gray-300 rounded-lg p-2" required>
-            <input type="text" placeholder="Apellido" class="border border-gray-300 rounded-lg p-2" required>
-            <select class="border border-gray-300 rounded-lg p-2" required>
+            <input type="text" placeholder="Nombre" class="border rounded-lg p-2" required>
+            <input type="text" placeholder="Apellido" class="border rounded-lg p-2" required>
+            <select class="border rounded-lg p-2" required>
               <option value="">Tipo de Documento</option>
               <option>DUI</option>
               <option>Pasaporte</option>
               <option>Licencia de Conducir</option>
               <option>CIP</option>
             </select>
-            <input type="text" placeholder="Número de Documento" class="border border-gray-300 rounded-lg p-2" required>
-            <select class="border border-gray-300 rounded-lg p-2" required>
+            <input type="text" placeholder="Número de Documento" class="border rounded-lg p-2" required>
+            <select class="border rounded-lg p-2" required>
               <option value="">Género</option>
               <option>Femenino</option>
               <option>Masculino</option>
               <option>Otro</option>
             </select>
-            <input type="text" placeholder="Dirección" class="border border-gray-300 rounded-lg p-2" required>
-            <input type="tel" placeholder="Teléfono" class="border border-gray-300 rounded-lg p-2" required>
-            <input type="email" placeholder="Correo electrónico" class="border border-gray-300 rounded-lg p-2">
+            <input type="text" placeholder="Dirección" class="border rounded-lg p-2" required>
+            <input type="tel" placeholder="Teléfono" class="border rounded-lg p-2" required>
+            <input type="email" placeholder="Correo electrónico" class="border rounded-lg p-2">
           </div>
         </div>
 
@@ -588,7 +153,7 @@
           <div id="preguntasForm" class="space-y-6"></div>
         </div>
 
-        <!-- Paso 4: Confirmación -->
+        <!-- Paso 3: Confirmación -->
         <div class="step hidden text-center">
           <h2 class="text-2xl font-semibold mb-4 text-gray-800">Confirmación</h2>
           <p class="text-gray-600 mb-6">Revisa tus datos antes de enviar el formulario.</p>
@@ -603,184 +168,7 @@
     </main>
   </div>
 
-  <script>
-    // Sidebar
-    const sidebar = document.getElementById("sidebar");
-    const logoCompact = document.getElementById("logo-compact");
-    const logoFull = document.getElementById("logo-full");
-    const navLabels = document.querySelectorAll(".nav-label");
-    const navItems = document.querySelectorAll(".nav-item");
-
-    sidebar.addEventListener("mouseenter", () => {
-      sidebar.classList.remove("sidebar-collapsed");
-      sidebar.classList.add("sidebar-expanded");
-      logoCompact.style.display = "none";
-      logoFull.style.display = "block";
-      navLabels.forEach(label => label.style.display = "inline-block");
-      navItems.forEach(item => item.classList.remove("justify-center"));
-    });
-
-    sidebar.addEventListener("mouseleave", () => {
-      sidebar.classList.remove("sidebar-expanded");
-      sidebar.classList.add("sidebar-collapsed");
-      logoCompact.style.display = "flex";
-      logoFull.style.display = "none";
-      navLabels.forEach(label => label.style.display = "none");
-      navItems.forEach(item => item.classList.add("justify-center"));
-    });
-    // Dropdown de perfil
-    const profileButton = document.getElementById('profileButton');
-    const profileDropdown = document.getElementById('profileDropdown');
-
-    profileButton.addEventListener('click', (e) => {
-      e.stopPropagation();
-      profileDropdown.classList.toggle('hidden');
-    });
-
-    // Cerrar dropdown al hacer clic fuera
-    document.addEventListener('click', (e) => {
-      if (!profileButton.contains(e.target) && !profileDropdown.contains(e.target)) {
-        profileDropdown.classList.add('hidden');
-      }
-    });
-
-    function cerrarDropdown() {
-      profileDropdown.classList.add('hidden');
-    }
-
-    // Función para cerrar sesión
-    function cerrarSesion() {
-      if (confirm('¿Estás seguro que deseas cerrar sesión?')) {
-        window.location.href = 'logout.php';
-      }
-    }
-
-    // Cerrar dropdown con tecla ESC
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') {
-        cerrarDropdown();
-      }
-    });
-
-    // Formulario por pasos
-    const steps = document.querySelectorAll(".step");
-    const progressBar = document.getElementById("progressBar");
-    const nextBtn = document.getElementById("nextBtn");
-    const prevBtn = document.getElementById("prevBtn");
-    let currentStep = 0;
-
-    // Preguntas de ejemplo
-    const totalPreguntas = 32;
-    const preguntas = Array.from({
-      length: totalPreguntas
-    }, (_, i) => ({
-      texto: `Pregunta ${i + 1}: Lorem ipsum dolor sit amet, consectetur adipiscing elit?`,
-    }));
-
-    const preguntasPorPagina = 8;
-    let paginaActual = 0;
-
-    function mostrarPreguntas() {
-      const preguntasForm = document.getElementById("preguntasForm");
-      preguntasForm.innerHTML = '';
-
-      const inicio = paginaActual * preguntasPorPagina;
-      const fin = inicio + preguntasPorPagina;
-      const subset = preguntas.slice(inicio, fin);
-
-      subset.forEach((p, index) => {
-        const preguntaHTML = `
-          <div class="border border-gray-200 rounded-lg p-4">
-            <p class="text-gray-800 font-medium mb-2">${p.texto}</p>
-            <div class="flex space-x-6">
-              <label class="flex items-center space-x-2">
-                <input type="radio" name="pregunta${inicio + index}" value="si" class="text-blue-600" required>
-                <span>Sí</span>
-              </label>
-              <label class="flex items-center space-x-2">
-                <input type="radio" name="pregunta${inicio + index}" value="no" class="text-blue-600" required>
-                <span>No</span>
-              </label>
-            </div>
-          </div>
-        `;
-        preguntasForm.insertAdjacentHTML('beforeend', preguntaHTML);
-      });
-
-      // CORRECCIÓN: Actualizar botones de navegación correctamente
-      // Mostrar botón anterior si NO estamos en la primera página de preguntas
-      prevBtn.classList.toggle('hidden', paginaActual === 0 && currentStep === 1);
-
-      // Actualizar texto del botón siguiente
-      nextBtn.textContent = (fin >= preguntas.length) ? 'Finalizar' : 'Siguiente';
-    }
-
-    // En la función updateForm(), actualiza los botones:
-    function updateForm() {
-      steps.forEach((step, index) => {
-        step.classList.toggle("hidden", index !== currentStep);
-      });
-
-      progressBar.style.width = `${((currentStep + 1) / steps.length) * 100}%`;
-
-      // Si estamos en el paso de preguntas, cargarlas
-      if (currentStep === 1) {
-        mostrarPreguntas();
-      }
-
-      // Mostrar/ocultar botones según el paso
-      // CORRECCIÓN: Mostrar botón anterior si NO estamos en el paso 0
-      prevBtn.classList.toggle("hidden", currentStep === 0);
-
-      if (currentStep === steps.length - 1) {
-        nextBtn.textContent = "Enviar";
-      } else if (currentStep === 1) {
-        nextBtn.textContent = (paginaActual + 1) * preguntasPorPagina >= preguntas.length ? "Finalizar" : "Siguiente";
-      } else {
-        nextBtn.textContent = "Siguiente";
-      }
-    }
-
-    nextBtn.addEventListener("click", () => {
-      // Si estamos en el paso de preguntas y hay más páginas
-      if (currentStep === 1 && (paginaActual + 1) * preguntasPorPagina < preguntas.length) {
-        paginaActual++;
-        mostrarPreguntas();
-        return;
-      }
-
-      // Avanzar al siguiente paso
-      if (currentStep < steps.length - 1) {
-        currentStep++;
-        updateForm();
-      } else {
-        // Aquí iría la lógica para enviar el formulario
-        alert("Formulario enviado correctamente");
-      }
-    });
-
-    prevBtn.addEventListener("click", () => {
-      // Si estamos en el paso de preguntas y hay páginas anteriores
-      if (currentStep === 1 && paginaActual > 0) {
-        paginaActual--;
-        mostrarPreguntas();
-        return;
-      }
-
-      // Retroceder al paso anterior
-      if (currentStep > 0) {
-        currentStep--;
-        // CORRECCIÓN: Resetear la página de preguntas cuando retrocedemos al paso anterior
-        if (currentStep === 1) {
-          paginaActual = 0;
-        }
-        updateForm();
-      }
-    });
-
-    // Inicializar formulario
-    updateForm();
-  </script>
+  <script src="JS/form.js"></script>
 </body>
 
 </html>
