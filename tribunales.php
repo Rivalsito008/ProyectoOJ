@@ -359,7 +359,7 @@
                     </svg>
                     <span class="nav-label hide-on-collapse font-medium whitespace-nowrap ml-3">Usuarios</span>
                 </a>
-                <a href="inicio.php" class="nav-item active flex items-center px-3 py-3 rounded-lg justify-center">
+                <a href="tribunales.php" class="nav-item active flex items-center px-3 py-3 rounded-lg justify-center">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                         <path
                             d="M3 21h18M4 21v-9M8 21v-9M12 21v-9M16 21v-9M20 21v-9 M2 12h20 M12 3L3 9h18L12 3z"
