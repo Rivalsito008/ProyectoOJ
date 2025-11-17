@@ -1,325 +1,16 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <script>
-        (function() {
-            // Aplicar tema
-            const t = localStorage.getItem('theme-preference') || 'auto';
-            let f = t;
-            if (t === 'auto') {
-                f = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-            }
-            document.documentElement.setAttribute('data-theme', f);
-
-            // Aplicar tamaño de fuente
-            const fontSize = localStorage.getItem('font-size') || '16';
-            document.documentElement.style.setProperty('--font-size', fontSize + 'px');
-
-            // Aplicar contraste
-            const contrast = localStorage.getItem('contrast') || '1';
-            document.documentElement.style.setProperty('--contrast', contrast);
-        })();
-    </script>
+    <title>SIGEN - Sistema de Gestión Notarial</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="Style/tribunales.css">
 </head>
 
 <body>
-    <style>
-        :root {
-            --bg-color: #f9fafb;
-            --text-color: #111827;
-            --card-bg: #ffffff;
-            --border-color: #e5e7eb;
-            --sidebar-bg: #ffffff;
-            --text-colorsdb: #3d444d;
-            --titledashboard: #000000ff;
-            --border-color-card: #d8d8d8ff;
-            --contrast: 1;
-            --item-active: #3b82f6;
-            --hover-item: rgba(99, 99, 99, 0.1);
-            --hover-hd: rgba(99, 99, 99, 0.1);
-            --font-size: 16px;
-            --text-colorcrd: #111827;
-            --text-colorhd: #111827;
-            --dropdown-color: #ffffff;
-            --accent-color: #3b82f6;
-            --button-bg: #3b82f6;
-            --button-hover: #2563eb;
-        }
-
-        [data-theme="dark"] {
-            --titledashboard: #ffffffff;
-            --bg-color: #e4e4e4ff;
-            --text-colorcrd: #000000ff;
-            --text-colorsdb: #ffffffff;
-            --text-colorhd: #ffffffff;
-            --card-bg: #ffffffff;
-            --sidebar-bg: #2a2240;
-            --border-color: #3d3454;
-            --hover-hd: rgba(108, 85, 150, 0.35);
-            --flecha-color: #ffffffff;
-            --hover-item: rgba(108, 85, 150, 0.35);
-            --item-active: #6c55ba;
-            --border-color-card: #b4b4b4ff;
-            --dropdown-color: #ffffffff;
-            --accent-color: #9333ea;
-            --button-bg: #9333ea;
-            --button-hover: #7c3aed;
-        }
-
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-colorcrd);
-            font-size: var(--font-size);
-            transition: all 0.3s ease;
-        }
-
-        /* ===== ELEMENTOS INTERACTIVOS CON COLORES DINÁMICOS ===== */
-        input[type="range"] {
-            accent-color: var(--accent-color);
-        }
-
-        input[type="radio"] {
-            accent-color: var(--accent-color);
-        }
-
-        .btn-primary {
-            background-color: var(--button-bg);
-            color: white;
-            transition: all 0.3s ease;
-        }
-
-        .btn-primary:hover {
-            background-color: var(--button-hover);
-        }
-
-        /* ===== SIDEBAR ===== */
-        .sidebar {
-            transition: width 0.3s ease;
-            background-color: var(--sidebar-bg);
-            color: var(--text-colorsdb);
-            border-right: 1px solid var(--border-color);
-        }
-
-        .sidebar-collapsed {
-            width: 80px;
-        }
-
-        .sidebar-expanded {
-            width: 256px;
-        }
-
-        .content {
-            margin-left: 80px;
-            transition: margin-left 0.3s ease;
-        }
-
-        /* ===== NAV ITEMS ===== */
-        .nav-item {
-            transition: all 0.25s ease;
-            color: var(--text-colorsdb);
-            border-radius: 0.5rem;
-        }
-
-        .nav-item:hover {
-            background-color: var(--hover-item);
-            color: var(--text-colorsdb);
-        }
-
-        [data-theme="dark"] .nav-item:hover {
-            background-color: var(--hover-item);
-            color: #ffffff;
-            box-shadow: inset 0 0 6px rgba(180, 160, 255, 0.2);
-            transform: translateX(2px);
-        }
-
-        .nav-item.active {
-            background-color: var(--item-active);
-            color: #ffffff;
-            box-shadow: inset 0 0 8px rgba(255, 255, 255, 0.1);
-        }
-
-        .nav-item.active:hover {
-            background-color: var(--item-active);
-            color: #ffffff;
-            transform: none;
-        }
-
-        .flecha {
-            stroke: var(--flecha-color);
-            transition: stroke 0.3s ease;
-        }
-
-        .nav-item svg {
-            min-width: 20px;
-        }
-
-        /* ===== DROPDOWN ===== */
-        .dropdown {
-            background-color: var(--dropdown-color);
-            border-radius: 0.75rem;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-        }
-
-        .dropdown:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-            border-color: rgba(108, 85, 150, 0.3);
-        }
-
-        /* ===== CARDS ===== */
-        .card {
-            background-color: var(--card-bg);
-            border: 1px solid var(--border-color-card);
-            border-radius: 0.5rem;
-            transition: all 0.3s ease, transform 0.2s ease;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-        }
-
-        .card:hover {
-            transform: translateY(-2px) scale(1.01);
-            border-color: var(--accent-color);
-            box-shadow: 0 6px 12px rgba(161, 161, 161, 0.8);
-            background: linear-gradient(145deg, #fff, #fff);
-        }
-
-        /* ===== HEADER ===== */
-        .header-bg {
-            background-color: var(--sidebar-bg);
-            border-bottom: 1px solid var(--border-color);
-            color: var(--text-colorhd);
-        }
-
-        .header:hover {
-            background-color: var(--hover-hd);
-            border-radius: 0.75rem;
-            color: #ffffff;
-            box-shadow: inset 0 0 8px rgba(255, 255, 255, 0.1);
-            transform: none;
-        }
-
-        .titledashboard {
-            color: var(--titledashboard);
-            transition: color 0.3s ease;
-        }
-
-        .hide-on-collapse {
-            display: none;
-        }
-
-        .hidden {
-            display: none;
-        }
-
-        /* ===== TABS ===== */
-        .tabs-container {
-            background: transparent;
-            padding-top: 8px;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .tabs-wrapper {
-            display: flex;
-            gap: 8px;
-            padding: 0 8px;
-        }
-
-        .browser-tab {
-            position: relative;
-            padding: 12px 20px;
-            background: transparent;
-            border-radius: 8px 8px 0 0;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            min-width: 50px;
-            width: 50px;
-            border: none;
-            overflow: hidden;
-        }
-
-        .browser-tab:hover,
-        .browser-tab.active {
-            width: 160px;
-            min-width: 160px;
-            padding: 12px 20px;
-        }
-
-        .browser-tab:hover:not(.active) {
-            background: var(--hover-item);
-        }
-
-        .browser-tab.active {
-            background: var(--card-bg);
-            box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.05);
-        }
-
-        .tab-indicator {
-            width: 14px;
-            height: 14px;
-            border-radius: 50%;
-            flex-shrink: 0;
-            transition: transform 0.3s ease;
-        }
-
-        .browser-tab:hover .tab-indicator,
-        .browser-tab.active .tab-indicator {
-            transform: scale(1.1);
-        }
-
-        .tab-label {
-            font-weight: 500;
-            color: var(--text-colorcrd);
-            font-size: 14px;
-            user-select: none;
-            white-space: nowrap;
-            opacity: 0;
-            transform: translateX(-10px);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .browser-tab:hover .tab-label,
-        .browser-tab.active .tab-label {
-            opacity: 1;
-            transform: translateX(0);
-        }
-
-        .tab-content-wrapper {
-            background: var(--card-bg);
-            min-height: 500px;
-            padding: 40px;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
-            animation: fadeIn 0.3s ease;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-
-            to {
-                opacity: 1;
-            }
-        }
-    </style>
-
     <!-- Sidebar -->
     <aside id="sidebar" class="sidebar sidebar-collapsed fixed top-0 left-0 z-40 h-screen">
         <div class="h-full px-3 py-4 overflow-y-auto">
@@ -378,7 +69,8 @@
             </nav>
         </div>
     </aside>
-    <!--Contenido principal-->
+
+    <!-- Main Content -->
     <div class="content">
         <!--HEADER-->
         <header class="header-bg border-b border-gray-200 sticky top-0 z-30">
@@ -432,108 +124,243 @@
                     </div>
                 </div>
         </header>
+
+        <main class="p-6">
+            <div class="tabs-container">
+                <div class="tabs-wrapper">
+                    <div class="browser-tab active" data-tab="Todo">
+                        <div class="tab-indicator bg-blue-500"></div>
+                        <span class="tab-label">Todos</span>
+                    </div>
+                    <div class="browser-tab" data-tab="activo">
+                        <div class="tab-indicator bg-green-500"></div>
+                        <span class="tab-label">Estado activo</span>
+                    </div>
+                    <div class="browser-tab" data-tab="inactivo">
+                        <div class="tab-indicator bg-red-500"></div>
+                        <span class="tab-label">Estado Inactivo</span>
+                    </div>
+                </div>
+
+                <div class="tab-content-wrapper">
+                    <div class="tab-content active" id="Todo">
+                        <div class="relative overflow-x-auto">
+                            <table class="w-full text-sm text-left">
+                                <thead class="text-xs uppercase">
+                                    <tr>
+                                        <th class="px-6 py-3">ID</th>
+                                        <th class="px-6 py-3">Nombre</th>
+                                        <th class="px-6 py-3">Tipo</th>
+                                        <th class="px-6 py-3">Numeración</th>
+                                        <th class="px-6 py-3">Materia</th>
+                                        <th class="px-6 py-3">Departamento</th>
+                                        <th class="px-6 py-3">Municipios</th>
+                                        <th class="px-6 py-3">Dirección </th>
+                                        <th class="px-6 py-3">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="tab-content" id="activo">
+                        <div class="relative overflow-x-auto">
+                            <table class="w-full text-sm text-left">
+                                <thead class="text-xs uppercase">
+                                    <tr>
+                                        <th class="px-6 py-3">ID</th>
+                                        <th class="px-6 py-3">Nombre</th>
+                                        <th class="px-6 py-3">Tipo</th>
+                                        <th class="px-6 py-3">Numeración</th>
+                                        <th class="px-6 py-3">Materia</th>
+                                        <th class="px-6 py-3">Departamento</th>
+                                        <th class="px-6 py-3">Municipios</th>
+                                        <th class="px-6 py-3">Dirección </th>
+                                        <th class="px-6 py-3">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="tab-content" id="inactivo">
+                        <div class="relative overflow-x-auto">
+                            <table class="w-full text-sm text-left">
+                                <thead class="text-xs uppercase">
+                                    <tr>
+                                        <th class="px-6 py-3">ID</th>
+                                        <th class="px-6 py-3">Nombre</th>
+                                        <th class="px-6 py-3">Tipo</th>
+                                        <th class="px-6 py-3">Numeración</th>
+                                        <th class="px-6 py-3">Materia</th>
+                                        <th class="px-6 py-3">Departamento</th>
+                                        <th class="px-6 py-3">Municipios</th>
+                                        <th class="px-6 py-3">Dirección </th>
+                                        <th class="px-6 py-3">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Botón Flotante -->
+            <div class="fixed bottom-8 right-8 z-50">
+                <button id="openFormBtn" class="group relative w-14 h-14 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-medium rounded-full shadow-lg hover:shadow-2xl transition-all duration-500 ease-out flex items-center justify-center overflow-hidden hover:w-52">
+                    <div class="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 blur-md transition-opacity duration-500"></div>
+                    <span class="absolute text-3xl font-bold transition-all duration-300 transform group-hover:-translate-x-4 group-hover:opacity-0">+</span>
+                    <span class="absolute opacity-0 text-sm tracking-wide font-semibold transition-all duration-500 transform translate-x-4 group-hover:translate-x-0 group-hover:opacity-100">Agregar Usuario</span>
+                </button>
+            </div>
+
+            <!-- Modal -->
+            <div id="userFormModal" class="fixed inset-0 z-50 bg-black bg-opacity-50 hidden items-center justify-center p-4">
+                <div class="modal-content rounded-2xl shadow-2xl max-w-2xl w-full overflow-y-auto max-h-[90vh]">
+                    <div class="modal-header flex justify-between items-center p-5 rounded-t-2xl">
+                        <h2 class="text-lg font-semibold flex items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"></svg>
+                            Nuevo Tribunal
+                        </h2>
+                        <button id="closeFormBtn" class="text-gray-500 hover:text-red-500 transition">✕</button>
+                    </div>
+
+                    <section class="p-6 space-y-6">
+                        <div class="space-y-4">
+                            <div>
+                                <label class="text-sm font-semibold">Nombre</label>
+                                <input type="text" class="w-full mt-1 border rounded-lg p-2">
+                            </div>
+                            <div class="mb-4">
+                                <label class="block text-gray-700 font-semibold">Tipo de Tribunal</label>
+                                <select id="tipoTribunal" class="w-full p-3 border rounded-lg">
+
+                                    <!-- SALAS -->
+                                    <optgroup label="Salas de la Corte Suprema">
+                                        <option>Sala de lo Constitucional</option>
+                                        <option>Sala de lo Civil</option>
+                                        <option>Sala de lo Penal</option>
+                                        <option>Sala de lo Contencioso Administrativo</option>
+                                    </optgroup>
+
+                                    <!-- CÁMARAS -->
+                                    <optgroup label="Cámaras">
+                                        <option>Cámara Civil</option>
+                                        <option>Cámara Penal</option>
+                                        <option>Cámara de Familia</option>
+                                        <option>Cámara de lo Laboral</option>
+                                        <option>Cámara de lo Contencioso Administrativo</option>
+                                        <option>Cámara de lo Medio Ambiente</option>
+                                        <option>Cámara Especializada para una Vida Libre de Violencia y Discriminación para las Mujeres</option>
+                                        <option>Cámara Especializada de Extinción de Dominio</option>
+                                        <option>Cámara Especializada de Menores</option>
+                                    </optgroup>
+
+                                    <!-- ESPECIALIZADOS -->
+                                    <optgroup label="Tribunales Especializados">
+                                        <option>Juzgado Especializado de Instrucción</option>
+                                        <option>Tribunal Especializado de Sentencia</option>
+                                        <option>Juzgado Especializado para una Vida Libre de Violencia y Discriminación para las Mujeres</option>
+                                        <option>Tribunal Especializado para una Vida Libre de Violencia y Discriminación para las Mujeres</option>
+                                        <option>Juzgado Especializado de Extinción de Dominio</option>
+                                        <option>Tribunal Especializado de Extinción de Dominio</option>
+                                        <option>Juzgado Especializado de Menores</option>
+                                    </optgroup>
+
+                                    <!-- JUZGADOS -->
+                                    <optgroup label="Juzgados">
+                                        <option>Juzgado de lo Civil</option>
+                                        <option>Juzgado de lo Mercantil</option>
+                                        <option>Juzgado de Familia</option>
+                                        <option>Juzgado de lo Laboral</option>
+                                        <option>Juzgado de Instrucción</option>
+                                        <option>Juzgado de Sentencia</option>
+                                        <option>Juzgado de Medio Ambiente</option>
+                                        <option>Juzgado de Ejecución de la Pena</option>
+                                        <option>Juzgado de Vigilancia Penitenciaria</option>
+                                        <option>Juzgado de Menores</option>
+                                    </optgroup>
+
+                                    <!-- PAZ -->
+                                    <optgroup label="Juzgados de Paz">
+                                        <option>Juzgado de Paz</option>
+                                    </optgroup>
+
+                                </select>
+                            </div>
+                            <!-- Numeración -->
+                            <label class="block text-gray-700 font-semibold">Numeración</label>
+                            <select class="w-full border rounded p-2 mb-4" id="numeracion">
+                                <option value="" selected>Sin numeración</option>
+                                <option value="Primero">Primero</option>
+                                <option value="Segundo">Segundo</option>
+                                <option value="Tercero">Tercero</option>
+                                <option value="Cuarto">Cuarto</option>
+                                <option value="Quinto">Quinto</option>
+                                <option value="Sexto">Sexto</option>
+                                <option value="Séptimo">Séptimo</option>
+                                <option value="Octavo">Octavo</option>
+                                <option value="Noveno">Noveno</option>
+                                <option value="Décimo">Décimo</option>
+                                <option value="Único">Único</option>
+                            </select>
+                            <!-- Materia (automática) -->
+                            <div class="mb-4">
+                                <label class="block text-gray-700 font-semibold">Materia</label>
+                                <select id="materia" class="w-full p-3 border rounded-lg">
+                                    <option value="">Seleccione un tipo primero...</option>
+                                </select>
+                            </div>
+                            <!-- Departamento -->
+                            <div class="mb-4">
+                                <label class="block text-gray-700 font-semibold">Departamento</label>
+                                <select id="departamento" class="w-full p-3 border rounded-lg">
+                                    <option value="">Seleccione un departamento...</option>
+                                    <option>San Salvador</option>
+                                    <option>La Libertad</option>
+                                    <option>Santa Ana</option>
+                                    <option>San Miguel</option>
+                                    <option>Sonsonate</option>
+                                    <option>Usulután</option>
+                                    <option>La Unión</option>
+                                    <option>Morazán</option>
+                                    <option>Chalatenango</option>
+                                    <option>Cabañas</option>
+                                    <option>Cuscatlán</option>
+                                    <option>La Paz</option>
+                                    <option>San Vicente</option>
+                                    <option>Ahuachapán</option>
+                                </select>
+                            </div>
+                            <!-- Municipios dinámicos -->
+                            <div class="mb-4">
+                                <label class="block text-gray-700 font-semibold">Municipio</label>
+                                <select id="municipio" class="w-full p-3 border rounded-lg">
+                                    <option value="">Seleccione un departamento primero...</option>
+                                </select>
+                            </div>
+                            <!-- Dirección -->
+                            <div class="mb-6">
+                                <label class="block text-gray-700 font-semibold">Dirección Completa</label>
+                                <textarea id="direccion" class="w-full p-3 border rounded-lg" rows="3" placeholder="Ej: Centro Judicial Integrado de Santa Tecla..."></textarea>
+                            </div>
+                    </section>
+
+                    <div class="px-6 py-4 bg-white flex justify-end">
+                        <button class="btn-save-user px-5 py-2 rounded-lg font-medium">Guardar Usuario</button>
+                    </div>
+                </div>
+            </div>
+        </main>
     </div>
-    <script>
-        // Sidebar hover effect
-        const sidebar = document.getElementById('sidebar');
-        const logoCompact = document.getElementById('logo-compact');
-        const logoFull = document.getElementById('logo-full');
-        const navLabels = document.querySelectorAll('.nav-label');
-        const navItems = document.querySelectorAll('.nav-item');
+    <script src="JS/tribunales.js"></script>
 
-        sidebar.addEventListener('mouseenter', () => {
-            sidebar.classList.remove('sidebar-collapsed');
-            sidebar.classList.add('sidebar-expanded');
-            logoCompact.style.display = 'none';
-            logoFull.style.display = 'block';
-            navLabels.forEach(label => {
-                label.style.display = 'inline-block';
-            });
-            navItems.forEach(item => {
-                item.classList.remove('justify-center');
-            });
-        });
-
-        sidebar.addEventListener('mouseleave', () => {
-            sidebar.classList.remove('sidebar-expanded');
-            sidebar.classList.add('sidebar-collapsed');
-            logoCompact.style.display = 'flex';
-            logoFull.style.display = 'none';
-            navLabels.forEach(label => {
-                label.style.display = 'none';
-            });
-            navItems.forEach(item => {
-                item.classList.add('justify-center');
-            });
-        });
-
-        // Dropdown de perfil
-        const profileButton = document.getElementById('profileButton');
-        const profileDropdown = document.getElementById('profileDropdown');
-
-        profileButton.addEventListener('click', (e) => {
-            e.stopPropagation();
-            profileDropdown.classList.toggle('hidden');
-        });
-
-        // Cerrar dropdown al hacer clic fuera
-        document.addEventListener('click', (e) => {
-            if (!profileButton.contains(e.target) && !profileDropdown.contains(e.target)) {
-                profileDropdown.classList.add('hidden');
-            }
-        });
-
-        function cerrarDropdown() {
-            profileDropdown.classList.add('hidden');
-        }
-
-        // Función para cerrar sesión
-        function cerrarSesion() {
-            if (confirm('¿Estás seguro que deseas cerrar sesión?')) {
-                window.location.href = 'logout.php';
-            }
-        }
-
-        // Cerrar dropdown con tecla ESC
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                cerrarDropdown();
-            }
-        });
-
-        // Tab functionality
-        const browserTabs = document.querySelectorAll('.browser-tab');
-        const tabContents = document.querySelectorAll('.tab-content');
-
-        browserTabs.forEach(tab => {
-            tab.addEventListener('click', () => {
-                const tabName = tab.getAttribute('data-tab');
-
-                // Remove active class from all tabs
-                browserTabs.forEach(t => t.classList.remove('active'));
-
-                // Add active class to clicked tab
-                tab.classList.add('active');
-
-                // Remove active class from all contents
-                tabContents.forEach(content => {
-                    content.classList.remove('active');
-                });
-
-                // Add active class to selected content
-                document.getElementById(tabName).classList.add('active');
-            });
-        });
-
-        // Detectar cambios en preferencia de sistema (para modo auto)
-        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
-            const temaActual = localStorage.getItem('theme-preference') || 'auto';
-            if (temaActual === 'auto') {
-                const nuevoTema = e.matches ? 'dark' : 'light';
-                document.documentElement.setAttribute('data-theme', nuevoTema);
-            }
-        });
-    </script>
 </body>
 
 </html>
