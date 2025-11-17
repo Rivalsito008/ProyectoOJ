@@ -63,7 +63,7 @@
                             stroke-linecap="round"
                             stroke-linejoin="round" />
                     </svg>
-                    <span class="nav-label hide-on-collapse font-medium whitespace-nowrap ml-3">Tribunales</span>
+                    <span class="nav-label hidden font-medium whitespace-nowrap ml-3">Tribunales</span>
                 </a>
                 <a href="configuracion.php" class="nav-item active flex items-center px-3 py-3 rounded-lg justify-center">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
