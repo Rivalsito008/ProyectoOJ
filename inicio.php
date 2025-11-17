@@ -110,7 +110,7 @@
 
                             <!-- Opciones -->
                             <div class="bg-[var(--dropdown-color)] dark:bg-[#241c37] transition-colors duration-300">
-                                <a href="logout.php"
+                                <a href="index.php"
                                     class="flex items-center gap-3 px-5 py-3 text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-[#3c2a4b] transition-all duration-200">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"

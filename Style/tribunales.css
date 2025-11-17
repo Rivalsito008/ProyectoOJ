@@ -9,7 +9,6 @@
     --border-color-card: #d8d8d8ff;
     --border-modal: #d8d8d8ff;
     --contrast: 1;
-
     --hover-item: rgba(99, 99, 99, 0.1);
     --hover-hd: rgba(99, 99, 99, 0.1);
     --font-size: 16px;
@@ -182,7 +181,10 @@ body {
     border-color: rgba(108, 85, 150, 0.3);
     /* leve cambio al pasar el mouse */
 }
-
+.flecha {
+    stroke: var(--flecha-color);
+    transition: stroke 0.3s ease;
+}
 /* ===== HEADER ===== */
 .header-bg {
     background-color: var(--sidebar-bg);
