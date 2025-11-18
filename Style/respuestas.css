@@ -361,6 +361,19 @@ tbody tr {
     border-bottom: 1px solid var(--border-color);
 }
 
+[data-theme="dark"] tbody tr {
+    border-bottom: 1px solid #c7c7c7; /* gray-600 - más claro que gray-700 */
+}
+
+[data-theme="dark"] thead tr {
+    border-bottom: 1px solid #c7c7c7; /* gray-600 */
+}
+
+/* Hover effect para filas en modo oscuro */
+[data-theme="dark"] tbody tr:hover {
+    background-color: #f7f7f7; /* gray-700 */
+}
+
 input,
 select {
     background-color: var(--card-bg);
@@ -370,4 +383,430 @@ select {
 
 #profileButton:hover {
     background-color: var(--hover-hd);
+}
+
+/* MODAL DINAMICO DE RESPUESTAS */
+
+/* Mejoras para el modal */
+.modal-dialog {
+    animation: modalAppear 0.3s ease-out;
+}
+
+@keyframes modalAppear {
+    from {
+        opacity: 0;
+        transform: scale(0.9) translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+/* Scroll personalizado */
+.modal-dialog::-webkit-scrollbar {
+    width: 8px;
+}
+
+.modal-dialog::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.modal-dialog::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 4px;
+}
+
+.modal-dialog::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
+
+[data-theme="dark"] .modal-dialog::-webkit-scrollbar-track {
+    background: #374151;
+}
+
+[data-theme="dark"] .modal-dialog::-webkit-scrollbar-thumb {
+    background: #6b7280;
+}
+
+[data-theme="dark"] .modal-dialog::-webkit-scrollbar-thumb:hover {
+    background: #9ca3af;
+}
+
+/* Fondos más claros para las tarjetas de preguntas */
+.bg-green-50 {
+    background-color: #ecfdf5;
+}
+
+.dark .bg-green-900\/10 {
+    background-color: rgba(6, 78, 59, 0.1);
+}
+
+.bg-red-50 {
+    background-color: #fef2f2;
+}
+
+.dark .bg-red-900\/10 {
+    background-color: rgba(127, 29, 29, 0.1);
+}
+
+/* Bordes más suaves */
+.border-green-100 {
+    border-color: #d1fae5;
+}
+
+.border-red-100 {
+    border-color: #fee2e2;
+}
+
+/* Estilos mejorados para el área de sentencia */
+.sentencia-container {
+    background: linear-gradient(135deg, #dbeafe 0%, #eff6ff 100%);
+    border-left: 4px solid #3b82f6;
+    transition: all 0.3s ease;
+}
+
+[data-theme="dark"] .sentencia-container {
+    background: linear-gradient(135deg, rgba(156, 123, 206, 0.3) 0%, rgba(124, 58, 237, 0.2) 100%);
+    border-left: 4px solid #8b5cf6;
+}
+
+/* Textarea sin borde feo */
+.sentencia-textarea {
+    border: none !important;
+    background: rgba(255, 255, 255, 0.9) !important;
+    backdrop-filter: blur(10px);
+    box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.05);
+}
+
+[data-theme="dark"] .sentencia-textarea {
+    background: rgba(255, 255, 255, 0.8) !important;
+    box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.2);
+}
+
+/* Efectos de focus mejorados */
+.sentencia-textarea:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3), inset 0 2px 4px 0 rgba(0, 0, 0, 0.05);
+}
+
+[data-theme="dark"] .sentencia-textarea:focus {
+    box-shadow: 0 0 0 3px rgb(184, 154, 255), inset 0 2px 4px 0 rgba(0, 0, 0, 0.2);
+}
+
+/* Botones con mejor aspecto */
+.sentencia-btn-guardar {
+    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+/* efecto del boton */
+.sentencia-btn-guardar::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.5s;
+}
+.sentencia-btn-guardar:hover::before {
+    left: 100%;
+}
+
+.sentencia-btn-guardar:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
+}
+
+/* Modo oscuro para el botón Guardar Sentencia */
+[data-theme="dark"] .sentencia-btn-guardar {
+    background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+}
+
+[data-theme="dark"] .sentencia-btn-guardar:hover {
+    box-shadow: 0 8px 25px rgba(139, 92, 246, 0.5);
+}
+
+/* Botón Limpiar */
+.sentencia-btn-limpiar {
+    background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+    transition: all 0.3s ease;
+}
+
+.sentencia-btn-limpiar:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(107, 114, 128, 0.3);
+    background: linear-gradient(135deg, #4b5563 0%, #374151 100%);
+}
+
+/* Efectos de pulsación al hacer clic */
+.sentencia-btn-guardar:active,
+.sentencia-btn-limpiar:active {
+    transform: translateY(0);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+/* Colores más vibrantes para las respuestas */
+.text-green-600 {
+    color: #059669;
+}
+
+.dark .text-green-400 {
+    color: #059669;
+}
+
+.text-red-600 {
+    color: #dc2626;
+}
+
+.dark .text-red-400 {
+    color: #dc2626;
+}
+
+/* Mejoras para las tarjetas de preguntas */
+.bg-gradient-to-r {
+    background-size: 200% 200%;
+    animation: gradientShift 3s ease infinite;
+}
+
+@keyframes gradientShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+/* Estilos para el modal compacto de niveles de riesgo */
+#riskLevelsModal .max-w-sm {
+    max-width: 320px;
+}
+
+/* Scroll personalizado para el contenido */
+#riskLevelsModal .overflow-y-auto::-webkit-scrollbar {
+    width: 4px;
+}
+
+#riskLevelsModal .overflow-y-auto::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 2px;
+}
+
+#riskLevelsModal .overflow-y-auto::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 2px;
+}
+
+[data-theme="dark"] #riskLevelsModal .overflow-y-auto::-webkit-scrollbar-track {
+    background: #374151;
+}
+
+[data-theme="dark"] #riskLevelsModal .overflow-y-auto::-webkit-scrollbar-thumb {
+    background: #6b7280;
+}
+
+/* Estilos para el botón Entendido */
+.risk-understand-btn {
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.risk-understand-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.5s;
+}
+
+.risk-understand-btn:hover::before {
+    left: 100%;
+}
+
+.risk-understand-btn:hover {
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 8px 20px rgba(59, 130, 246, 0.4);
+}
+
+[data-theme="dark"] .risk-understand-btn:hover {
+    box-shadow: 0 8px 20px rgba(139, 92, 246, 0.5);
+}
+
+.risk-understand-btn:active {
+    transform: translateY(0) scale(1);
+}
+
+/* Mejoras para las tarjetas de niveles */
+.bg-green-50 { background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); }
+.bg-yellow-50 { background: linear-gradient(135deg, #fefce8 0%, #fef9c3 100%); }
+.bg-orange-50 { background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%); }
+.bg-red-50 { background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%); }
+
+/* Efectos hover para las tarjetas */
+#riskLevelsModal .bg-green-50:hover,
+#riskLevelsModal .bg-yellow-50:hover,
+#riskLevelsModal .bg-orange-50:hover,
+#riskLevelsModal .bg-red-50:hover {
+    transform: translateX(4px);
+    transition: transform 0.2s ease;
+}
+
+/* Colores específicos para el área de criterios */
+.bg-gradient-to-r.from-blue-50.to-blue-100 {
+    background: linear-gradient(135deg, #dbeafe 0%, #eff6ff 100%);
+}
+
+[data-theme="dark"] .bg-gradient-to-r.dark\:from-purple-900\/30.dark\:to-purple-800\/30 {
+    background: linear-gradient(135deg, rgba(102, 0, 255, 0.3) 0%, rgba(124, 58, 237, 0.2) 100%);
+}
+
+/* ===== ESTILOS PARA CRITERIO DE EVALUACIÓN ===== */
+
+/* Contenedor del criterio - Modo claro */
+.criteria-container {
+    background: linear-gradient(135deg, #dbeafe 0%, #eff6ff 100%);
+    border: 1px solid #3b82f6;
+}
+
+/* Contenedor del criterio - Modo oscuro */
+[data-theme="dark"] .criteria-container {
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.3) 0%, rgba(124, 58, 237, 0.4) 100%);
+    border: 1px solid #8b5cf6;
+}
+
+/* Título del criterio - Modo claro */
+.criteria-title {
+    color: #1d4ed8 !important;
+    font-weight: 600;
+}
+
+/* Título del criterio - Modo oscuro */
+[data-theme="dark"] .criteria-title {
+    color: #8b5cf6 !important;
+    font-weight: 600;
+}
+
+/* Texto del criterio - Modo claro */
+.criteria-text {
+    color: #1e40af !important;
+    font-weight: 500;
+}
+
+/* Texto del criterio - Modo oscuro */
+[data-theme="dark"] .criteria-text {
+    color: #8b5cf6 !important;
+    font-weight: 500;
+}
+
+/* Ícono del criterio - Modo claro */
+.criteria-container svg {
+    stroke: #1d4ed8;
+}
+
+/* Ícono del criterio - Modo oscuro */
+[data-theme="dark"] .criteria-container svg {
+    stroke: #8b5cf6;
+}
+
+/* ===== ESTILOS PARA TÍTULO DE SENTENCIA ===== */
+
+/* Título de sentencia - Modo claro */
+.sentencia-title {
+    color: #1d4ed8 !important;
+    font-weight: 600;
+}
+
+/* Título de sentencia - Modo oscuro */
+[data-theme="dark"] .sentencia-title {
+    color: #8b5cf6 !important;
+    font-weight: 600;
+}
+
+/* Ícono de sentencia - Modo claro */
+.sentencia-container svg {
+    stroke: #1d4ed8;
+}
+
+/* Ícono de sentencia - Modo oscuro */
+[data-theme="dark"] .sentencia-container svg {
+    stroke: #8b5cf6;
+}
+
+/* Estilos para el botón Entendido del modal de riesgo */
+.risk-understand-btn {
+    /* Colores base para modo claro */
+    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    
+    /* Transiciones */
+    transition: all 0.3s ease;
+    
+    /* Posicionamiento para efectos */
+    position: relative;
+    overflow: hidden;
+}
+
+/* Efecto de brillo al hover */
+.risk-understand-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.6s ease;
+}
+
+.risk-understand-btn:hover::before {
+    left: 100%;
+}
+
+/* Estados del botón */
+.risk-understand-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
+}
+
+.risk-understand-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+/* Modo oscuro */
+[data-theme="dark"] .risk-understand-btn {
+    background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+}
+
+[data-theme="dark"] .risk-understand-btn:hover {
+    box-shadow: 0 8px 25px rgba(139, 92, 246, 0.5);
+}
+
+[data-theme="dark"] .risk-understand-btn:active {
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+}
+
+/* Efecto de pulsación al hacer clic */
+@keyframes buttonClick {
+    0% { transform: scale(1); }
+    50% { transform: scale(0.95); }
+    100% { transform: scale(1); }
+}
+
+.risk-understand-btn:active {
+    animation: buttonClick 0.2s ease;
+}
+
+/* Mejora el ícono dentro del botón */
+.risk-understand-btn svg {
+    transition: transform 0.3s ease;
+}
+
+.risk-understand-btn:hover svg {
+    transform: scale(1.1);
 }
