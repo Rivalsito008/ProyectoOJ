@@ -164,8 +164,8 @@
                     </div>
 
                     <!-- Activador Automático -->
-                    <div class="browser-tab" data-tab="activador">
-                        <div class="tab-indicator bg-red-900"></div>
+                    <div class="browser-tab" data-tab="activadora">
+                        <div class="tab-indicator bg-[#8B0000]"></div>
                         <span class="tab-label">Activador</span>
                     </div>
                 </div>
@@ -178,14 +178,16 @@
                             <table class="w-full text-sm text-left">
                                 <thead class="text-xs uppercase">
                                     <tr>
-                                        <th scope="col" class="px-6 py-3">ID</th>
                                         <th scope="col" class="px-6 py-3">Pregunta</th>
                                         <th scope="col" class="px-6 py-3">Ámbito</th>
+                                        <th scope="col" class="px-6 py-3">Riesgo</th>
+                                        <th scope="col" class="px-6 py-3">Puntaje</th>
                                         <th scope="col" class="px-6 py-3">Estado</th>
-                                        <th scope="col" class="px-6 py-3">Acción</th>
+                                        <th scope="col" class="px-6 py-3 text-center">Acción</th>
                                     </tr>
                                 </thead>
-                                <tbody>
+                                <tbody id="tablaTodo">
+                                    <!-- Se llena dinámicamente -->
                                 </tbody>
                             </table>
                         </div>
@@ -197,17 +199,16 @@
                             <table class="w-full text-sm text-left">
                                 <thead class="text-xs uppercase">
                                     <tr>
-                                        <th scope="col" class="px-6 py-3">ID</th>
                                         <th scope="col" class="px-6 py-3">Pregunta</th>
                                         <th scope="col" class="px-6 py-3">Ámbito</th>
+                                        <th scope="col" class="px-6 py-3">Riesgo</th>
+                                        <th scope="col" class="px-6 py-3">Puntaje</th>
                                         <th scope="col" class="px-6 py-3">Estado</th>
-                                        <th scope="col" class="px-6 py-3">Acción</th>
+                                        <th scope="col" class="px-6 py-3 text-center">Acción</th>
                                     </tr>
                                 </thead>
-                                <tbody>
-                                    <tr>
-                                        <td class="px-6 py-4" colspan="5">Preguntas de nivel bajo</td>
-                                    </tr>
+                                <tbody id="tablaBajo">
+                                    <!-- Se llena dinámicamente -->
                                 </tbody>
                             </table>
                         </div>
@@ -219,17 +220,16 @@
                             <table class="w-full text-sm text-left">
                                 <thead class="text-xs uppercase">
                                     <tr>
-                                        <th scope="col" class="px-6 py-3">ID</th>
                                         <th scope="col" class="px-6 py-3">Pregunta</th>
                                         <th scope="col" class="px-6 py-3">Ámbito</th>
+                                        <th scope="col" class="px-6 py-3">Riesgo</th>
+                                        <th scope="col" class="px-6 py-3">Puntaje</th>
                                         <th scope="col" class="px-6 py-3">Estado</th>
-                                        <th scope="col" class="px-6 py-3">Acción</th>
+                                        <th scope="col" class="px-6 py-3 text-center">Acción</th>
                                     </tr>
                                 </thead>
-                                <tbody>
-                                    <tr>
-                                        <td class="px-6 py-4" colspan="5">Preguntas de nivel moderado</td>
-                                    </tr>
+                                <tbody id="tablaModerado">
+                                    <!-- Se llena dinámicamente -->
                                 </tbody>
                             </table>
                         </div>
@@ -241,17 +241,16 @@
                             <table class="w-full text-sm text-left">
                                 <thead class="text-xs uppercase">
                                     <tr>
-                                        <th scope="col" class="px-6 py-3">ID</th>
                                         <th scope="col" class="px-6 py-3">Pregunta</th>
                                         <th scope="col" class="px-6 py-3">Ámbito</th>
+                                        <th scope="col" class="px-6 py-3">Riesgo</th>
+                                        <th scope="col" class="px-6 py-3">Puntaje</th>
                                         <th scope="col" class="px-6 py-3">Estado</th>
-                                        <th scope="col" class="px-6 py-3">Acción</th>
+                                        <th scope="col" class="px-6 py-3 text-center">Acción</th>
                                     </tr>
                                 </thead>
-                                <tbody>
-                                    <tr>
-                                        <td class="px-6 py-4" colspan="5">Preguntas de nivel alto</td>
-                                    </tr>
+                                <tbody id="tablaAlto">
+                                    <!-- Se llena dinámicamente -->
                                 </tbody>
                             </table>
                         </div>
@@ -263,39 +262,37 @@
                             <table class="w-full text-sm text-left">
                                 <thead class="text-xs uppercase">
                                     <tr>
-                                        <th scope="col" class="px-6 py-3">ID</th>
                                         <th scope="col" class="px-6 py-3">Pregunta</th>
                                         <th scope="col" class="px-6 py-3">Ámbito</th>
+                                        <th scope="col" class="px-6 py-3">Riesgo</th>
+                                        <th scope="col" class="px-6 py-3">Puntaje</th>
                                         <th scope="col" class="px-6 py-3">Estado</th>
-                                        <th scope="col" class="px-6 py-3">Acción</th>
+                                        <th scope="col" class="px-6 py-3 text-center">Acción</th>
                                     </tr>
                                 </thead>
-                                <tbody>
-                                    <tr>
-                                        <td class="px-6 py-4" colspan="5">Preguntas de nivel extremo</td>
-                                    </tr>
+                                <tbody id="tablaExtremo">
+                                    <!-- Se llena dinámicamente -->
                                 </tbody>
                             </table>
                         </div>
                     </div>
 
                     <!-- Tab: Activador -->
-                    <div class="tab-content" id="activador">
+                    <div class="tab-content" id="activadora">
                         <div class="relative overflow-x-auto">
                             <table class="w-full text-sm text-left">
                                 <thead class="text-xs uppercase">
                                     <tr>
-                                        <th scope="col" class="px-6 py-3">ID</th>
                                         <th scope="col" class="px-6 py-3">Pregunta</th>
                                         <th scope="col" class="px-6 py-3">Ámbito</th>
+                                        <th scope="col" class="px-6 py-3">Riesgo</th>
+                                        <th scope="col" class="px-6 py-3">Puntaje</th>
                                         <th scope="col" class="px-6 py-3">Estado</th>
-                                        <th scope="col" class="px-6 py-3">Acción</th>
+                                        <th scope="col" class="px-6 py-3 text-center">Acción</th>
                                     </tr>
                                 </thead>
-                                <tbody>
-                                    <tr>
-                                        <td class="px-6 py-4" colspan="5">Preguntas con activador automático</td>
-                                    </tr>
+                                <tbody id="tablaActivadora">
+                                    <!-- Se llena dinámicamente -->
                                 </tbody>
                             </table>
                         </div>

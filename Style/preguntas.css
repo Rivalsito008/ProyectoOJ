@@ -526,3 +526,317 @@ select {
     background-color: rgba(127, 29, 29, 0.3);
 }
 
+/* Asegurar que las líneas de la tabla sean visibles en ambos modos */
+.table-border-light {
+    border-bottom-color: #e5e7eb !important; /* gray-200 */
+}
+
+.table-border-dark {
+    border-bottom-color: #374151 !important; /* gray-700 */
+}
+
+/* ===== ESTILOS PARA BADGES DE ESTADO CON SHIMMER ===== */
+
+.state-badge-shimmer {
+    position: relative;
+    overflow: hidden;
+    font-weight: 600;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+}
+
+/* Efecto shimmer continuo para badges */
+.state-badge-shimmer::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 25%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    animation: shimmerUniversal 3s infinite linear;
+    animation-delay: 0s;
+}
+
+@keyframes shimmerUniversal {
+    0% { left: -100%; }
+    100% { left: 400%; }
+}
+
+/* Estado Activo - Verde */
+.state-badge-shimmer.bg-green-600 {
+    background: linear-gradient(135deg, #10b981, #059669, #10b981) !important;
+    color: white !important;
+    border: 1px solid #047857;
+    box-shadow: 0 2px 6px rgba(16, 185, 129, 0.4);
+}
+
+.state-badge-shimmer.bg-green-600:hover {
+    background: linear-gradient(135deg, #059669, #047857, #059669) !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.5);
+}
+
+/* Estado Inactivo - Rojo */
+.state-badge-shimmer.bg-red-600 {
+    background: linear-gradient(135deg, #ef4444, #dc2626, #ef4444) !important;
+    color: white !important;
+    border: 1px solid #b91c1c;
+    box-shadow: 0 2px 6px rgba(239, 68, 68, 0.4);
+}
+
+.state-badge-shimmer.bg-red-600:hover {
+    background: linear-gradient(135deg, #dc2626, #b91c1c, #dc2626) !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.5);
+}
+
+/* Animación de pulsación al hacer clic */
+.state-badge-shimmer:active {
+    animation: buttonClick 0.2s ease;
+    transform: translateY(0);
+}
+
+@keyframes buttonClick {
+    0% { transform: scale(1); }
+    50% { transform: scale(0.95); }
+    100% { transform: scale(1); }
+}
+
+/* ===== ESTILOS PARA BOTONES DE ACCIONES ===== */
+
+/* ===== ESTILOS PARA BOTONES DE ACCIONES ===== */
+
+/* Botón VER/EDITAR - Modo claro (celeste) */
+.action-btn-view {
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8, #3b82f6) !important;
+    color: white !important;
+    border: 1px solid #2563eb;
+    position: relative;
+    overflow: hidden;
+    font-weight: 600;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(37, 99, 235, 0.3);
+}
+
+/* Efecto shimmer continuo para botones */
+.action-btn-view::before,
+.action-btn-delete::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 25%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    animation: shimmerUniversal 3s infinite linear;
+    animation-delay: 0s;
+}
+
+.action-btn-view:hover {
+    background: linear-gradient(135deg, #2563eb, #1e40af, #2563eb) !important;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(37, 99, 235, 0.4);
+}
+
+.action-btn-view:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 6px rgba(37, 99, 235, 0.3);
+    animation: buttonClick 0.2s ease;
+}
+
+/* Botón VER/EDITAR - Modo oscuro (morado) */
+[data-theme="dark"] .action-btn-view {
+    background: linear-gradient(135deg, #8b5cf6, #7c3aed, #8b5cf6) !important;
+    color: white !important;
+    border: 1px solid #7c3aed;
+    box-shadow: 0 2px 4px rgba(139, 92, 246, 0.3);
+}
+
+[data-theme="dark"] .action-btn-view:hover {
+    background: linear-gradient(135deg, #7c3aed, #6d28d9, #7c3aed) !important;
+    box-shadow: 0 6px 16px rgba(139, 92, 246, 0.5);
+}
+
+/* Botón ELIMINAR - Modo claro (rojo) */
+.action-btn-delete {
+    background: linear-gradient(135deg, #ef4444, #dc2626, #ef4444) !important;
+    color: white !important;
+    border: 1px solid #dc2626;
+    position: relative;
+    overflow: hidden;
+    font-weight: 600;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(239, 68, 68, 0.3);
+}
+
+.action-btn-delete:hover {
+    background: linear-gradient(135deg, #dc2626, #b91c1c, #dc2626) !important;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(220, 38, 38, 0.4);
+}
+
+.action-btn-delete:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 6px rgba(220, 38, 38, 0.3);
+    animation: buttonClick 0.2s ease;
+}
+
+/* Botón ELIMINAR - Modo oscuro (rojo) */
+[data-theme="dark"] .action-btn-delete {
+    background: linear-gradient(135deg, #ef4444, #dc2626, #ef4444) !important;
+    color: white !important;
+    border: 1px solid #dc2626;
+    box-shadow: 0 2px 4px rgba(239, 68, 68, 0.3);
+}
+
+[data-theme="dark"] .action-btn-delete:hover {
+    background: linear-gradient(135deg, #dc2626, #b91c1c, #dc2626) !important;
+    box-shadow: 0 6px 16px rgba(220, 38, 38, 0.5);
+}
+
+/* Animación de shimmer universal */
+@keyframes shimmerUniversal {
+    0% { left: -100%; }
+    100% { left: 400%; }
+}
+
+/* Animación de pulsación */
+@keyframes buttonClick {
+    0% { transform: scale(1); }
+    50% { transform: scale(0.95); }
+    100% { transform: scale(1); }
+}
+
+/* Para modo oscuro, ajustar la intensidad del brillo */
+[data-theme="dark"] .action-btn-view::before,
+[data-theme="dark"] .action-btn-delete::before {
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+}
+
+/* Asegurar buen espaciado entre botones */
+.w-20 {
+    width: 5rem !important;
+    min-width: 5rem !important;
+    max-width: 5rem !important;
+}
+
+/* Botón ELIMINAR - Modo claro (rojo) */
+.action-btn-delete {
+    background: linear-gradient(135deg, #ef4444, #dc2626, #ef4444) !important;
+    color: white !important;
+    border: 1px solid #dc2626;
+    position: relative;
+    overflow: hidden;
+    font-weight: 600;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(239, 68, 68, 0.3);
+}
+
+.action-btn-delete:hover {
+    background: linear-gradient(135deg, #dc2626, #b91c1c, #dc2626) !important;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(220, 38, 38, 0.4);
+}
+
+.action-btn-delete:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 6px rgba(220, 38, 38, 0.3);
+    animation: buttonClick 0.2s ease;
+}
+
+/* Botón ELIMINAR - Modo oscuro (rojo) */
+[data-theme="dark"] .action-btn-delete {
+    background: linear-gradient(135deg, #ef4444, #dc2626, #ef4444) !important;
+    color: white !important;
+    border: 1px solid #dc2626;
+    box-shadow: 0 2px 4px rgba(239, 68, 68, 0.3);
+}
+
+[data-theme="dark"] .action-btn-delete:hover {
+    background: linear-gradient(135deg, #dc2626, #b91c1c, #dc2626) !important;
+    box-shadow: 0 6px 16px rgba(220, 38, 38, 0.5);
+}
+
+/* Para modo oscuro, ajustar la intensidad del brillo */
+[data-theme="dark"] .action-btn-view::before,
+[data-theme="dark"] .action-btn-delete::before,
+[data-theme="dark"] .state-badge-shimmer::before {
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+}
+
+/* Asegurar buen espaciado entre botones */
+.w-20 {
+    width: 5rem !important;
+    min-width: 5rem !important;
+    max-width: 5rem !important;
+}
+
+.px-3 {
+    padding-left: 0.75rem !important;
+    padding-right: 0.75rem !important;
+}
+
+.py-1 {
+    padding-top: 0.25rem !important;
+    padding-bottom: 0.25rem !important;
+}
+/* ===== ESTILOS PARA BADGES DE ESTADO CON SHIMMER ===== */
+
+.state-badge-shimmer {
+    position: relative;
+    overflow: hidden;
+    font-weight: 600;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+}
+
+/* Efecto shimmer continuo para badges */
+.state-badge-shimmer::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 25%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    animation: shimmerUniversal 3s infinite linear;
+    animation-delay: 0s;
+}
+
+/* Estado Activo - Verde */
+.state-badge-shimmer.bg-green-600 {
+    background: linear-gradient(135deg, #10b981, #059669, #10b981) !important;
+    color: white !important;
+    border: 1px solid #047857;
+    box-shadow: 0 2px 6px rgba(16, 185, 129, 0.4);
+}
+
+.state-badge-shimmer.bg-green-600:hover {
+    background: linear-gradient(135deg, #059669, #047857, #059669) !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.5);
+}
+
+/* Estado Inactivo - Rojo */
+.state-badge-shimmer.bg-red-600 {
+    background: linear-gradient(135deg, #ef4444, #dc2626, #ef4444) !important;
+    color: white !important;
+    border: 1px solid #b91c1c;
+    box-shadow: 0 2px 6px rgba(239, 68, 68, 0.4);
+}
+
+.state-badge-shimmer.bg-red-600:hover {
+    background: linear-gradient(135deg, #dc2626, #b91c1c, #dc2626) !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.5);
+}
+
+/* Para modo oscuro, ajustar la intensidad del brillo en badges */
+[data-theme="dark"] .state-badge-shimmer::before {
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+}
+

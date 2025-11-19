@@ -409,6 +409,7 @@ input[type="checkbox"] {
 input[type="text"],
 input[type="tel"],
 input[type="email"],
+input[type="date"],
 select {
     background-color: var(--card-bg);
     color: var(--text-colorcrd);
@@ -421,6 +422,7 @@ select {
 input[type="text"]:focus,
 input[type="tel"]:focus,
 input[type="email"]:focus,
+input[type="date"]:focus,
 select:focus {
     outline: none;
     border-color: var(--accent-color);
@@ -430,6 +432,7 @@ select:focus {
 [data-theme="dark"] input[type="text"]:focus,
 [data-theme="dark"] input[type="tel"]:focus,
 [data-theme="dark"] input[type="email"]:focus,
+[data-theme="dark"] input[type="date"]:focus,
 [data-theme="dark"] select:focus {
     box-shadow: 0 0 0 3px rgba(147, 51, 234, 0.1);
 }

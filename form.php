@@ -153,6 +153,7 @@
               <option>Masculino</option>
               <option>Otro</option>
             </select>
+            <input type="date" class="border rounded-lg p-2" required>
             <input type="text" placeholder="Dirección" class="border rounded-lg p-2" required>
             <input type="tel" placeholder="Teléfono" class="border rounded-lg p-2" required>
             <input type="email" placeholder="Correo electrónico" class="border rounded-lg p-2">
