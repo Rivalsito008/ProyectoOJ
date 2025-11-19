@@ -97,25 +97,33 @@ if (contrasteGuardado) {
     contrastValue.textContent = contrasteGuardado;
 }
 
-// Dropdown de perfil
-const profileButton = document.getElementById('profileButton');
-const profileDropdown = document.getElementById('profileDropdown');
+// ========================================
+// DROPDOWN DE PERFIL
+// ========================================
+// JavaScript para el dropdown (asegúrate de que esta lógica esté en tu archivo JS)
+document.addEventListener('DOMContentLoaded', function() {
+    const profileButton = document.getElementById('profileButton');
+    const profileDropdown = document.getElementById('profileDropdown');
 
-profileButton.addEventListener('click', (e) => {
-    e.stopPropagation();
-    profileDropdown.classList.toggle('hidden');
-});
+    profileButton.addEventListener('click', (e) => {
+        e.stopPropagation();
+        profileDropdown.classList.toggle('hidden');
+    });
 
-// Cerrar dropdown al hacer clic fuera
-document.addEventListener('click', (e) => {
-    if (!profileButton.contains(e.target) && !profileDropdown.contains(e.target)) {
-        profileDropdown.classList.add('hidden');
-    }
-});
+    // Cerrar dropdown al hacer clic fuera
+    document.addEventListener('click', (e) => {
+        if (!profileButton.contains(e.target) && !profileDropdown.contains(e.target)) {
+            profileDropdown.classList.add('hidden');
+        }
+    });
 
-function cerrarDropdown() {
-    profileDropdown.classList.add('hidden');
-}
+    // Cerrar dropdown con tecla ESC
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            profileDropdown.classList.add('hidden');
+        }
+    });
+})();
 
 // Función para cerrar sesión
 function cerrarSesion() {
@@ -166,3 +174,4 @@ window.addEventListener('DOMContentLoaded', () => {
     document.documentElement.style.setProperty('--contrast', contrasteGuardado);
     contrastValue.textContent = contrasteGuardado;
 });
+

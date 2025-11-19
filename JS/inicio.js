@@ -54,41 +54,7 @@ sidebar.addEventListener('mouseleave', () => {
     });
 });
 
-// ========================================
-// DROPDOWN DE PERFIL
-// ========================================
-const profileButton = document.getElementById('profileButton');
-const profileDropdown = document.getElementById('profileDropdown');
 
-profileButton.addEventListener('click', (e) => {
-    e.stopPropagation();
-    profileDropdown.classList.toggle('hidden');
-});
-
-// Cerrar dropdown al hacer clic fuera
-document.addEventListener('click', (e) => {
-    if (!profileButton.contains(e.target) && !profileDropdown.contains(e.target)) {
-        profileDropdown.classList.add('hidden');
-    }
-});
-
-function cerrarDropdown() {
-    profileDropdown.classList.add('hidden');
-}
-
-// Función para cerrar sesión
-function cerrarSesion() {
-    if (confirm('¿Estás seguro que deseas cerrar sesión?')) {
-        window.location.href = 'logout.php';
-    }
-}
-
-// Cerrar dropdown con tecla ESC
-document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
-        cerrarDropdown();
-    }
-});
 
 // ========================================
 // TAB FUNCTIONALITY
@@ -335,4 +301,29 @@ function resetearSeleccion() {
 // ========================================
 document.addEventListener('DOMContentLoaded', function() {
     inicializarMapa();
+});
+
+// ========================================
+// PROFILE DROPDOWN FUNCTIONALITY
+// ========================================
+const profileButton = document.getElementById('profileButton');
+const profileDropdown = document.getElementById('profileDropdown');
+
+// Toggle dropdown al hacer click en el botón
+profileButton.addEventListener('click', (e) => {
+    e.stopPropagation();
+    profileDropdown.classList.toggle('hidden');
+});
+
+// Cerrar dropdown al hacer click fuera de él
+document.addEventListener('click', (e) => {
+    if (!profileButton.contains(e.target) && !profileDropdown.contains(e.target)) {
+        profileDropdown.classList.remove('hidden');
+        profileDropdown.classList.add('hidden');
+    }
+});
+
+// Prevenir que el dropdown se cierre al hacer click dentro de él
+profileDropdown.addEventListener('click', (e) => {
+    e.stopPropagation();
 });

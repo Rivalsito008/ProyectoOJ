@@ -85,37 +85,40 @@
                     <!--Botón de perfil -->
                     <div class="relative">
                         <!-- Botón del perfil -->
-                        <button id="profileButton" class="flex items-center gap-2 rounded-xl px-3 py-2 transition-colors">
-                            <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Perfil" class="w-8 h-8 rounded-full">
+                        <button id="profileButton"
+                            class="flex items-center gap-2 rounded-xl px-3 py-2 transition-colors">
+                            <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Perfil"
+                                class="w-8 h-8 rounded-full">
                             <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path class="flecha" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                <path class="flecha" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M19 9l-7 7-7-7"></path>
                             </svg>
                         </button>
 
                         <!-- Dropdown del perfil -->
                         <div id="profileDropdown"
-                            class="dropdown hidden absolute right-0 mt-3 w-80 rounded-2xl shadow-xl border border-gray-200 dark:border-transparent overflow-hidden z-50 transition-all duration-300">
+                            class="dropdown hidden absolute right-0 mt-3 w-80 rounded-2xl shadow-xl border overflow-hidden z-50 transition-all duration-300">
 
                             <!-- Encabezado -->
-                            <div class="p-4 bg-[var(--dropdown-color)] dark:bg-[#2b2343] backdrop-blur-xl">
+                            <div class="dropdown-header p-4 backdrop-blur-xl">
                                 <div class="flex items-center space-x-4">
-                                    <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png"
-                                        alt="Usuario"
-                                        class="w-12 h-12 rounded-full border border-gray-300 dark:border-gray-600 shadow-sm">
+                                    <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Usuario"
+                                        class="w-12 h-12 rounded-full border shadow-sm dropdown-avatar">
                                     <div>
-                                        <p class="text-base font-semibold text-gray-900 dark:text-gray-100">Nombre del Usuario</p>
-                                        <p class="text-sm text-gray-500 dark:text-gray-400">Administrador</p>
+                                        <p class="text-base font-semibold dropdown-username">Nombre del Usuario</p>
+                                        <p class="text-sm dropdown-role">Administrador</p>
                                     </div>
                                 </div>
                             </div>
 
                             <!-- Opciones -->
-                            <div class="bg-[var(--dropdown-color)] dark:bg-[#241c37] transition-colors duration-300">
+                            <div class="dropdown-body transition-colors duration-300">
                                 <a href="index.php"
-                                    class="flex items-center gap-3 px-5 py-3 text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-[#3c2a4b] transition-all duration-200">
+                                    class="dropdown-logout flex items-center gap-3 px-5 py-3 text-sm font-medium transition-all duration-200">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a2 2 0 11-4 0v-1m0-8V7a2 2 0 114 0v1"></path>
+                                            d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a2 2 0 11-4 0v-1m0-8V7a2 2 0 114 0v1">
+                                        </path>
                                     </svg>
                                     Cerrar sesión
                                 </a>

@@ -1,5 +1,5 @@
 :root {
-    --bg-color: #f9fafb;
+    --bg-color: #e8eaed;
     --text-color: #111827;
     --card-bg: #ffffff;
     --border-color: #e5e7eb;
@@ -422,4 +422,103 @@ textarea:focus {
 [data-theme="dark"] .btn-save-user:hover {
     background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
     box-shadow: 0 10px 20px rgba(139, 92, 246, 0.3);
+}
+
+/* ========================================
+   DROPDOWN DE PERFIL - MODO CLARO Y OSCURO
+   ======================================== */
+
+/* Estilos base del dropdown - MODO CLARO */
+.dropdown {
+    background-color: var(--dropdown-color);
+    border-color: var(--border-color);
+    border-radius: 0.75rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.dropdown:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    border-color: rgba(108, 85, 150, 0.3);
+}
+
+/* Encabezado del dropdown - MODO CLARO */
+.dropdown-header {
+    background-color: var(--card-bg);
+    border-bottom: 1px solid var(--border-color);
+}
+
+/* Avatar border - MODO CLARO */
+.dropdown-avatar {
+    border-color: var(--border-color);
+}
+
+/* Nombre de usuario - MODO CLARO */
+.dropdown-username {
+    color: var(--text-colorcrd);
+}
+
+/* Rol del usuario - MODO CLARO */
+.dropdown-role {
+    color: #6b7280;
+}
+
+/* Cuerpo del dropdown - MODO CLARO */
+.dropdown-body {
+    background-color: var(--card-bg);
+}
+
+/* Botón de cerrar sesión - MODO CLARO */
+.dropdown-logout {
+    color: #dc2626;
+}
+
+.dropdown-logout:hover {
+    background-color: #fef2f2;
+}
+
+/* ========================================
+   MODO OSCURO - DROPDOWN
+   ======================================== */
+
+/* Dropdown principal - MODO OSCURO */
+[data-theme="dark"] .dropdown {
+    background-color: #2a2240;
+    border-color: #3d3454;
+}
+
+/* Encabezado del dropdown - MODO OSCURO */
+[data-theme="dark"] .dropdown-header {
+    background-color: #2b2343;
+    border-bottom: 1px solid #3d3454;
+}
+
+/* Avatar border - MODO OSCURO */
+[data-theme="dark"] .dropdown-avatar {
+    border-color: #4b4563;
+}
+
+/* Nombre de usuario - MODO OSCURO */
+[data-theme="dark"] .dropdown-username {
+    color: #f3f4f6;
+}
+
+/* Rol del usuario - MODO OSCURO */
+[data-theme="dark"] .dropdown-role {
+    color: #9ca3af;
+}
+
+/* Cuerpo del dropdown - MODO OSCURO */
+[data-theme="dark"] .dropdown-body {
+    background-color: #241c37;
+}
+
+/* Botón de cerrar sesión - MODO OSCURO */
+[data-theme="dark"] .dropdown-logout {
+    color: #fca5a5;
+}
+
+[data-theme="dark"] .dropdown-logout:hover {
+    background-color: rgba(127, 29, 29, 0.3);
 }
