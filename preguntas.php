@@ -355,8 +355,13 @@
                                 <option value="activador" class="text-purple-600">Activador Automático</option>
                             </select>
 
+                            <!-- En tu modal de preguntas, reemplaza el botón actual por este: -->
                             <div class="px-6 py-4 bg-white flex justify-end">
-                                <button id="btnGuardarPregunta" class="btn-primary px-5 py-2 rounded-lg bg-blue-500 text-white hover:bg-blue-600 transition">Guardar Pregunta</button>
+                                <button
+                                    id="btnGuardarPregunta"
+                                    class="w-full flex items-center justify-center gap-2">
+                                    Guardar Pregunta
+                                </button>
                             </div>
                         </div>
 
