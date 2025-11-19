@@ -356,7 +356,7 @@
                     </section>
 
                     <div class="px-6 py-4 bg-white flex justify-end">
-                        <button class="btn-save-user px-5 py-2 rounded-lg font-medium">Guardar Usuario</button>
+                        <button class="btn-save-tribu px-5 py-2 rounded-lg font-medium">Guardar Tribunal</button>
                     </div>
                 </div>
             </div>

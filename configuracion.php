@@ -172,13 +172,13 @@
                 <div class="card rounded-xl p-6 shadow md:col-span-2">
                     <h2 class="text-xl font-semibold mb-4">Cuenta</h2>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-                        <button id="btnEditarPerfil" class="btn-primary py-3 rounded-lg transition">
+                        <button id="btnEditarPerfil" class="btn-config py-3 rounded-lg transition">
                             Editar perfil
                         </button>
-                        <button id="btnCambiarClave" class="btn-primary py-3 rounded-lg transition">
+                        <button id="btnCambiarClave" class="btn-config py-3 rounded-lg transition">
                             Solicitar cambio de contraseña
                         </button>
-                        <button id="btnVerificacion" class="btn-primary py-3 rounded-lg transition">
+                        <button id="btnVerificacion" class="btn-config py-3 rounded-lg transition">
                             Activar verificación en dos pasos
                         </button>
                     </div>
