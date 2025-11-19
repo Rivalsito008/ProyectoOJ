@@ -820,20 +820,22 @@ select {
     transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+/* Barras de riesgo */
 .risk-bar-table::after {
     content: '';
     position: absolute;
     top: 0;
     left: -100%;
-    width: 100%;
+    width: 25%;
     height: 100%;
     background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
-    animation: shimmerTable 2.5s infinite;
+    animation: shimmerUniversal 3s infinite linear;
+    animation-delay: 0s;
 }
 
-@keyframes shimmerTable {
+@keyframes shimmerUniversal {
     0% { left: -100%; }
-    100% { left: 100%; }
+    100% { left: 400%; }
 }
 
 /* Colores vibrantes para las barras */
@@ -929,10 +931,7 @@ tr:hover .risk-bar-table {
     animation: shimmerBadge 3s infinite;
 }
 
-@keyframes shimmerBadge {
-    0% { left: -100%; }
-    100% { left: 100%; }
-}
+
 
 /* Efectos hover para los badges */
 .state-badge:hover {
@@ -1156,20 +1155,17 @@ tr:hover .risk-bar-table {
 
 /* ===== ESTILOS CON ANIMACIÓN SHIMMER CONTINUA ===== */
 
-.action-btn-view::before, .action-btn-delete::before {
+.action-btn-view::before, 
+.action-btn-delete::before {
     content: '';
     position: absolute;
     top: 0;
     left: -100%;
-    width: 100%;
+    width: 25%;
     height: 100%;
     background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-    animation: shimmerButton 3s infinite;
-}
-
-@keyframes shimmerButton {
-    0% { left: -100%; }
-    100% { left: 100%; }
+    animation: shimmerUniversal 3s infinite linear;
+    animation-delay: 0s;
 }
 
 /* Para modo oscuro, ajustar la intensidad del brillo */
@@ -1188,16 +1184,17 @@ tr:hover .risk-bar-table {
     transition: all 0.3s ease;
 }
 
-/* Efecto shimmer */
-.state-badge::before {
+.state-badge::before,
+.state-badge-shimmer::before {
     content: '';
     position: absolute;
     top: 0;
     left: -100%;
-    width: 100%;
+    width: 25%;
     height: 100%;
     background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-    transition: left 0.6s ease;
+    animation: shimmerUniversal 3s infinite linear;
+    animation-delay: 0s;
 }
 
 .state-badge:hover::before {
