@@ -335,12 +335,11 @@
                                 <label class="block font-medium mb-1">Ámbito *</label>
                                 <select class="input-field w-full">
                                     <option>Seleccionar ámbito</option>
-                                    <option value="legal">Legal</option>
-                                    <option value="financiero">Financiero</option>
-                                    <option value="operacional">Operacional</option>
-                                    <option value="tecnologico">Tecnológico</option>
-                                    <option value="compliance">Compliance</option>
-                                    <option value="reputacional">Reputacional</option>
+                                    <option value="Conducta">Conducta del agresor</option>
+                                    <option value="Contexto">Contexto de la Violencia</option>
+                                    <option value="Riesgo">Riesgo de la Victima</option>
+                                    <option value="Vulnerabilidad">Vulnerabilidad de Victima</option>
+                                    <option value="Percepción">Percepción de Victima</option>
                                 </select>
                             </div>
 
