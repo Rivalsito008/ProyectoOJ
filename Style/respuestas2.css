@@ -1322,3 +1322,36 @@ tr:hover .risk-bar-table {
     50% { transform: scale(0.95); }
     100% { transform: scale(1); }
 }
+
+
+/* Estilos para la barra de búsqueda */
+#searchInput {
+    transition: all 0.3s ease;
+}
+
+#searchInput:focus {
+    box-shadow: 0 0 0 3px rgba(59, 131, 246, 0.5);
+}
+
+#clearSearch {
+    transition: color 0.2s ease;
+}
+
+/* Efecto hover para la barra de búsqueda */
+#searchInput:hover {
+    border-color: #ffffff00;
+}
+
+/* Modo oscuro para la barra de búsqueda */
+[data-theme="dark"] #searchInput {
+    border-color: #4b5563;
+    background-color: #ffffff;
+}
+
+[data-theme="dark"] #searchInput:hover {
+    border-color: #ffffff;
+}
+
+[data-theme="dark"] #searchInput:focus {
+    box-shadow: 0 0 0 3px rgba(138, 92, 246, 0.589);
+}
