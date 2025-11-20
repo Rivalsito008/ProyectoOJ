@@ -43,7 +43,6 @@
               <table class="w-full text-sm text-left">
                 <thead class="text-xs uppercase">
                   <tr>
-                    <th class="px-6 py-3">ID</th>
                     <th class="px-6 py-3">Nombre</th>
                     <th class="px-6 py-3">Apellido</th>
                     <th class="px-6 py-3">Email</th>
@@ -52,7 +51,7 @@
                     <th class="px-6 py-3">Acciones</th>
                   </tr>
                 </thead>
-                <tbody>
+                <tbody id="tablaTodo">
                 </tbody>
               </table>
             </div>
@@ -63,7 +62,6 @@
               <table class="w-full text-sm text-left">
                 <thead class="text-xs uppercase">
                   <tr>
-                    <th class="px-6 py-3">ID</th>
                     <th class="px-6 py-3">Nombre</th>
                     <th class="px-6 py-3">Apellido</th>
                     <th class="px-6 py-3">Email</th>
@@ -72,7 +70,7 @@
                     <th class="px-6 py-3">Acciones</th>
                   </tr>
                 </thead>
-                <tbody>
+                <tbody id="tablaActivo">
                 </tbody>
               </table>
             </div>
@@ -83,7 +81,6 @@
               <table class="w-full text-sm text-left">
                 <thead class="text-xs uppercase">
                   <tr>
-                    <th class="px-6 py-3">ID</th>
                     <th class="px-6 py-3">Nombre</th>
                     <th class="px-6 py-3">Apellido</th>
                     <th class="px-6 py-3">Email</th>
@@ -92,7 +89,7 @@
                     <th class="px-6 py-3">Acciones</th>
                   </tr>
                 </thead>
-                <tbody>
+                <tbody id="tablaInactivo">
                 </tbody>
               </table>
             </div>
