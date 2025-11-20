@@ -674,7 +674,7 @@ function renderTabla(filtro = "Todo") {
             .filter(v => filtro === "Todo" || v.riesgo.toLowerCase() === tab)
             .forEach(v => {
                 const tr = document.createElement("tr");
-                tr.classList.add("border-b", "hover:bg-gray-100", "dark:border-gray-500", "dark:hover:bg-gray-700");
+                tr.classList.add("border-b", "hover:bg-gray-50", "dark:border-gray-50", "dark:hover:bg-gray-340");
 
                 tr.innerHTML = `
                     <td class="px-6 py-3">${v.nombre}</td>

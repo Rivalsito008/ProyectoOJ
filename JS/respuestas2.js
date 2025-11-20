@@ -779,7 +779,7 @@ function renderTabla(filtro = "Todo") {
             })
             .forEach(v => {
                 const tr = document.createElement("tr");
-                tr.classList.add("border-b", "hover:bg-gray-100", "dark:border-gray-500", "dark:hover:bg-gray-700");
+                tr.classList.add("border-b", "hover:bg-gray-50", "dark:border-gray-50", "dark:hover:bg-gray-340");
 
                 // Calcular riesgo basado en puntos
                 const calculoRiesgo = calcularRiesgo(v.respuestas);

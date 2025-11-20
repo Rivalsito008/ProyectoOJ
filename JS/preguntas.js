@@ -113,7 +113,7 @@ function cargarTablaPorNivel(nivel) {
     preguntasFiltradas.forEach(p => {
         const tr = document.createElement("tr");
         // Clase mejorada para los bordes en ambos modos
-        tr.className = "border-b border-gray-200 dark:border-gray-700 hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 dark:hover:from-gray-800 dark:hover:to-gray-700 transition-all duration-300";
+        tr.className = "border-b border-gray-200 dark:border-gray-700 hover:bg-gradient-to-r hover:from-gray-50 hover:to-gray-50 dark:hover:from-gray-800 dark:hover:to-gray-700 transition-all duration-300";
 
         // Determinar clases CSS según el nivel de riesgo - SIN DEGRADADO
         let riesgoClass = "";
@@ -466,7 +466,7 @@ function agregarPreguntaATabla(pregunta) {
     }
 
     const tr = document.createElement("tr");
-    tr.className = "border-b border-gray-200 dark:border-gray-700 hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 dark:hover:from-gray-800 dark:hover:to-gray-700 transition-all duration-300";
+        tr.className = "border-b border-gray-200 dark:border-gray-700 hover:bg-gradient-to-r hover:from-gray-50 hover:to-gray-50 dark:hover:from-gray-800 dark:hover:to-gray-700 transition-all duration-300";
 
     tr.innerHTML = `
         <td class="px-6 py-4 text-gray-900 dark:text-white font-medium">${pregunta.pregunta}</td>

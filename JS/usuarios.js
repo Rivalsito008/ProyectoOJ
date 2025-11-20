@@ -77,7 +77,7 @@ function cargarTablaPorNivel(nivel) {
     // En la función cargarTablaPorNivel, dentro del forEach:
     usuariosFiltradas.forEach(p => {
         const tr = document.createElement("tr");
-        tr.className = "border-b border-gray-200 dark:border-gray-700 hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 dark:hover:from-gray-800 dark:hover:to-gray-700 transition-all duration-300";
+        tr.className = "border-b border-gray-200 dark:border-gray-700 hover:bg-gradient-to-r hover:from-gray-50 hover:to-gray-50 dark:hover:from-gray-800 dark:hover:to-gray-700 transition-all duration-300";
 
         // Determinar clases CSS según el ESTADO
         let estadoClass = "";
