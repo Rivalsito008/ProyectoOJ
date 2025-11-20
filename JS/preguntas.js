@@ -302,65 +302,6 @@ function inicializarEventListeners() {
         });
     }
 
-    // Dropdown de perfil
-    const profileButton = document.getElementById('profileButton');
-    const profileDropdown = document.getElementById('profileDropdown');
-    
-    if (profileButton && profileDropdown) {
-        profileButton.addEventListener('click', (e) => {
-            e.stopPropagation();
-            profileDropdown.classList.toggle('hidden');
-        });
-
-        // Cerrar dropdown al hacer clic fuera
-        document.addEventListener('click', (e) => {
-            if (!profileButton.contains(e.target) && !profileDropdown.contains(e.target)) {
-                profileDropdown.classList.add('hidden');
-            }
-        });
-
-        // Cerrar dropdown con tecla ESC
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                profileDropdown.classList.add('hidden');
-            }
-        });
-    }
-
-    // Sidebar hover effect
-    const sidebar = document.getElementById('sidebar');
-    if (sidebar) {
-        const logoCompact = document.getElementById('logo-compact');
-        const logoFull = document.getElementById('logo-full');
-        const navLabels = document.querySelectorAll('.nav-label');
-        const navItems = document.querySelectorAll('.nav-item');
-
-        sidebar.addEventListener('mouseenter', () => {
-            sidebar.classList.remove('sidebar-collapsed');
-            sidebar.classList.add('sidebar-expanded');
-            if (logoCompact) logoCompact.style.display = 'none';
-            if (logoFull) logoFull.style.display = 'block';
-            navLabels.forEach(label => {
-                label.style.display = 'inline-block';
-            });
-            navItems.forEach(item => {
-                item.classList.remove('justify-center');
-            });
-        });
-
-        sidebar.addEventListener('mouseleave', () => {
-            sidebar.classList.remove('sidebar-expanded');
-            sidebar.classList.add('sidebar-collapsed');
-            if (logoCompact) logoCompact.style.display = 'flex';
-            if (logoFull) logoFull.style.display = 'none';
-            navLabels.forEach(label => {
-                label.style.display = 'none';
-            });
-            navItems.forEach(item => {
-                item.classList.add('justify-center');
-            });
-        });
-    }
 
     // Detectar cambios en preferencia de sistema (para modo auto)
     window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {

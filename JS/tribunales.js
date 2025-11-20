@@ -16,7 +16,6 @@
     document.documentElement.style.setProperty('--contrast', contrast);
 })();
 
-const sidebar = document.getElementById('sidebar');
 const logoCompact = document.getElementById('logo-compact');
 const logoFull = document.getElementById('logo-full');
 const navLabels = document.querySelectorAll('.nav-label');
@@ -49,43 +48,6 @@ document.addEventListener('keydown', (e) => {
         closeModal();
     }
 });
-
-// Sidebar
-sidebar.addEventListener('mouseenter', () => {
-    sidebar.classList.replace('sidebar-collapsed', 'sidebar-expanded');
-    logoCompact.style.display = 'none';
-    logoFull.style.display = 'block';
-    navLabels.forEach(l => l.style.display = 'inline-block');
-    navItems.forEach(i => i.classList.remove('justify-center'));
-});
-
-sidebar.addEventListener('mouseleave', () => {
-    sidebar.classList.replace('sidebar-expanded', 'sidebar-collapsed');
-    logoCompact.style.display = 'flex';
-    logoFull.style.display = 'none';
-    navLabels.forEach(l => l.style.display = 'none');
-    navItems.forEach(i => i.classList.add('justify-center'));
-});
-
-// Dropdown de perfil
-const profileButton = document.getElementById('profileButton');
-const profileDropdown = document.getElementById('profileDropdown');
-
-profileButton.addEventListener('click', (e) => {
-    e.stopPropagation();
-    profileDropdown.classList.toggle('hidden');
-});
-
-// Cerrar dropdown al hacer clic fuera
-document.addEventListener('click', (e) => {
-    if (!profileButton.contains(e.target) && !profileDropdown.contains(e.target)) {
-        profileDropdown.classList.add('hidden');
-    }
-});
-
-function cerrarDropdown() {
-    profileDropdown.classList.add('hidden');
-}
 
 // Tabs - CORREGIDO
 const tabs = document.querySelectorAll('.browser-tab');

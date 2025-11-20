@@ -16,64 +16,6 @@
     document.documentElement.style.setProperty('--contrast', contrast);
 })();
 
-// Sidebar
-const sidebar = document.getElementById("sidebar");
-const logoCompact = document.getElementById("logo-compact");
-const logoFull = document.getElementById("logo-full");
-const navLabels = document.querySelectorAll(".nav-label");
-const navItems = document.querySelectorAll(".nav-item");
-
-sidebar.addEventListener("mouseenter", () => {
-    sidebar.classList.remove("sidebar-collapsed");
-    sidebar.classList.add("sidebar-expanded");
-    logoCompact.style.display = "none";
-    logoFull.style.display = "block";
-    navLabels.forEach(label => label.style.display = "inline-block");
-    navItems.forEach(item => item.classList.remove("justify-center"));
-});
-
-sidebar.addEventListener("mouseleave", () => {
-    sidebar.classList.remove("sidebar-expanded");
-    sidebar.classList.add("sidebar-collapsed");
-    logoCompact.style.display = "flex";
-    logoFull.style.display = "none";
-    navLabels.forEach(label => label.style.display = "none");
-    navItems.forEach(item => item.classList.add("justify-center"));
-});
-// Dropdown de perfil
-const profileButton = document.getElementById('profileButton');
-const profileDropdown = document.getElementById('profileDropdown');
-
-profileButton.addEventListener('click', (e) => {
-    e.stopPropagation();
-    profileDropdown.classList.toggle('hidden');
-});
-
-// Cerrar dropdown al hacer clic fuera
-document.addEventListener('click', (e) => {
-    if (!profileButton.contains(e.target) && !profileDropdown.contains(e.target)) {
-        profileDropdown.classList.add('hidden');
-    }
-});
-
-function cerrarDropdown() {
-    profileDropdown.classList.add('hidden');
-}
-
-// Función para cerrar sesión
-function cerrarSesion() {
-    if (confirm('¿Estás seguro que deseas cerrar sesión?')) {
-        window.location.href = 'logout.php';
-    }
-}
-
-// Cerrar dropdown con tecla ESC
-document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
-        cerrarDropdown();
-    }
-});
-
 // Formulario por pasos
 const steps = document.querySelectorAll(".step");
 const progressBar = document.getElementById("progressBar");

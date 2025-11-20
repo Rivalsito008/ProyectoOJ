@@ -1,37 +1,3 @@
-// Variables globales
-const sidebar = document.getElementById('sidebar');
-const logoCompact = document.getElementById('logo-compact');
-const logoFull = document.getElementById('logo-full');
-const navLabels = document.querySelectorAll('.nav-label');
-const navItems = document.querySelectorAll('.nav-item');
-
-// Sidebar hover effect
-sidebar.addEventListener('mouseenter', () => {
-    sidebar.classList.remove('sidebar-collapsed');
-    sidebar.classList.add('sidebar-expanded');
-    logoCompact.classList.add('hidden');
-    logoFull.classList.remove('hidden');
-    navLabels.forEach(label => {
-        label.classList.remove('hidden');
-    });
-    navItems.forEach(item => {
-        item.classList.remove('justify-center');
-    });
-});
-
-sidebar.addEventListener('mouseleave', () => {
-    sidebar.classList.remove('sidebar-expanded');
-    sidebar.classList.add('sidebar-collapsed');
-    logoCompact.classList.remove('hidden');
-    logoFull.classList.add('hidden');
-    navLabels.forEach(label => {
-        label.classList.add('hidden');
-    });
-    navItems.forEach(item => {
-        item.classList.add('justify-center');
-    });
-});
-
 // Tema
 const radios = document.querySelectorAll('input[name="theme"]');
 const aplicarTema = (modo) => {
@@ -96,48 +62,6 @@ if (contrasteGuardado) {
     document.documentElement.style.setProperty('--contrast', contrasteGuardado);
     contrastValue.textContent = contrasteGuardado;
 }
-
-// ========================================
-// DROPDOWN DE PERFIL
-// ========================================
-// JavaScript para el dropdown (asegúrate de que esta lógica esté en tu archivo JS)
-document.addEventListener('DOMContentLoaded', function() {
-    const profileButton = document.getElementById('profileButton');
-    const profileDropdown = document.getElementById('profileDropdown');
-
-    profileButton.addEventListener('click', (e) => {
-        e.stopPropagation();
-        profileDropdown.classList.toggle('hidden');
-    });
-
-    // Cerrar dropdown al hacer clic fuera
-    document.addEventListener('click', (e) => {
-        if (!profileButton.contains(e.target) && !profileDropdown.contains(e.target)) {
-            profileDropdown.classList.add('hidden');
-        }
-    });
-
-    // Cerrar dropdown con tecla ESC
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') {
-            profileDropdown.classList.add('hidden');
-        }
-    });
-})();
-
-// Función para cerrar sesión
-function cerrarSesion() {
-    if (confirm('¿Estás seguro que deseas cerrar sesión?')) {
-        window.location.href = 'logout.php';
-    }
-}
-
-// Cerrar dropdown con tecla ESC
-document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
-        cerrarDropdown();
-    }
-});
 
 // Botones de cuenta
 document.getElementById('btnEditarPerfil').onclick = () => { };

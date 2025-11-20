@@ -20,43 +20,6 @@
 })();
 
 // ========================================
-// SIDEBAR HOVER EFFECT
-// ========================================
-const sidebar = document.getElementById('sidebar');
-const logoCompact = document.getElementById('logo-compact');
-const logoFull = document.getElementById('logo-full');
-const navLabels = document.querySelectorAll('.nav-label');
-const navItems = document.querySelectorAll('.nav-item');
-
-sidebar.addEventListener('mouseenter', () => {
-    sidebar.classList.remove('sidebar-collapsed');
-    sidebar.classList.add('sidebar-expanded');
-    logoCompact.style.display = 'none';
-    logoFull.style.display = 'block';
-    navLabels.forEach(label => {
-        label.style.display = 'inline-block';
-    });
-    navItems.forEach(item => {
-        item.classList.remove('justify-center');
-    });
-});
-
-sidebar.addEventListener('mouseleave', () => {
-    sidebar.classList.remove('sidebar-expanded');
-    sidebar.classList.add('sidebar-collapsed');
-    logoCompact.style.display = 'flex';
-    logoFull.style.display = 'none';
-    navLabels.forEach(label => {
-        label.style.display = 'none';
-    });
-    navItems.forEach(item => {
-        item.classList.add('justify-center');
-    });
-});
-
-
-
-// ========================================
 // TAB FUNCTIONALITY
 // ========================================
 const browserTabs = document.querySelectorAll('.browser-tab');
@@ -303,27 +266,3 @@ document.addEventListener('DOMContentLoaded', function() {
     inicializarMapa();
 });
 
-// ========================================
-// PROFILE DROPDOWN FUNCTIONALITY
-// ========================================
-const profileButton = document.getElementById('profileButton');
-const profileDropdown = document.getElementById('profileDropdown');
-
-// Toggle dropdown al hacer click en el botón
-profileButton.addEventListener('click', (e) => {
-    e.stopPropagation();
-    profileDropdown.classList.toggle('hidden');
-});
-
-// Cerrar dropdown al hacer click fuera de él
-document.addEventListener('click', (e) => {
-    if (!profileButton.contains(e.target) && !profileDropdown.contains(e.target)) {
-        profileDropdown.classList.remove('hidden');
-        profileDropdown.classList.add('hidden');
-    }
-});
-
-// Prevenir que el dropdown se cierre al hacer click dentro de él
-profileDropdown.addEventListener('click', (e) => {
-    e.stopPropagation();
-});
