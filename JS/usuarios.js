@@ -18,14 +18,14 @@
 
 // CORREGIDO: Cambiar "preguntas" por "usuarios" y agregar propiedades faltantes
 const usuarios = [
-    { id: 1, nombre: "Iván Alejandro", apellido: "Barrera Escalante", email: "ivanbarrera@email.com", rol: "Administrador", estado: "Activo" },
-    { id: 2, nombre: "Carlos Manuel", apellido: "Gonzales Pineda", email: "carlosgonzales@email.com", rol: "Notario", estado: "Inactivo" },
-    { id: 3, nombre: "Mario Alberto", apellido: "Mejia Cruz", email: "marioalberto@email.com", rol: "Administrador", estado: "Activo" },
-    { id: 4, nombre: "Yahir Alejandro", apellido: "Palma Gutierres", email: "yahirpalma@email.com", rol: "Juez", estado: "Inactivo" },
-    { id: 5, nombre: "Hector Jose", apellido: "Moreno Argueta", email: "hectorjose@email.com", rol: "Notario", estado: "Activo" },
-    { id: 6, nombre: "Esteban Miguel", apellido: "Landaverde Argueta", email: "estebanmiguel@email.com", rol: "Administrador", estado: "Activo" },
-    { id: 7, nombre: "Rodrigo Andres", apellido: "Barrera Escalante", email: "rodrigoandres@email.com", rol: "Administrador", estado: "Inactivo" },
-    { id: 8, nombre: "Juan Pablo", apellido: "Barrera Escalante", email: "jpbarrera@email.com", rol: "Juez", estado: "Activo" },
+    { id: 1, nombre: "Iván Alejandro", apellido: "Barrera Escalante", email: "ivanbarrera@email.com", rol: "Administrador", estado: "Activo", nivel: "activo" },
+    { id: 2, nombre: "Carlos Manuel", apellido: "Gonzales Pineda", email: "carlosgonzales@email.com", rol: "Notario", estado: "Inactivo", nivel: "inactivo" },
+    { id: 3, nombre: "Mario Alberto", apellido: "Mejia Cruz", email: "marioalberto@email.com", rol: "Administrador", estado: "Activo", nivel: "activo" },
+    { id: 4, nombre: "Yahir Alejandro", apellido: "Palma Gutierres", email: "yahirpalma@email.com", rol: "Juez", estado: "Inactivo", nivel: "inactivo" },
+    { id: 5, nombre: "Hector Jose", apellido: "Moreno Argueta", email: "hectorjose@email.com", rol: "Notario", estado: "Activo", nivel: "activo" },
+    { id: 6, nombre: "Esteban Miguel", apellido: "Landaverde Argueta", email: "estebanmiguel@email.com", rol: "Administrador", estado: "Activo", nivel: "activo" },
+    { id: 7, nombre: "Rodrigo Andres", apellido: "Barrera Escalante", email: "rodrigoandres@email.com", rol: "Administrador", estado: "Inactivo", nivel: "inactivo" },
+    { id: 8, nombre: "Juan Pablo", apellido: "Barrera Escalante", email: "jpbarrera@email.com", rol: "Juez", estado: "Activo", nivel: "activo" },
 ];
 
 // CORREGIDO: Llamar a la función cuando se carga la página
