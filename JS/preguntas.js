@@ -80,21 +80,21 @@ function cargarTodasLasTablas() {
 function cargarTablaPorNivel(nivel) {
     const tbodyId = `tabla${nivel.charAt(0).toUpperCase() + nivel.slice(1)}`;
     const tbody = document.getElementById(tbodyId);
-    
+
     if (!tbody) {
         console.error(`No se encontró el tbody con id: ${tbodyId}`);
         return;
     }
-    
+
     tbody.innerHTML = "";
 
     // Filtrar preguntas según el nivel
     let preguntasFiltradas = [];
-    
+
     if (nivel === 'todo') {
         preguntasFiltradas = preguntas;
     } else {
-        preguntasFiltradas = preguntas.filter(p => 
+        preguntasFiltradas = preguntas.filter(p =>
             p.nivel.toLowerCase() === nivel.toLowerCase()
         );
     }
@@ -118,8 +118,8 @@ function cargarTablaPorNivel(nivel) {
         // Determinar clases CSS según el nivel de riesgo - SIN DEGRADADO
         let riesgoClass = "";
         let riesgoText = p.nivel;
-        
-        switch(p.nivel.toLowerCase()) {
+
+        switch (p.nivel.toLowerCase()) {
             case 'bajo':
                 riesgoClass = "bg-green-500 text-white";
                 break;
@@ -142,7 +142,7 @@ function cargarTablaPorNivel(nivel) {
 
         tr.innerHTML = `
             <td class="px-6 py-4 text-gray-900 dark:text-white font-medium">${p.pregunta}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-gray-900 dark:text-white">${p.ambito}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-center text-gray-900 dark:text-white">${p.ambito}</td>
             <td class="px-6 py-4 whitespace-nowrap">
                 <span class="inline-flex items-center justify-center w-20 px-3 py-1 rounded-full text-xs font-semibold relative overflow-hidden state-badge-shimmer ${riesgoClass}">
                     ${riesgoText}
@@ -152,11 +152,10 @@ function cargarTablaPorNivel(nivel) {
                 ${p.puntaje}
             </td>
             <td class="px-6 py-4 whitespace-nowrap">
-                <span class="state-badge-shimmer inline-flex items-center justify-center w-20 px-3 py-1 rounded-full text-xs font-semibold relative overflow-hidden ${
-                    p.estado === 'Activo' 
-                    ? 'bg-green-500 text-white' 
-                    : 'bg-red-600 text-white'
-                } border-0 shadow-sm">
+                <span class="state-badge-shimmer inline-flex items-center justify-center w-20 px-3 py-1 rounded-full text-xs font-semibold relative overflow-hidden ${p.estado === 'Activo'
+                ? 'bg-green-500 text-white'
+                : 'bg-red-600 text-white'
+            } border-0 shadow-sm">
                     ${p.estado}
                 </span>
             </td>
@@ -186,14 +185,14 @@ function agregarEventListenersABotones() {
     // Botones Editar
     const botonesEditar = document.querySelectorAll('.action-btn-view');
     botonesEditar.forEach(boton => {
-        boton.addEventListener('click', function(e) {
+        boton.addEventListener('click', function (e) {
             e.preventDefault();
             // Animación de click
             this.style.transform = 'scale(0.95)';
             setTimeout(() => {
                 this.style.transform = 'scale(1)';
             }, 150);
-            
+
             // Aquí iría la lógica para editar
             console.log('Editar pregunta');
         });
@@ -202,14 +201,14 @@ function agregarEventListenersABotones() {
     // Botones Eliminar
     const botonesEliminar = document.querySelectorAll('.action-btn-delete');
     botonesEliminar.forEach(boton => {
-        boton.addEventListener('click', function(e) {
+        boton.addEventListener('click', function (e) {
             e.preventDefault();
             // Animación de click
             this.style.transform = 'scale(0.95)';
             setTimeout(() => {
                 this.style.transform = 'scale(1)';
             }, 150);
-            
+
             // Aquí iría la lógica para eliminar
             console.log('Eliminar pregunta');
             if (confirm('¿Estás seguro de que quieres eliminar esta pregunta?')) {
@@ -247,7 +246,7 @@ function inicializarEventListeners() {
         if (closeQuestionBtn) {
             closeQuestionBtn.addEventListener('click', closeQuestionModal);
         }
-        
+
         if (cancelQuestionBtn) {
             cancelQuestionBtn.addEventListener('click', closeQuestionModal);
         }
@@ -273,27 +272,27 @@ function inicializarEventListeners() {
         browserTabs.forEach(tab => {
             tab.addEventListener('click', () => {
                 const tabName = tab.getAttribute('data-tab');
-                
+
                 console.log(`Cambiando a pestaña: ${tabName}`);
-                
+
                 // Remove active class from all tabs
                 browserTabs.forEach(t => t.classList.remove('active'));
-                
+
                 // Add active class to clicked tab
                 tab.classList.add('active');
-                
+
                 // Remove active class from all contents
                 const tabContents = document.querySelectorAll('.tab-content');
                 tabContents.forEach(content => {
                     content.classList.remove('active');
                 });
-                
+
                 // Add active class to selected content
                 const selectedContent = document.getElementById(tabName);
                 if (selectedContent) {
                     selectedContent.classList.add('active');
                 }
-                
+
                 // Recargar la tabla específica si es necesario
                 if (tabName !== 'todo') {
                     cargarTablaPorNivel(tabName);
@@ -338,7 +337,7 @@ function limpiarFormulario() {
 
 function guardarPregunta(e) {
     e.preventDefault();
-    
+
     // Obtener valores del formulario
     const preguntaInput = document.getElementById('pregunta');
     const ambitoSelect = document.getElementById('ambito');
@@ -383,16 +382,16 @@ function guardarPregunta(e) {
 
     // Aquí puedes enviar los datos a tu backend
     console.log('Pregunta guardada:', nuevaPregunta);
-    
+
     // Agregar a la array de preguntas
     preguntas.push(nuevaPregunta);
-    
+
     // Actualizar todas las tablas
     cargarTodasLasTablas();
-    
+
     // Mostrar confirmación
     alert('Pregunta guardada correctamente');
-    
+
     // Cerrar modal
     closeQuestionModal();
 }
@@ -400,24 +399,24 @@ function guardarPregunta(e) {
 // -------------------------------
 // INICIALIZACIÓN PRINCIPAL
 // -------------------------------
-document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener("DOMContentLoaded", function () {
     console.log("DOM cargado, inicializando aplicación...");
-    
+
     // Verificar elementos críticos
-    console.log("Elementos de tablas:");    
+    console.log("Elementos de tablas:");
     console.log("- tablaTodo:", document.getElementById('tablaTodo'));
     console.log("- tablaBajo:", document.getElementById('tablaBajo'));
     console.log("- tablaModerado:", document.getElementById('tablaModerado'));
     console.log("- tablaAlto:", document.getElementById('tablaAlto'));
     console.log("- tablaExtremo:", document.getElementById('tablaExtremo'));
     console.log("- tablaActivadora:", document.getElementById('tablaActivadora'));
-    
+
     // Cargar todas las tablas
     cargarTodasLasTablas();
-    
+
     // Inicializar todos los event listeners
     inicializarEventListeners();
-    
+
     console.log("Aplicación inicializada correctamente");
 });
 
@@ -428,7 +427,7 @@ document.addEventListener('keydown', (e) => {
         if (questionFormModal && questionFormModal.classList.contains('flex')) {
             closeQuestionModal();
         }
-        
+
         const profileDropdown = document.getElementById('profileDropdown');
         if (profileDropdown && !profileDropdown.classList.contains('hidden')) {
             profileDropdown.classList.add('hidden');
@@ -443,8 +442,8 @@ function agregarPreguntaATabla(pregunta) {
     // Determinar clases CSS según el nivel de riesgo - SIN DEGRADADO
     let riesgoClass = "";
     let riesgoText = pregunta.nivel;
-    
-    switch(pregunta.nivel.toLowerCase()) {
+
+    switch (pregunta.nivel.toLowerCase()) {
         case 'bajo':
             riesgoClass = "bg-green-500 text-white";
             break;
@@ -466,7 +465,7 @@ function agregarPreguntaATabla(pregunta) {
     }
 
     const tr = document.createElement("tr");
-        tr.className = "border-b border-gray-200 dark:border-gray-700 hover:bg-gradient-to-r hover:from-gray-50 hover:to-gray-50 dark:hover:from-gray-800 dark:hover:to-gray-700 transition-all duration-300";
+    tr.className = "border-b border-gray-200 dark:border-gray-700 hover:bg-gradient-to-r hover:from-gray-50 hover:to-gray-50 dark:hover:from-gray-800 dark:hover:to-gray-700 transition-all duration-300";
 
     tr.innerHTML = `
         <td class="px-6 py-4 text-gray-900 dark:text-white font-medium">${pregunta.pregunta}</td>
@@ -480,11 +479,10 @@ function agregarPreguntaATabla(pregunta) {
             ${pregunta.puntaje} pts
         </td>
         <td class="px-6 py-4 whitespace-nowrap">
-            <span class="state-badge-shimmer inline-flex items-center justify-center w-20 px-3 py-1 rounded-full text-xs font-semibold relative overflow-hidden ${
-                pregunta.estado === 'Activo' 
-                ? 'bg-green-500 text-white' 
-                : 'bg-red-600 text-white'
-            } border-0 shadow-sm">
+            <span class="state-badge-shimmer inline-flex items-center justify-center w-20 px-3 py-1 rounded-full text-xs font-semibold relative overflow-hidden ${pregunta.estado === 'Activo'
+            ? 'bg-green-500 text-white'
+            : 'bg-red-600 text-white'
+        } border-0 shadow-sm">
                 ${pregunta.estado}
             </span>
         </td>
@@ -501,7 +499,7 @@ function agregarPreguntaATabla(pregunta) {
     `;
 
     tbody.appendChild(tr);
-    
+
     // Agregar event listeners a los nuevos botones
     agregarEventListenersABotones();
 }

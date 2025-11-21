@@ -534,9 +534,9 @@ function inicializarBusqueda() {
     }
 
     // Event listener para búsqueda en tiempo real
-    searchInput.addEventListener('input', function(e) {
+    searchInput.addEventListener('input', function (e) {
         terminoBusqueda = e.target.value.toLowerCase().trim();
-        
+
         // Mostrar/ocultar botón de limpiar
         if (clearSearch) {
             if (terminoBusqueda) {
@@ -545,14 +545,14 @@ function inicializarBusqueda() {
                 clearSearch.classList.add('hidden');
             }
         }
-        
+
         // Aplicar filtros
         aplicarFiltros();
     });
 
     // Event listener para limpiar búsqueda
     if (clearSearch) {
-        clearSearch.addEventListener('click', function() {
+        clearSearch.addEventListener('click', function () {
             searchInput.value = '';
             terminoBusqueda = '';
             clearSearch.classList.add('hidden');
@@ -561,7 +561,7 @@ function inicializarBusqueda() {
     }
 
     // Event listener para Enter
-    searchInput.addEventListener('keypress', function(e) {
+    searchInput.addEventListener('keypress', function (e) {
         if (e.key === 'Enter') {
             aplicarFiltros();
         }
@@ -571,13 +571,13 @@ function inicializarBusqueda() {
 // Función para aplicar todos los filtros - CORREGIDA
 function aplicarFiltros() {
     // Primero aplicar filtro de búsqueda
-    victimasFiltradas = victimas.filter(victima => 
+    victimasFiltradas = victimas.filter(victima =>
         victima.nombre.toLowerCase().includes(terminoBusqueda)
     );
 
     // Luego aplicar filtro de riesgo solo si no es "Todo"
     if (filtroActual !== "Todo") {
-        victimasFiltradas = victimasFiltradas.filter(victima => 
+        victimasFiltradas = victimasFiltradas.filter(victima =>
             victima.riesgo.toLowerCase() === filtroActual.toLowerCase()
         );
     }
@@ -597,25 +597,25 @@ function renderTablaFiltrada() {
         "alto": "tablaAlto",
         "extremo": "tablaExtremo"
     };
-    
+
     const tbodyId = tbodyMap[filtroActual] || "tablaTodo";
     const tbody = document.getElementById(tbodyId);
-    
+
     if (!tbody) {
         console.error(`No se encontró el tbody con ID: ${tbodyId}`);
         return;
     }
-    
+
     tbody.innerHTML = "";
 
     if (victimasFiltradas.length === 0) {
         const tr = document.createElement("tr");
         tr.innerHTML = `
             <td colspan="5" class="px-6 py-8 text-center text-gray-500 dark:text-gray-400 text-lg">
-                ${terminoBusqueda ? 
-                    `No se encontraron víctimas con el nombre "${terminoBusqueda}"` : 
-                    'No hay víctimas en esta categoría'
-                }
+                ${terminoBusqueda ?
+                `No se encontraron víctimas con el nombre "${terminoBusqueda}"` :
+                'No hay víctimas en esta categoría'
+            }
             </td>
         `;
         tbody.appendChild(tr);
@@ -839,7 +839,7 @@ function cerrarRiskModal() {
 }
 
 // Event listener para el botón flotante
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     const floatingBtn = document.getElementById('floatingRiskBtn');
     if (floatingBtn) {
         floatingBtn.addEventListener('click', abrirRiskModal);
@@ -847,7 +847,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Inicializar búsqueda
     inicializarBusqueda();
-    
+
     // Renderizar tabla inicial
     renderTabla("Todo");
 });

@@ -48,8 +48,13 @@ body {
     border-right: 1px solid var(--border-color);
 }
 
-.sidebar-collapsed { width: 80px; }
-.sidebar-expanded { width: 256px; }
+.sidebar-collapsed {
+    width: 80px;
+}
+
+.sidebar-expanded {
+    width: 256px;
+}
 
 .content {
     margin-left: 80px;
@@ -134,7 +139,9 @@ body {
     transition: stroke 0.3s ease;
 }
 
-.nav-item svg { min-width: 20px; }
+.nav-item svg {
+    min-width: 20px;
+}
 
 /* ===== DROPDOWN DE PERFIL ===== */
 .dropdown {
@@ -156,12 +163,29 @@ body {
     border-bottom: 1px solid var(--border-color);
 }
 
-.dropdown-avatar { border-color: var(--border-color); }
-.dropdown-username { color: var(--text-colorcrd); }
-.dropdown-role { color: #6b7280; }
-.dropdown-body { background-color: var(--card-bg); }
-.dropdown-logout { color: #dc2626; }
-.dropdown-logout:hover { background-color: #fef2f2; }
+.dropdown-avatar {
+    border-color: var(--border-color);
+}
+
+.dropdown-username {
+    color: var(--text-colorcrd);
+}
+
+.dropdown-role {
+    color: #6b7280;
+}
+
+.dropdown-body {
+    background-color: var(--card-bg);
+}
+
+.dropdown-logout {
+    color: #dc2626;
+}
+
+.dropdown-logout:hover {
+    background-color: #fef2f2;
+}
 
 /* Modo oscuro */
 [data-theme="dark"] .dropdown {
@@ -174,12 +198,29 @@ body {
     border-bottom: 1px solid #3d3454;
 }
 
-[data-theme="dark"] .dropdown-avatar { border-color: #4b4563; }
-[data-theme="dark"] .dropdown-username { color: #f3f4f6; }
-[data-theme="dark"] .dropdown-role { color: #9ca3af; }
-[data-theme="dark"] .dropdown-body { background-color: #241c37; }
-[data-theme="dark"] .dropdown-logout { color: #fca5a5; }
-[data-theme="dark"] .dropdown-logout:hover { background-color: rgba(127, 29, 29, 0.3); }
+[data-theme="dark"] .dropdown-avatar {
+    border-color: #4b4563;
+}
+
+[data-theme="dark"] .dropdown-username {
+    color: #f3f4f6;
+}
+
+[data-theme="dark"] .dropdown-role {
+    color: #9ca3af;
+}
+
+[data-theme="dark"] .dropdown-body {
+    background-color: #241c37;
+}
+
+[data-theme="dark"] .dropdown-logout {
+    color: #fca5a5;
+}
+
+[data-theme="dark"] .dropdown-logout:hover {
+    background-color: rgba(127, 29, 29, 0.3);
+}
 
 /* ===== HEADER ===== */
 .header-bg {
@@ -202,7 +243,9 @@ body {
 }
 
 .hide-on-collapse,
-.hidden { display: none; }
+.hidden {
+    display: none;
+}
 
 /* ===== TABS ===== */
 .tabs-container {
@@ -288,7 +331,9 @@ body {
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-.tab-content { display: none; }
+.tab-content {
+    display: none;
+}
 
 .tab-content.active {
     display: block;
@@ -296,8 +341,13 @@ body {
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
 }
 
 /* ===== TABLES ===== */
@@ -325,7 +375,8 @@ tbody tr {
     background-color: #f7f7f7;
 }
 
-input, select {
+input,
+select {
     background-color: var(--card-bg);
     color: var(--text-colorcrd);
     border-color: var(--border-color);
@@ -345,6 +396,7 @@ input, select {
         opacity: 0;
         transform: scale(0.9) translateY(-20px);
     }
+
     to {
         opacity: 1;
         transform: scale(1) translateY(0);
@@ -465,8 +517,13 @@ input, select {
 
 /* Animación shimmer universal */
 @keyframes shimmerUniversal {
-    0% { left: -100%; }
-    100% { left: 400%; }
+    0% {
+        left: -100%;
+    }
+
+    100% {
+        left: 400%;
+    }
 }
 
 .sentencia-btn-guardar::before,
@@ -640,8 +697,15 @@ tr:hover .risk-bar-table {
 }
 
 @keyframes buttonClick {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(0.95); }
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(0.95);
+    }
 }
 
 /* ===== BOTÓN ENTENDIDO ===== */
@@ -714,10 +778,21 @@ tr:hover .risk-bar-table {
 }
 
 /* Clases de nivel de riesgo */
-.nivel-bajo { background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); }
-.nivel-moderado { background: linear-gradient(135deg, #fefce8 0%, #fef9c3 100%); }
-.nivel-alto { background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%); }
-.nivel-extremo { background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%); }
+.nivel-bajo {
+    background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+}
+
+.nivel-moderado {
+    background: linear-gradient(135deg, #fefce8 0%, #fef9c3 100%);
+}
+
+.nivel-alto {
+    background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%);
+}
+
+.nivel-extremo {
+    background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+}
 
 #riskLevelsModal .nivel-bajo:hover,
 #riskLevelsModal .nivel-moderado:hover,
@@ -739,8 +814,15 @@ tr:hover .risk-bar-table {
 }
 
 /* Colores de respuestas */
-.respuesta-si { color: #059669; font-weight: bold; }
-.respuesta-no { color: #dc2626; font-weight: bold; }
+.respuesta-si {
+    color: #059669;
+    font-weight: bold;
+}
+
+.respuesta-no {
+    color: #dc2626;
+    font-weight: bold;
+}
 
 [data-theme="dark"] .respuesta-si,
 [data-theme="dark"] .respuesta-no {

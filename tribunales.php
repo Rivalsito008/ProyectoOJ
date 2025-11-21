@@ -16,9 +16,9 @@
     <!-- Main Content -->
     <div class="content">
         <!-- Header Component -->
-        <?php 
+        <?php
         $page_title = "Tribunales"; // Título personalizado
-        include 'components/header.php'; 
+        include 'components/header.php';
         ?>
         <main class="p-6">
             <div class="tabs-container">
@@ -27,7 +27,7 @@
                         <div class="tab-indicator bg-blue-500"></div>
                         <span class="tab-label">Todos</span>
                     </div>
-<!--                     <div class="browser-tab" data-tab="activo">
+                    <!--                     <div class="browser-tab" data-tab="activo">
                         <div class="tab-indicator bg-green-500"></div>
                         <span class="tab-label">Estado activo</span>
                     </div>
@@ -44,7 +44,7 @@
                                 <thead class="text-xs uppercase">
                                     <tr>
                                         <th class="px-6 py-3">Nombre</th>
-                                        <th class="px-6 py-3">Tipo</th>
+                                        <th class="px-6 py-3 text-center">Tipo</th>
                                         <th class="px-6 py-3">Numeración</th>
                                         <th class="px-6 py-3">Materia</th>
                                         <th class="px-6 py-3">Departamento</th>
@@ -60,7 +60,7 @@
                         </div>
                     </div>
 
-<!--                     <div class="tab-content" id="activo">
+                    <!--                     <div class="tab-content" id="activo">
                         <div class="relative overflow-x-auto">
                             <table class="w-full text-sm text-left">
                                 <thead class="text-xs uppercase">

@@ -1,7 +1,7 @@
 // ========================================
 // APLICAR CONFIGURACIONES INICIALES
 // ========================================
-(function() {
+(function () {
     // Aplicar tema
     const t = localStorage.getItem('theme-preference') || 'auto';
     let f = t;
@@ -147,19 +147,19 @@ function inicializarMapa() {
 
     paths.forEach(path => {
         // Agregar evento click a cada departamento
-        path.addEventListener('click', function() {
+        path.addEventListener('click', function () {
             const nombreDepto = this.getAttribute('name');
             seleccionarDepartamento(nombreDepto, this);
         });
 
         // Agregar eventos hover
-        path.addEventListener('mouseenter', function() {
+        path.addEventListener('mouseenter', function () {
             if (!this.classList.contains('selected')) {
                 this.classList.add('highlighted');
             }
         });
 
-        path.addEventListener('mouseleave', function() {
+        path.addEventListener('mouseleave', function () {
             this.classList.remove('highlighted');
         });
     });
@@ -262,7 +262,7 @@ function resetearSeleccion() {
 // ========================================
 // INICIALIZAR AL CARGAR EL DOM
 // ========================================
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     inicializarMapa();
 });
 

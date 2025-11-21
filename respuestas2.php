@@ -16,9 +16,9 @@
     <!-- Main Content -->
     <div class="content">
         <!-- Header Component -->
-        <?php 
+        <?php
         $page_title = "Respuestas 2"; // Título personalizado
-        include 'components/header.php'; 
+        include 'components/header.php';
         ?>
 
         <!-- Content -->
@@ -82,7 +82,7 @@
                                 <thead class="text-xs uppercase border-b border-gray-200 dark:border-gray-600">
                                     <tr class="border-b border-gray-200 dark:border-gray-500">
                                         <th scope="col" class="px-6 py-3">Víctima</th>
-                                        <th scope="col" class="px-6 py-3">Riesgo</th>
+                                        <th scope="col" class="px-6 py-3 text-center">Riesgo</th>
                                         <th scope="col" class="px-6 py-3">Estado</th>
                                         <th scope="col" class="px-6 py-3">Fecha</th>
                                         <th scope="col" class="px-6 py-3 text-center">Acciones</th>
@@ -100,7 +100,7 @@
                                 <thead class="text-xs uppercase border-b border-gray-200 dark:border-gray-600">
                                     <tr class="border-b border-gray-200 dark:border-gray-500">
                                         <th scope="col" class="px-6 py-3">Víctima</th>
-                                        <th scope="col" class="px-6 py-3">Riesgo</th>
+                                        <th scope="col" class="px-6 py-3 text-center">Riesgo</th>
                                         <th scope="col" class="px-6 py-3">Estado</th>
                                         <th scope="col" class="px-6 py-3">Fecha</th>
                                         <th scope="col" class="px-6 py-3 text-center">Acciones</th>
@@ -118,7 +118,7 @@
                                 <thead class="text-xs uppercase border-b border-gray-200 dark:border-gray-600">
                                     <tr class="border-b border-gray-200 dark:border-gray-500">
                                         <th scope="col" class="px-6 py-3">Víctima</th>
-                                        <th scope="col" class="px-6 py-3">Riesgo</th>
+                                        <th scope="col" class="px-6 py-3 text-center">Riesgo</th>
                                         <th scope="col" class="px-6 py-3">Estado</th>
                                         <th scope="col" class="px-6 py-3">Fecha</th>
                                         <th scope="col" class="px-6 py-3 text-center">Acciones</th>
@@ -136,7 +136,7 @@
                                 <thead class="text-xs uppercase border-b border-gray-200 dark:border-gray-600">
                                     <tr class="border-b border-gray-200 dark:border-gray-500">
                                         <th scope="col" class="px-6 py-3">Víctima</th>
-                                        <th scope="col" class="px-6 py-3">Riesgo</th>
+                                        <th scope="col" class="px-6 py-3 text-center">Riesgo</th>
                                         <th scope="col" class="px-6 py-3">Estado</th>
                                         <th scope="col" class="px-6 py-3">Fecha</th>
                                         <th scope="col" class="px-6 py-3 text-center">Acciones</th>
@@ -154,7 +154,7 @@
                                 <thead class="text-xs uppercase border-b border-gray-200 dark:border-gray-600">
                                     <tr class="border-b border-gray-200 dark:border-gray-500">
                                         <th scope="col" class="px-6 py-3">Víctima</th>
-                                        <th scope="col" class="px-6 py-3">Riesgo</th>
+                                        <th scope="col" class="px-6 py-3 text-center">Riesgo</th>
                                         <th scope="col" class="px-6 py-3">Estado</th>
                                         <th scope="col" class="px-6 py-3">Fecha</th>
                                         <th scope="col" class="px-6 py-3 text-center">Acciones</th>
@@ -173,7 +173,6 @@
                 <div class="modal-dialog bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-w-4xl w-full max-h-[95vh] overflow-hidden">
                     <div class="p-6 overflow-y-auto max-h-[95vh]">
                         <div id="modalContent">
-                            <!-- El contenido se llenará dinámicamente -->
                         </div>
                     </div>
                 </div>

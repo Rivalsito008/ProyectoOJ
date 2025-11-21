@@ -15,11 +15,11 @@
 
   <!-- Main Content -->
   <div id="mainContent" class="content">
-        <!-- Header Component -->
-        <?php 
-        $page_title = "Formulario"; // Título personalizado
-        include 'components/header.php'; 
-        ?>
+    <!-- Header Component -->
+    <?php
+    $page_title = "Formulario"; // Título personalizado
+    include 'components/header.php';
+    ?>
     <main class="p-6">
       <!-- Progreso -->
       <div class="w-full h-2 mb-8 rounded-full" id="progressContainer">

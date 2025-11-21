@@ -131,11 +131,9 @@ body {
 
 /* Activo (modo oscuro) */
 [data-theme="dark"] .nav-item.active {
-    background: linear-gradient(
-        135deg,
-        rgba(151, 120, 255, 0.15) 0%,
-        rgba(151, 120, 255, 0.10) 100%
-    );
+    background: linear-gradient(135deg,
+            rgba(151, 120, 255, 0.15) 0%,
+            rgba(151, 120, 255, 0.10) 100%);
     color: #cbb8ff;
     border-left: 4px solid #9778ff;
     box-shadow: inset 0 0 20px rgba(151, 120, 255, 0.25);
@@ -152,11 +150,9 @@ body {
 
 /* Hover del activo (modo oscuro) */
 [data-theme="dark"] .nav-item.active:hover {
-    background: linear-gradient(
-        135deg,
-        rgba(151, 120, 255, 0.22) 0%,
-        rgba(151, 120, 255, 0.17) 100%
-    );
+    background: linear-gradient(135deg,
+            rgba(151, 120, 255, 0.22) 0%,
+            rgba(151, 120, 255, 0.17) 100%);
     color: #e6dbff;
     border-left: 4px solid #b298ff;
     box-shadow: inset 0 0 25px rgba(151, 120, 255, 0.35);
@@ -180,6 +176,7 @@ body {
 .nav-item svg {
     min-width: 20px;
 }
+
 /* Botón principal */
 .btn-primary {
     background-color: var(--button-bg);
@@ -528,11 +525,13 @@ select {
 
 /* Asegurar que las líneas de la tabla sean visibles en ambos modos */
 .table-border-light {
-    border-bottom-color: #e5e7eb !important; /* gray-200 */
+    border-bottom-color: #e5e7eb !important;
+    /* gray-200 */
 }
 
 .table-border-dark {
-    border-bottom-color: #374151 !important; /* gray-700 */
+    border-bottom-color: #374151 !important;
+    /* gray-700 */
 }
 
 /* ===== ESTILOS PARA BADGES DE ESTADO CON SHIMMER ===== */
@@ -559,8 +558,13 @@ select {
 }
 
 @keyframes shimmerUniversal {
-    0% { left: -100%; }
-    100% { left: 400%; }
+    0% {
+        left: -100%;
+    }
+
+    100% {
+        left: 400%;
+    }
 }
 
 /* Estado Activo - Verde */
@@ -598,9 +602,17 @@ select {
 }
 
 @keyframes buttonClick {
-    0% { transform: scale(1); }
-    50% { transform: scale(0.95); }
-    100% { transform: scale(1); }
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(0.95);
+    }
+
+    100% {
+        transform: scale(1);
+    }
 }
 
 /* ===== ESTILOS PARA BOTONES DE ACCIONES ===== */
@@ -699,15 +711,28 @@ select {
 
 /* Animación de shimmer universal */
 @keyframes shimmerUniversal {
-    0% { left: -100%; }
-    100% { left: 400%; }
+    0% {
+        left: -100%;
+    }
+
+    100% {
+        left: 400%;
+    }
 }
 
 /* Animación de pulsación */
 @keyframes buttonClick {
-    0% { transform: scale(1); }
-    50% { transform: scale(0.95); }
-    100% { transform: scale(1); }
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(0.95);
+    }
+
+    100% {
+        transform: scale(1);
+    }
 }
 
 /* Para modo oscuro, ajustar la intensidad del brillo */
@@ -784,6 +809,7 @@ select {
     padding-top: 0.25rem !important;
     padding-bottom: 0.25rem !important;
 }
+
 /* ===== ESTILOS PARA BADGES DE ESTADO CON SHIMMER ===== */
 
 .state-badge-shimmer {
@@ -850,18 +876,18 @@ select {
     position: relative !important;
     overflow: hidden !important;
     transition: all 0.3s ease !important;
-    
+
     /* Tamaño igual al botón siguiente */
     padding: 0.5rem 1.5rem !important;
     border-radius: 0.5rem !important;
     box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3) !important;
-    
+
     /* Flex para alinear ícono y texto */
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
     gap: 0.5rem !important;
-    
+
     /* Texto más compacto */
     font-size: 0.875rem !important;
     letter-spacing: 0 !important;
@@ -954,7 +980,15 @@ select {
 
 /* Animación de pulsación */
 @keyframes buttonClick {
-    0% { transform: scale(1); }
-    50% { transform: scale(0.95); }
-    100% { transform: scale(1); }
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(0.95);
+    }
+
+    100% {
+        transform: scale(1);
+    }
 }

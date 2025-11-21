@@ -1,16 +1,5 @@
 <?php
-/**
- * Componente de Header Reutilizable para SIGEN
- * Uso: include 'components/header.php';
- * 
- * Variables opcionales que puedes definir antes de incluir:
- * $page_title - Título de la página (default: "Dashboard")
- * $user_name - Nombre del usuario (default: "Nombre del Usuario")
- * $user_role - Rol del usuario (default: "Administrador")
- * $user_avatar - URL del avatar (default: icono genérico)
- */
 
-// Valores por defecto si no se definen
 $page_title = $page_title ?? 'Dashboard';
 $user_name = $user_name ?? 'Nombre del Usuario';
 $user_role = $user_role ?? 'Administrador';

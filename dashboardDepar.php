@@ -17,9 +17,9 @@
     <!-- Main Content -->
     <div class="content">
         <!-- Header Component -->
-        <?php 
+        <?php
         $page_title = "Dashboard Departamental"; // Título personalizado
-        include 'components/header.php'; 
+        include 'components/header.php';
         ?>
 
         <!-- Content -->

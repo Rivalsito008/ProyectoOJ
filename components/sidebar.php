@@ -1,12 +1,4 @@
 <?php
-
-/**
- * Componente de Sidebar Reutilizable para SIGEN
- * Uso: include 'components/sidebar.php';
- * 
- * La página activa se detecta automáticamente por el nombre del archivo
- */
-
 // Obtener el nombre del archivo actual sin extensión
 $current_page = basename($_SERVER['PHP_SELF'], '.php');
 

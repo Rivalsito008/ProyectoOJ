@@ -23,9 +23,9 @@
     <!-- Main Content -->
     <div class="content">
         <!-- Header Component -->
-        <?php 
+        <?php
         $page_title = "Configuración"; // Título personalizado
-        include 'components/header.php'; 
+        include 'components/header.php';
         ?>
 
         <!-- Dashboard Content -->

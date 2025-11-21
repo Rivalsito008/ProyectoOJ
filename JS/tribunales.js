@@ -18,70 +18,70 @@
 
 // DATOS QUEMADOS DE TRIBUNALES (CORREGIDOS)
 const tribunales = [
-    { 
-        id: 1, 
-        nombre: "Sala de lo Constitucional", 
-        tipo: "Sala de la Corte Suprema", 
-        numeracion: "Único", 
-        materia: "Constitucional", 
-        departamento: "San Salvador", 
+    {
+        id: 1,
+        nombre: "Sala de lo Constitucional",
+        tipo: "Sala de la Corte Suprema",
+        numeracion: "Único",
+        materia: "Constitucional",
+        departamento: "San Salvador",
         municipio: "San Salvador Centro",
-        distrito: "San Salvador", 
-        direccion: "Centro Judicial Isidro Menéndez", 
-        estado: "Activo" 
+        distrito: "San Salvador",
+        direccion: "Centro Judicial Isidro Menéndez",
+        estado: "Activo"
     },
-    { 
-        id: 2, 
-        nombre: "Cámara Segunda de lo Civil", 
-        tipo: "Cámara", 
-        numeracion: "Segundo", 
-        materia: "Civil", 
-        departamento: "San Salvador", 
+    {
+        id: 2,
+        nombre: "Cámara Segunda de lo Civil",
+        tipo: "Cámara",
+        numeracion: "Segundo",
+        materia: "Civil",
+        departamento: "San Salvador",
         municipio: "San Salvador Centro",
-        distrito: "San Salvador", 
-        direccion: "Centro Judicial Isidro Menéndez", 
-        estado: "Activo" 
+        distrito: "San Salvador",
+        direccion: "Centro Judicial Isidro Menéndez",
+        estado: "Activo"
     },
-    { 
-        id: 3, 
-        nombre: "Juzgado Tercero de Familia", 
-        tipo: "Juzgado", 
-        numeracion: "Tercero", 
-        materia: "Familia", 
-        departamento: "La Libertad", 
+    {
+        id: 3,
+        nombre: "Juzgado Tercero de Familia",
+        tipo: "Juzgado",
+        numeracion: "Tercero",
+        materia: "Familia",
+        departamento: "La Libertad",
         municipio: "La Libertad Sur",
-        distrito: "Santa Tecla", 
-        direccion: "Centro Judicial Integrado de Santa Tecla", 
-        estado: "Inactivo" 
+        distrito: "Santa Tecla",
+        direccion: "Centro Judicial Integrado de Santa Tecla",
+        estado: "Inactivo"
     },
-    { 
-        id: 4, 
-        nombre: "Tribunal Especializado de Sentencia", 
-        tipo: "Tribunal Especializado", 
-        numeracion: "Primero", 
-        materia: "Penal (Sentencia)", 
-        departamento: "San Salvador", 
+    {
+        id: 4,
+        nombre: "Tribunal Especializado de Sentencia",
+        tipo: "Tribunal Especializado",
+        numeracion: "Primero",
+        materia: "Penal (Sentencia)",
+        departamento: "San Salvador",
         municipio: "San Salvador Centro",
-        distrito: "San Salvador", 
-        direccion: "Centro Judicial Isidro Menéndez", 
-        estado: "Activo" 
+        distrito: "San Salvador",
+        direccion: "Centro Judicial Isidro Menéndez",
+        estado: "Activo"
     },
-    { 
-        id: 5, 
-        nombre: "Juzgado de Paz", 
-        tipo: "Juzgado de Paz", 
-        numeracion: "Sin numeración", 
-        materia: "Multipropósito", 
-        departamento: "Santa Ana", 
+    {
+        id: 5,
+        nombre: "Juzgado de Paz",
+        tipo: "Juzgado de Paz",
+        numeracion: "Sin numeración",
+        materia: "Multipropósito",
+        departamento: "Santa Ana",
         municipio: "Santa Ana Centro",
-        distrito: "Santa Ana", 
-        direccion: "Palacio de Justicia de Santa Ana", 
-        estado: "Activo" 
+        distrito: "Santa Ana",
+        direccion: "Palacio de Justicia de Santa Ana",
+        estado: "Activo"
     }
 ];
 
 // Cargar tablas cuando el DOM esté listo
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     cargarTodasLasTablas();
     inicializarModal();
     inicializarTabs();
@@ -97,21 +97,21 @@ function cargarTodasLasTablas() {
 function cargarTablaPorEstado(estado) {
     const tbodyId = `tabla${estado.charAt(0).toUpperCase() + estado.slice(1)}`;
     const tbody = document.getElementById(tbodyId);
-    
+
     if (!tbody) {
         console.error(`No se encontró el tbody con id: ${tbodyId}`);
         return;
     }
-    
+
     tbody.innerHTML = "";
 
     // Filtrar tribunales según el estado
     let tribunalesFiltrados = [];
-    
+
     if (estado === 'todo') {
         tribunalesFiltrados = tribunales;
     } else {
-        tribunalesFiltrados = tribunales.filter(t => 
+        tribunalesFiltrados = tribunales.filter(t =>
             t.estado.toLowerCase() === estado.toLowerCase()
         );
     }
@@ -132,7 +132,7 @@ function cargarTablaPorEstado(estado) {
         tr.className = "border-b border-gray-200 dark:border-gray-700 hover:bg-gradient-to-r hover:from-gray-50 hover:to-gray-50 dark:hover:from-gray-800 dark:hover:to-gray-700 transition-all duration-300";
         tr.innerHTML = `
             <td class="px-6 py-4 text-gray-900 dark:text-white font-medium">${t.nombre}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-gray-900 dark:text-white">${t.tipo}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-center text-gray-900 dark:text-white">${t.tipo}</td>
             <td class="px-6 py-4 whitespace-nowrap text-gray-900 dark:text-white">${t.numeracion}</td>
             <td class="px-6 py-4 whitespace-nowrap text-gray-900 dark:text-white">${t.materia}</td>
             <td class="px-6 py-4 whitespace-nowrap text-gray-900 dark:text-white">${t.departamento}</td>
@@ -199,7 +199,7 @@ function inicializarTabs() {
     tabs.forEach(tab => {
         tab.addEventListener('click', () => {
             const tabName = tab.getAttribute('data-tab');
-            
+
             // Remover active de todos los tabs
             tabs.forEach(t => {
                 t.classList.remove('active');
@@ -209,25 +209,25 @@ function inicializarTabs() {
                     indicator.style.transform = 'scale(1)';
                 }
             });
-            
+
             // Remover active de todos los contenidos
             contents.forEach(c => c.classList.remove('active'));
-            
+
             // Agregar active al tab clickeado
             tab.classList.add('active');
-            
+
             // Aplicar transformación solo al indicador activo
             const activeIndicator = tab.querySelector('.tab-indicator');
             if (activeIndicator) {
                 activeIndicator.style.transform = 'scale(1.1)';
             }
-            
+
             // Agregar active al contenido correspondiente
             const targetContent = document.getElementById(tabName);
             if (targetContent) {
                 targetContent.classList.add('active');
             }
-            
+
             // Recargar la tabla correspondiente
             if (tabName === 'Todo') {
                 cargarTablaPorEstado('todo');
@@ -425,14 +425,14 @@ function agregarEventListenersABotones() {
     // Botones Editar
     const botonesEditar = document.querySelectorAll('.action-btn-view');
     botonesEditar.forEach(boton => {
-        boton.addEventListener('click', function(e) {
+        boton.addEventListener('click', function (e) {
             e.preventDefault();
             // Animación de click
             this.style.transform = 'scale(0.95)';
             setTimeout(() => {
                 this.style.transform = 'scale(1)';
             }, 150);
-            
+
             console.log('Editar tribunal');
         });
     });
@@ -440,14 +440,14 @@ function agregarEventListenersABotones() {
     // Botones Eliminar
     const botonesEliminar = document.querySelectorAll('.action-btn-delete');
     botonesEliminar.forEach(boton => {
-        boton.addEventListener('click', function(e) {
+        boton.addEventListener('click', function (e) {
             e.preventDefault();
             // Animación de click
             this.style.transform = 'scale(0.95)';
             setTimeout(() => {
                 this.style.transform = 'scale(1)';
             }, 150);
-            
+
             console.log('Eliminar tribunal');
             if (confirm('¿Estás seguro de que quieres eliminar este tribunal?')) {
                 // Lógica de eliminación

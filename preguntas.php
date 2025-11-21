@@ -70,11 +70,11 @@
                                 <thead class="text-xs uppercase">
                                     <tr>
                                         <th scope="col" class="px-6 py-3">Pregunta</th>
-                                        <th scope="col" class="px-6 py-3">Ámbito</th>
+                                        <th scope="col" class="px-6 py-3 text-center">Ámbito</th>
                                         <th scope="col" class="px-6 py-3">Riesgo</th>
                                         <th scope="col" class="px-6 py-3">Puntaje</th>
                                         <th scope="col" class="px-6 py-3">Estado</th>
-                                        <th scope="col" class="px-6 py-3 text-center">Acción</th>
+                                        <th scope="col" class="px-6 py-3 text-center">Acciones</th>
                                     </tr>
                                 </thead>
                                 <tbody id="tablaTodo">
@@ -91,11 +91,11 @@
                                 <thead class="text-xs uppercase">
                                     <tr>
                                         <th scope="col" class="px-6 py-3">Pregunta</th>
-                                        <th scope="col" class="px-6 py-3">Ámbito</th>
+                                        <th scope="col" class="px-6 py-3 text-center">Ámbito</th>
                                         <th scope="col" class="px-6 py-3">Riesgo</th>
                                         <th scope="col" class="px-6 py-3">Puntaje</th>
                                         <th scope="col" class="px-6 py-3">Estado</th>
-                                        <th scope="col" class="px-6 py-3 text-center">Acción</th>
+                                        <th scope="col" class="px-6 py-3 text-center">Acciones</th>
                                     </tr>
                                 </thead>
                                 <tbody id="tablaBajo">
@@ -112,11 +112,11 @@
                                 <thead class="text-xs uppercase">
                                     <tr>
                                         <th scope="col" class="px-6 py-3">Pregunta</th>
-                                        <th scope="col" class="px-6 py-3">Ámbito</th>
+                                        <th scope="col" class="px-6 py-3 text-center">Ámbito</th>
                                         <th scope="col" class="px-6 py-3">Riesgo</th>
                                         <th scope="col" class="px-6 py-3">Puntaje</th>
                                         <th scope="col" class="px-6 py-3">Estado</th>
-                                        <th scope="col" class="px-6 py-3 text-center">Acción</th>
+                                        <th scope="col" class="px-6 py-3 text-center">Acciones</th>
                                     </tr>
                                 </thead>
                                 <tbody id="tablaModerado">
@@ -133,11 +133,11 @@
                                 <thead class="text-xs uppercase">
                                     <tr>
                                         <th scope="col" class="px-6 py-3">Pregunta</th>
-                                        <th scope="col" class="px-6 py-3">Ámbito</th>
+                                        <th scope="col" class="px-6 py-3 text-center">Ámbito</th>
                                         <th scope="col" class="px-6 py-3">Riesgo</th>
                                         <th scope="col" class="px-6 py-3">Puntaje</th>
                                         <th scope="col" class="px-6 py-3">Estado</th>
-                                        <th scope="col" class="px-6 py-3 text-center">Acción</th>
+                                        <th scope="col" class="px-6 py-3 text-center">Acciones</th>
                                     </tr>
                                 </thead>
                                 <tbody id="tablaAlto">
@@ -154,11 +154,11 @@
                                 <thead class="text-xs uppercase">
                                     <tr>
                                         <th scope="col" class="px-6 py-3">Pregunta</th>
-                                        <th scope="col" class="px-6 py-3">Ámbito</th>
+                                        <th scope="col" class="px-6 py-3 text-center">Ámbito</th>
                                         <th scope="col" class="px-6 py-3">Riesgo</th>
                                         <th scope="col" class="px-6 py-3">Puntaje</th>
                                         <th scope="col" class="px-6 py-3">Estado</th>
-                                        <th scope="col" class="px-6 py-3 text-center">Acción</th>
+                                        <th scope="col" class="px-6 py-3 text-center">Acciones</th>
                                     </tr>
                                 </thead>
                                 <tbody id="tablaExtremo">
@@ -175,11 +175,11 @@
                                 <thead class="text-xs uppercase">
                                     <tr>
                                         <th scope="col" class="px-6 py-3">Pregunta</th>
-                                        <th scope="col" class="px-6 py-3">Ámbito</th>
+                                        <th scope="col" class="px-6 py-3 text-center">Ámbito</th>
                                         <th scope="col" class="px-6 py-3">Riesgo</th>
                                         <th scope="col" class="px-6 py-3">Puntaje</th>
                                         <th scope="col" class="px-6 py-3">Estado</th>
-                                        <th scope="col" class="px-6 py-3 text-center">Acción</th>
+                                        <th scope="col" class="px-6 py-3 text-center">Acciones</th>
                                     </tr>
                                 </thead>
                                 <tbody id="tablaActivadora">

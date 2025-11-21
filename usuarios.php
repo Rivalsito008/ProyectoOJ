@@ -11,15 +11,15 @@
 </head>
 
 <body>
-<?php include 'components/sidebar.php'; ?>
+  <?php include 'components/sidebar.php'; ?>
 
   <!-- Main Content -->
   <div class="content">
-        <!-- Header Component -->
-        <?php 
-        $page_title = "Usuarios"; // Título personalizado
-        include 'components/header.php'; 
-        ?>
+    <!-- Header Component -->
+    <?php
+    $page_title = "Usuarios"; // Título personalizado
+    include 'components/header.php';
+    ?>
     <main class="p-6">
       <div class="tabs-container">
         <div class="tabs-wrapper">
@@ -45,10 +45,10 @@
                   <tr>
                     <th class="px-6 py-3">Nombre</th>
                     <th class="px-6 py-3">Apellido</th>
-                    <th class="px-6 py-3">Email</th>
+                    <th class="px-6 py-3 text-center">Email</th>
                     <th class="px-6 py-3">Rol</th>
                     <th class="px-6 py-3">Estado</th>
-                    <th class="px-6 py-3">Acciones</th>
+                    <th class="px-6 py-3 text-center">Acciones</th>
                   </tr>
                 </thead>
                 <tbody id="tablaTodo">
@@ -64,10 +64,10 @@
                   <tr>
                     <th class="px-6 py-3">Nombre</th>
                     <th class="px-6 py-3">Apellido</th>
-                    <th class="px-6 py-3">Email</th>
+                    <th class="px-6 py-3 text-center">Email</th>
                     <th class="px-6 py-3">Rol</th>
                     <th class="px-6 py-3">Estado</th>
-                    <th class="px-6 py-3">Acciones</th>
+                    <th class="px-6 py-3 text-center">Acciones</th>
                   </tr>
                 </thead>
                 <tbody id="tablaActivo">
@@ -83,10 +83,10 @@
                   <tr>
                     <th class="px-6 py-3">Nombre</th>
                     <th class="px-6 py-3">Apellido</th>
-                    <th class="px-6 py-3">Email</th>
+                    <th class="px-6 py-3 text-center">Email</th>
                     <th class="px-6 py-3">Rol</th>
                     <th class="px-6 py-3">Estado</th>
-                    <th class="px-6 py-3">Acciones</th>
+                    <th class="px-6 py-3 text-center">Acciones</th>
                   </tr>
                 </thead>
                 <tbody id="tablaInactivo">

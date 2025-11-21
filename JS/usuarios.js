@@ -112,31 +112,32 @@ function cargarTablaPorNivel(nivel) {
                 rolClass = "bg-gray-500 text-white";
         }
 
+        // En la función cargarTablaPorNivel, modifica la celda de acciones:
         tr.innerHTML = `
-        <td class="px-6 py-4 text-gray-900 dark:text-white font-medium">${p.nombre}</td>
-        <td class="px-6 py-4 whitespace-nowrap text-gray-900 dark:text-white">${p.apellido}</td>
-        <td class="px-6 py-4 whitespace-nowrap text-gray-900 dark:text-white">${p.email}</td>
-        <td class="px-6 py-4 whitespace-nowrap">
-            <span class="inline-flex items-center justify-center w-24 px-3 py-1 rounded-full text-xs font-semibold relative overflow-hidden state-badge-shimmer ${rolClass}">
-                ${rolText}
-            </span>
-        </td>
-        <td class="px-6 py-4 whitespace-nowrap">
-            <span class="inline-flex items-center justify-center w-20 px-3 py-1 rounded-full text-xs font-semibold relative overflow-hidden state-badge-shimmer ${estadoClass}">
-                ${estadoText}
-            </span>
-        </td>
-        <td class="px-6 py-4 whitespace-nowrap">
-            <div class="flex space-x-2">
-                <button class="action-btn-view w-20 px-3 py-1 rounded-lg text-xs font-medium transition-all duration-200 shadow-sm relative overflow-hidden">
-                    Editar
-                </button>
-                <button class="action-btn-delete w-20 px-3 py-1 rounded-lg text-xs font-medium transition-all duration-200 shadow-sm relative overflow-hidden">
-                    Eliminar
-                </button>
-            </div>
-        </td>
-    `;
+    <td class="px-6 py-4 text-gray-900 dark:text-white font-medium">${p.nombre}</td>
+    <td class="px-6 py-4 whitespace-nowrap text-gray-900 dark:text-white">${p.apellido}</td>
+    <td class="px-6 py-4 whitespace-nowrap text-center text-gray-900 dark:text-white">${p.email}</td>
+    <td class="px-6 py-4 whitespace-nowrap">
+        <span class="inline-flex items-center justify-center w-24 px-3 py-1 rounded-full text-xs font-semibold relative overflow-hidden state-badge-shimmer ${rolClass}">
+            ${rolText}
+        </span>
+    </td>
+    <td class="px-6 py-4 whitespace-nowrap">
+        <span class="inline-flex items-center justify-center w-20 px-3 py-1 rounded-full text-xs font-semibold relative overflow-hidden state-badge-shimmer ${estadoClass}">
+            ${estadoText}
+        </span>
+    </td>
+    <td class="px-6 py-4 whitespace-nowrap acciones-center">
+        <div class="flex space-x-2 justify-center">
+            <button class="action-btn-view w-20 px-3 py-1 rounded-lg text-xs font-medium transition-all duration-200 shadow-sm relative overflow-hidden">
+                Editar
+            </button>
+            <button class="action-btn-delete w-20 px-3 py-1 rounded-lg text-xs font-medium transition-all duration-200 shadow-sm relative overflow-hidden">
+                Eliminar
+            </button>
+        </div>
+    </td>
+`;
 
         tbody.appendChild(tr);
     });
