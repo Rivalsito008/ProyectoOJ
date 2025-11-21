@@ -16,7 +16,7 @@
     document.documentElement.style.setProperty('--contrast', contrast);
 })();
 
-// DATOS QUEMADOS DE TRIBUNALES
+// DATOS QUEMADOS DE TRIBUNALES (CORREGIDOS)
 const tribunales = [
     { 
         id: 1, 
@@ -25,7 +25,8 @@ const tribunales = [
         numeracion: "Único", 
         materia: "Constitucional", 
         departamento: "San Salvador", 
-        municipio: "San Salvador", 
+        municipio: "San Salvador Centro",
+        distrito: "San Salvador", 
         direccion: "Centro Judicial Isidro Menéndez", 
         estado: "Activo" 
     },
@@ -36,7 +37,8 @@ const tribunales = [
         numeracion: "Segundo", 
         materia: "Civil", 
         departamento: "San Salvador", 
-        municipio: "San Salvador", 
+        municipio: "San Salvador Centro",
+        distrito: "San Salvador", 
         direccion: "Centro Judicial Isidro Menéndez", 
         estado: "Activo" 
     },
@@ -47,7 +49,8 @@ const tribunales = [
         numeracion: "Tercero", 
         materia: "Familia", 
         departamento: "La Libertad", 
-        municipio: "Santa Tecla", 
+        municipio: "La Libertad Sur",
+        distrito: "Santa Tecla", 
         direccion: "Centro Judicial Integrado de Santa Tecla", 
         estado: "Inactivo" 
     },
@@ -58,7 +61,8 @@ const tribunales = [
         numeracion: "Primero", 
         materia: "Penal (Sentencia)", 
         departamento: "San Salvador", 
-        municipio: "San Salvador", 
+        municipio: "San Salvador Centro",
+        distrito: "San Salvador", 
         direccion: "Centro Judicial Isidro Menéndez", 
         estado: "Activo" 
     },
@@ -69,41 +73,9 @@ const tribunales = [
         numeracion: "Sin numeración", 
         materia: "Multipropósito", 
         departamento: "Santa Ana", 
-        municipio: "Santa Ana", 
+        municipio: "Santa Ana Centro",
+        distrito: "Santa Ana", 
         direccion: "Palacio de Justicia de Santa Ana", 
-        estado: "Activo" 
-    },
-    { 
-        id: 6, 
-        nombre: "Cámara de lo Laboral", 
-        tipo: "Cámara", 
-        numeracion: "Único", 
-        materia: "Laboral", 
-        departamento: "San Miguel", 
-        municipio: "San Miguel", 
-        direccion: "Palacio de Justicia de San Miguel", 
-        estado: "Inactivo" 
-    },
-    { 
-        id: 7, 
-        nombre: "Juzgado Especializado para Mujeres", 
-        tipo: "Juzgado Especializado", 
-        numeracion: "Primero", 
-        materia: "Violencia contra la Mujer", 
-        departamento: "La Libertad", 
-        municipio: "Santa Tecla", 
-        direccion: "Centro Judicial Integrado de Santa Tecla", 
-        estado: "Activo" 
-    },
-    { 
-        id: 8, 
-        nombre: "Sala de lo Penal", 
-        tipo: "Sala de la Corte Suprema", 
-        numeracion: "Único", 
-        materia: "Penal", 
-        departamento: "San Salvador", 
-        municipio: "San Salvador", 
-        direccion: "Centro Judicial Isidro Menéndez", 
         estado: "Activo" 
     }
 ];
@@ -147,7 +119,7 @@ function cargarTablaPorEstado(estado) {
     if (tribunalesFiltrados.length === 0) {
         const tr = document.createElement("tr");
         tr.innerHTML = `
-            <td colspan="8" class="px-6 py-8 text-center text-gray-500 dark:text-gray-400 text-lg">
+            <td colspan="9" class="px-6 py-8 text-center text-gray-500 dark:text-gray-400 text-lg">
                 No hay tribunales con estado ${estado}
             </td>
         `;
@@ -165,6 +137,7 @@ function cargarTablaPorEstado(estado) {
             <td class="px-6 py-4 whitespace-nowrap text-gray-900 dark:text-white">${t.materia}</td>
             <td class="px-6 py-4 whitespace-nowrap text-gray-900 dark:text-white">${t.departamento}</td>
             <td class="px-6 py-4 whitespace-nowrap text-gray-900 dark:text-white">${t.municipio}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-gray-900 dark:text-white">${t.distrito}</td>
             <td class="px-6 py-4 text-gray-900 dark:text-white">${t.direccion}</td>
             <td class="px-6 py-4 whitespace-nowrap">
                 <div class="flex space-x-2">
@@ -267,46 +240,129 @@ function inicializarTabs() {
     });
 }
 
+// ESTRUCTURA CORREGIDA: DEPARTAMENTO -> MUNICIPIO -> DISTRITO
+const estructuraTerritorial = {
+    "Ahuachapán": {
+        "Ahuachapán Norte": ["Atiquizaya", "El Refugio", "San Lorenzo", "Turín"],
+        "Ahuachapán Centro": ["Ahuachapán", "Apaneca", "Concepción de Ataco", "Tacuba"],
+        "Ahuachapán Sur": ["Guaymango", "Jujutla", "San Francisco Menendez", "San Pedro Puxtla"]
+    },
+    "San Salvador": {
+        "San Salvador Norte": ["Aguilares", "El Paisnal", "Guazapa"],
+        "San Salvador Oeste": ["Apopa", "Nejapa"],
+        "San Salvador Este": ["Ilopango", "San Martín", "Soyapango", "Tonacatepeque"],
+        "San Salvador Centro": ["Ayutuxtepeque", "Mejicanos", "San Salvador", "Cuscatancingo", "Ciudad Delgado"],
+        "San Salvador Sur": ["Panchimalco", "Rosario de Mora", "San Marcos", "Santo Tomás", "Santiago Texacuangos"]
+    },
+    "La Libertad": {
+        "La Libertad Norte": ["Quezaltepeque", "San Matías", "San Pablo Tacachico"],
+        "La Libertad Centro": ["San Juan Opico", "Ciudad Arce"],
+        "La Libertad Oeste": ["Colón", "Jayaque", "Sacacoyo", "Tepecoyo", "Talnique"],
+        "La Libertad Este": ["Antiguo Cuscatlán", "Huizucar", "Nuevo Cuscatlán", "San José Villanueva", "Zaragoza"],
+        "La Libertad Costa": ["Chiltiupán", "Jicalapa", "La Libertad", "Tamanique", "Teotepeque"],
+        "La Libertad Sur": ["Comasagua", "Santa Tecla"]
+    },
+    "Chalatenango": {
+        "Chalatenango Norte": ["La Palma", "Citalá", "San Ignacio"],
+        "Chalatenango Centro": ["Nueva Concepción", "Tejutla", "La Reina", "Agua Caliente", "Dulce Nombre de María", "El Paraíso", "San Francisco Morazán", "San Rafael", "Santa Rita", "San Fernando"],
+        "Chalatenango Sur": ["Chalatenango", "Arcatao", "Azacualpa", "Comalapa", "Concepción Quezaltepeque", "El Carrizal", "La Laguna", "Las Vueltas", "Nombre de Jesús", "Nueva Trinidad", "Ojos de Agua", "Potonico", "San Antonio de La Cruz", "San Antonio Los Ranchos", "San Francisco Lempa", "San Isidro Labrador", "San José Cancasque", "San Miguel de Mercedes", "San José Las Flores", "San Luis del Carmen"]
+    },
+    "Cuscatlán": {
+        "Cuscatlán Norte": ["Suchitoto", "San José Guayabal", "Oratorio de Concepción", "San Bartolomé Perulapán", "San Pedro Perulapán"],
+        "Cuscatlán Sur": ["Cojutepeque", "San Rafael Cedros", "Candelaria", "Monte San Juan", "El Carmen", "San Cristóbal", "Santa Cruz Michapa", "San Ramón", "El Rosario", "Santa Cruz Analquito", "Tenancingo"]
+    },
+    "Cabañas": {
+        "Cabañas Este": ["Sensuntepeque", "Victoria", "Dolores", "Guacotecti", "San Isidro"],
+        "Cabañas Oeste": ["Ilobasco", "Tejutepeque", "Jutiapa", "Cinquera"]
+    },
+    "La Paz": {
+        "La Paz Oeste": ["Cuyultitán", "Olocuilta", "San Juan Talpa", "San Luis Talpa", "San Pedro Masahuat", "Tapalhuaca", "San Francisco Chinameca"],
+        "La Paz Centro": ["El Rosario", "Jerusalén", "Mercedes La Ceiba", "Paraíso de Osorio", "San Antonio Masahuat", "San Emigdio", "San Juan Tepezontes", "San Luis La Herradura", "San Miguel Tepezontes", "San Pedro Nonualco", "Santa María Ostuma", "Santiago Nonualco"],
+        "La Paz Este": ["San Juan Nonualco", "San Rafael Obrajuelo", "Zacatecoluca"]
+    },
+    "La Unión": {
+        "La Unión Norte": ["Anamorós", "Bolivar", "Concepción de Oriente", "El Sauce", "Lislique", "Nueva Esparta", "Pasaquina", "Polorós", "San José La Fuente", "Santa Rosa de Lima"],
+        "La Unión Sur": ["Conchagua", "El Carmen", "Intipucá", "La Unión", "Meanguera del Golfo", "San Alejo", "Yayantique", "Yucuaiquín"]
+    },
+    "Usulután": {
+        "Usulután Norte": ["Santiago de María", "Alegría", "Berlín", "Mercedes Umaña", "Jucuapa", "El Triunfo", "Estanzuelas", "San Buenaventura", "Nueva Granada"],
+        "Usulután Este": ["Usulután", "Jucuarán", "San Dionisio", "Concepción Batres", "Santa María", "Ozatlán", "Tecapán", "Santa Elena", "California", "Ereguayquín"],
+        "Usulután Oeste": ["Jiquilisco", "Puerto El Triunfo", "San Agustín", "San Francisco Javier"]
+    },
+    "Sonsonate": {
+        "Sonsonate Norte": ["Juayúa", "Nahuizalco", "Salcoatitán", "Santa Catarina Masahuat"],
+        "Sonsonate Centro": ["Sonsonate", "Sonzacate", "Nahulingo", "San Antonio del Monte", "Santo Domingo de Guzmán"],
+        "Sonsonate Este": ["Izalco", "Armenia", "Caluco", "San Julián", "Cuisnahuat", "Santa Isabel Ishuatán"],
+        "Sonsonate Oeste": ["Acajutla"]
+    },
+    "Santa Ana": {
+        "Santa Ana Norte": ["Masahuat", "Metapán", "Santa Rosa Guachipilín", "Texistepeque"],
+        "Santa Ana Centro": ["Santa Ana"],
+        "Santa Ana Este": ["Coatepeque", "El Congo"],
+        "Santa Ana Oeste": ["Candelaria de la Frontera", "Chalchuapa", "El Porvenir", "San Antonio Pajonal", "San Sebastián Salitrillo", "Santiago de La Frontera"]
+    },
+    "San Vicente": {
+        "San Vicente Norte": ["Apastepeque", "Santa Clara", "San Ildefonso", "San Esteban Catarina", "San Sebastián", "San Lorenzo", "Santo Domingo"],
+        "San Vicente Sur": ["San Vicente", "Guadalupe", "Verapaz", "Tepetitán", "Tecoluca", "San Cayetano Istepeque"]
+    },
+    "San Miguel": {
+        "San Miguel Norte": ["Ciudad Barrios", "Sesori", "Nuevo Edén de San Juan", "San Gerardo", "San Luis de La Reina", "Carolina", "San Antonio del Mosco", "Chapeltique"],
+        "San Miguel Centro": ["San Miguel", "Comacarán", "Uluazapa", "Moncagua", "Quelepa", "Chirilagua"],
+        "San Miguel Oeste": ["Chinameca", "Nueva Guadalupe", "Lolotique", "San Jorge", "San Rafael Oriente", "El Tránsito"]
+    },
+    "Morazán": {
+        "Morazán Norte": ["Arambala", "Cacaopera", "Corinto", "El Rosario", "Joateca", "Jocoaitique", "Meanguera", "Perquín", "San Fernando", "San Isidro", "Torola"],
+        "Morazán Sur": ["Chilanga", "Delicias de Concepción", "El Divisadero", "Gualococti", "Guatajiagua", "Jocoro", "Lolotiquillo", "Osicala", "San Carlos", "San Francisco Gotera", "San Simón", "Sensembra", "Sociedad", "Yamabal", "Yoloaiquín"]
+    }
+};
+
 // FUNCIÓN PARA INICIALIZAR SELECTS DINÁMICOS
 function inicializarSelects() {
     /* ---------------------------------------------------------
-       1. Municipios según departamento
+       1. MUNICIPIOS según departamento
     --------------------------------------------------------- */
-    const municipiosPorDepto = {
-        "San Salvador": ["Aguilares", "El Paisnal", "Guazapa", "Soyapango", "Ilopango", "San Martin", "Tonacatepeque", "San Marcos", "Panchimalco", "Santiago Texacuangos", "Santo Tomás", "Rosario de Mora", "Apopa", "Nejapa", "San Salvador", "Mejicanos", "Ayutuxtepeque", "Cuscatancingo", "Ciudad Delgado"],
-        "La Libertad": ["Antiguo Cuscatlán", "Chiltiupán", "Ciudad Arce", "Colón", "Comasagua", "Huizúcar", "Jayaque", "Jicalapa", "La Libertad", "Nuevo Cuscatlan", "Quezaltepeque", "Sacacoyo", "San Juan Opico", "San José Villanueva", "San Matías", "San Pablo Tacachico", "Santa Tecla", "Talnique", "Tamanique", "Teotepeque", "Tepecoyo", "Zaragoza"],
-        "Santa Ana": ["Masahuat", "Metapán", "Santa Rosa Guachipilín", "Texistepeque", "Santa Ana", "Coatepeque", "El Congo", "Candelaria de la Frontera", "Chalchuapa", "El Porvenir", "San Antonio Pajonal", "San Sebastián Salitrillo", "Santiago de la Frontera"],
-        "San Miguel": ["San Miguel", "Comacarán", "Uluazapa", "Moncagua", "Quelepa", "Chirilagua", "Ciudad Barrios", "Sesori", "Nuevo Edén de San Juan", "San Gerardo", "San Luis de La Reina", "Carolina", "San Antonio del Mosco", "Chalpeltique", "Lolotique", "Nueva Guadalupe", "Chinameca", "San Jorge", "San Rafael Oriente", "El Tránsito"],
-        "Sonsonate": ["Juayúa", "Nahuizalco", "Salcoatitán", "Santa Catarina Masahuat", "Sonsonate", "Sonzacate", "Nahuilingo", "San Antonio del Monte", "Santo Domingo de Guzmán", "Izalco", "Armenia", "Caluco", "San Julián", "Cuisnahuat", "Santa Isabel Ishuatán", "Acajutla"],
-        "Usulután": ["Santiago de María", "Alegría", "Berlín", "Mercedes Umaña", "Jucuapa", "El Triunfo", "Estanzuelas", "San Buenaventura", "Nueva Granada", "Jiquilisco", "Puerto El Triunfo", "San Agustín", "San Francisco Javier", "Usulután", "Jucuarán", "San Dionisio", "Concepción Batres", "Santa María", "Ozatlán", "Santa Elena", "California", "Ereguayquín"],
-        "La Unión": ["Anamorós", "Bolívar", "Concepción de Oriente", "El Sauce", "Lislique", "Nueva Esparta", "Pasaquina", "Poloros", "San José La Fuente", "Santa Rosa de Lima", "La Union", "Conchagua", "El Carmen", "Intipucá", "Meanguera del Golfo", "San Alejo", "Yayantique", "Yucuaquín"],
-        "Morazán": ["Corinto", "Arambala", "El Jocoatique", "El Rosario", "Joateca", "Meanguera", "Perquín", "San Fernando", "San Isidro", "Torola", "San Francisco Gotera", "Cacaopera", "Chilanga", "Delicias de Concepción", "Gualococti", "Loloquiquilco", "Osicala", "Sensembra", "Sociedad", "Yamabal"],
-        "Chalatenango": ["Chalatenango", "Citalá", "La Palma", "San Ignacio", "Potonico", "San Rafael", "Arcatao", "Azacualpa", "Las Vueltas", "Nueva Concepción", "Tejutla", "El Paraíso", "San Antonio de la Cruz", "San Isidro Labradro", "San Jose Cancasque", "San Miguel de Mercedes", "San Francisco Lempa", "Dulce Nombre de María", "San Antonio Los Ranchos", "San Emigdio", "San Luis del Carmen", "San Marcos de la Sierra", "Santa Rita", "Nombre de Jesús", "Ojos de Agua", "La Laguna"],
-        "Cabañas": ["Sensuntepeque", "Guacotecti", "San Isidro", "Victoria", "Dolores", "San Ildefonso", "Villa Hidalgo", "Ilobasco", "Cinquera"],
-        "Cuscatlán": ["Cojutepeque", "San Pedro Pelulapán", "San Rafael Cedro", "Candelaria", "Monte San Juan", "El Carmen", "Santa Cruz Michapa", "Tenancingo", "Suchitoto", "San Bartolomé Perulapía", "San Jose Guayabal", "Oratorio de Concepción", "San Cristobal", "Santa Cruz Analquito", "San Ramon", "El Rosario", "Concepción"],
-        "La Paz": ["Zacatecoluca", "San Juan Nonualco", "Santiango Nonualco", "San Luis Talpa", "San Pedro Nonualco", "Cuyultitán", "Santa María Ostuma", "San Miguel Tepezontes", "San Pedro Masahuat", "El Rosario", "San Emigdio", "San Francisco Chinameca", "Paraíso de Osorio", "Jerusalén", "La Montañita", "San Ramón", "Santa Marta", "San Felipe", "Guadalupe"],
-        "San Vicente": ["San Vicente", "Apastepeque", "Santa Clara", "San Esteban Catarina", "San Ildefonso", "San Sebastián", "Santo Domingo", "Tecoluca", "Guadalupe"],
-        "Ahuachapán": ["Atiquizaya", "El Refugio", "San Lorenzo", "Turín", "Chalchuapa", "Ahuachapán", "Apaneca", "Concepción de Ataco", "Tacuba", "Guaymango", "San Pedro Puxtla"]
-    };
-
     const departamentoSelect = document.getElementById("departamento");
     if (departamentoSelect) {
         departamentoSelect.addEventListener("change", function () {
             const depto = this.value;
             const municipioSelect = document.getElementById("municipio");
+            const distritoSelect = document.getElementById("distrito");
 
+            // Limpiar selects
             municipioSelect.innerHTML = "<option value=''>Seleccione municipio...</option>";
+            distritoSelect.innerHTML = "<option value=''>Seleccione un municipio primero...</option>";
 
-            if (municipiosPorDepto[depto]) {
-                municipiosPorDepto[depto].forEach(m => {
-                    municipioSelect.innerHTML += `<option>${m}</option>`;
+            if (estructuraTerritorial[depto]) {
+                // Llenar municipios
+                Object.keys(estructuraTerritorial[depto]).forEach(municipio => {
+                    municipioSelect.innerHTML += `<option value="${municipio}">${municipio}</option>`;
                 });
             }
         });
     }
 
     /* ---------------------------------------------------------
-       2. Materias según tipo de tribunal
+       2. DISTRITOS según municipio
+    --------------------------------------------------------- */
+    const municipioSelect = document.getElementById("municipio");
+    if (municipioSelect) {
+        municipioSelect.addEventListener("change", function () {
+            const depto = document.getElementById("departamento").value;
+            const municipio = this.value;
+            const distritoSelect = document.getElementById("distrito");
+
+            distritoSelect.innerHTML = "<option value=''>Seleccione distrito...</option>";
+
+            if (estructuraTerritorial[depto] && estructuraTerritorial[depto][municipio]) {
+                estructuraTerritorial[depto][municipio].forEach(distrito => {
+                    distritoSelect.innerHTML += `<option value="${distrito}">${distrito}</option>`;
+                });
+            }
+        });
+    }
+
+    /* ---------------------------------------------------------
+       3. Materias según tipo de tribunal
     --------------------------------------------------------- */
     const materiasPorTipo = {
         "Sala de lo Constitucional": ["Constitucional"],

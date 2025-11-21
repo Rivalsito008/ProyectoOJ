@@ -48,8 +48,9 @@
                                         <th class="px-6 py-3">Numeración</th>
                                         <th class="px-6 py-3">Materia</th>
                                         <th class="px-6 py-3">Departamento</th>
-                                        <th class="px-6 py-3">Municipios</th>
-                                        <th class="px-6 py-3">Dirección </th>
+                                        <th class="px-6 py-3">Municipio</th>
+                                        <th class="px-6 py-3">Distrito</th>
+                                        <th class="px-6 py-3">Dirección</th>
                                         <th class="px-6 py-3 text-center">Acciones</th>
                                     </tr>
                                 </thead>
@@ -58,8 +59,8 @@
                             </table>
                         </div>
                     </div>
-<!-- 
-                    <div class="tab-content" id="activo">
+
+<!--                     <div class="tab-content" id="activo">
                         <div class="relative overflow-x-auto">
                             <table class="w-full text-sm text-left">
                                 <thead class="text-xs uppercase">
@@ -69,9 +70,10 @@
                                         <th class="px-6 py-3">Numeración</th>
                                         <th class="px-6 py-3">Materia</th>
                                         <th class="px-6 py-3">Departamento</th>
-                                        <th class="px-6 py-3">Municipios</th>
-                                        <th class="px-6 py-3">Dirección </th>
-                                        <th class="px-6 py-3">Acciones</th>
+                                        <th class="px-6 py-3">Municipio</th>
+                                        <th class="px-6 py-3">Distrito</th>
+                                        <th class="px-6 py-3">Dirección</th>
+                                        <th class="px-6 py-3 text-center">Acciones</th>
                                     </tr>
                                 </thead>
                                 <tbody id="tablaActivo">
@@ -90,16 +92,17 @@
                                         <th class="px-6 py-3">Numeración</th>
                                         <th class="px-6 py-3">Materia</th>
                                         <th class="px-6 py-3">Departamento</th>
-                                        <th class="px-6 py-3">Municipios</th>
-                                        <th class="px-6 py-3">Dirección </th>
-                                        <th class="px-6 py-3">Acciones</th>
+                                        <th class="px-6 py-3">Municipio</th>
+                                        <th class="px-6 py-3">Distrito</th>
+                                        <th class="px-6 py-3">Dirección</th>
+                                        <th class="px-6 py-3 text-center">Acciones</th>
                                     </tr>
                                 </thead>
                                 <tbody id="tablaInactivo">
                                 </tbody>
                             </table>
                         </div>
-                    </div> -->
+                    </div -->
                 </div>
             </div>
 
@@ -125,14 +128,16 @@
 
                     <section class="p-6 space-y-6">
                         <div class="space-y-4">
+                            <!-- Nombre -->
                             <div>
                                 <label class="text-sm font-semibold">Nombre</label>
                                 <input type="text" class="w-full mt-1 border rounded-lg p-2">
                             </div>
+
+                            <!-- Tipo de Tribunal -->
                             <div class="mb-4">
                                 <label class="block text-gray-700 font-semibold">Tipo de Tribunal</label>
                                 <select id="tipoTribunal" class="w-full p-3 border rounded-lg">
-
                                     <!-- SALAS -->
                                     <optgroup label="Salas de la Corte Suprema">
                                         <option>Sala de lo Constitucional</option>
@@ -183,25 +188,28 @@
                                     <optgroup label="Juzgados de Paz">
                                         <option>Juzgado de Paz</option>
                                     </optgroup>
-
                                 </select>
                             </div>
+
                             <!-- Numeración -->
-                            <label class="block text-gray-700 font-semibold">Numeración</label>
-                            <select class="w-full border rounded p-2 mb-4" id="numeracion">
-                                <option value="" selected>Sin numeración</option>
-                                <option value="Primero">Primero</option>
-                                <option value="Segundo">Segundo</option>
-                                <option value="Tercero">Tercero</option>
-                                <option value="Cuarto">Cuarto</option>
-                                <option value="Quinto">Quinto</option>
-                                <option value="Sexto">Sexto</option>
-                                <option value="Séptimo">Séptimo</option>
-                                <option value="Octavo">Octavo</option>
-                                <option value="Noveno">Noveno</option>
-                                <option value="Décimo">Décimo</option>
-                                <option value="Único">Único</option>
-                            </select>
+                            <div class="mb-4">
+                                <label class="block text-gray-700 font-semibold">Numeración</label>
+                                <select class="w-full border rounded p-3" id="numeracion">
+                                    <option value="" selected>Sin numeración</option>
+                                    <option value="Primero">Primero</option>
+                                    <option value="Segundo">Segundo</option>
+                                    <option value="Tercero">Tercero</option>
+                                    <option value="Cuarto">Cuarto</option>
+                                    <option value="Quinto">Quinto</option>
+                                    <option value="Sexto">Sexto</option>
+                                    <option value="Séptimo">Séptimo</option>
+                                    <option value="Octavo">Octavo</option>
+                                    <option value="Noveno">Noveno</option>
+                                    <option value="Décimo">Décimo</option>
+                                    <option value="Único">Único</option>
+                                </select>
+                            </div>
+
                             <!-- Materia (automática) -->
                             <div class="mb-4">
                                 <label class="block text-gray-700 font-semibold">Materia</label>
@@ -209,39 +217,60 @@
                                     <option value="">Seleccione un tipo primero...</option>
                                 </select>
                             </div>
+
                             <!-- Departamento -->
                             <div class="mb-4">
                                 <label class="block text-gray-700 font-semibold">Departamento</label>
                                 <select id="departamento" class="w-full p-3 border rounded-lg">
                                     <option value="">Seleccione un departamento...</option>
+                                    <option>Ahuachapán</option>
                                     <option>San Salvador</option>
                                     <option>La Libertad</option>
-                                    <option>Santa Ana</option>
-                                    <option>San Miguel</option>
-                                    <option>Sonsonate</option>
-                                    <option>Usulután</option>
-                                    <option>La Unión</option>
-                                    <option>Morazán</option>
                                     <option>Chalatenango</option>
-                                    <option>Cabañas</option>
                                     <option>Cuscatlán</option>
+                                    <option>Cabañas</option>
                                     <option>La Paz</option>
+                                    <option>La Unión</option>
+                                    <option>Usulután</option>
+                                    <option>Sonsonate</option>
+                                    <option>Santa Ana</option>
                                     <option>San Vicente</option>
-                                    <option>Ahuachapán</option>
+                                    <option>San Miguel</option>
+                                    <option>Morazán</option>
                                 </select>
                             </div>
-                            <!-- Municipios dinámicos -->
+
+                            <!-- Municipio (dinámico) -->
                             <div class="mb-4">
                                 <label class="block text-gray-700 font-semibold">Municipio</label>
                                 <select id="municipio" class="w-full p-3 border rounded-lg">
                                     <option value="">Seleccione un departamento primero...</option>
                                 </select>
                             </div>
+
+                            <!-- Distrito (dinámico) -->
+                            <div class="mb-4">
+                                <label class="block text-gray-700 font-semibold">Distrito</label>
+                                <select id="distrito" class="w-full p-3 border rounded-lg">
+                                    <option value="">Seleccione un municipio primero...</option>
+                                </select>
+                            </div>
+
                             <!-- Dirección -->
                             <div class="mb-6">
                                 <label class="block text-gray-700 font-semibold">Dirección Completa</label>
                                 <textarea id="direccion" class="w-full p-3 border rounded-lg" rows="3" placeholder="Ej: Centro Judicial Integrado de Santa Tecla..."></textarea>
                             </div>
+
+                            <!-- Estado -->
+                            <div class="mb-6">
+                                <label class="block text-gray-700 font-semibold">Estado</label>
+                                <select id="estado" class="w-full p-3 border rounded-lg">
+                                    <option value="Activo">Activo</option>
+                                    <option value="Inactivo">Inactivo</option>
+                                </select>
+                            </div>
+                        </div>
                     </section>
 
                     <div class="px-6 py-4 bg-white flex justify-end">
@@ -252,7 +281,6 @@
         </main>
     </div>
     <script src="JS/tribunales.js"></script>
-
 </body>
 
 </html>
