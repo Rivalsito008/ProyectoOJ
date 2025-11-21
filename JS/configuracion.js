@@ -77,9 +77,7 @@ window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e =
         aplicarTema('auto');
     }
 });
-// Al final del script existente en configuracion.php, agrega:
 
-// Cargar TODAS las preferencias guardadas al inicio
 window.addEventListener('DOMContentLoaded', () => {
     // Tema
     const temaGuardado = localStorage.getItem('theme-preference') || 'auto';
