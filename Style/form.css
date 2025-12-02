@@ -21,6 +21,21 @@
     --button-hover: #2563eb;
     --progress-bg: #3b82f6;
     --border-color-progress-barr: #cfcfcfff;
+    
+    /* NUEVAS VARIABLES PARA CAMPOS DEL FORMULARIO */
+    --input-border: #d1d5db;
+    --input-border-hover: #3b82f6;
+    --input-border-focus: #3b82f6;
+    --input-bg: #ffffff;
+    --input-text: #111827;
+    
+    /* VARIABLES PARA BOTONES DE VIOLENCIA */
+    --violencia-btn-border: #d1d5db;
+    --violencia-btn-bg: #ffffff;
+    --violencia-btn-hover-border: #3b82f6;
+    --violencia-btn-hover-bg: #eff6ff;
+    --violencia-btn-active-border: #3b82f6;
+    --violencia-btn-active-bg: #dbeafe;
 }
 
 [data-theme="dark"] {
@@ -44,6 +59,21 @@
     --button-hover: #7c3aed;
     --progress-bg: #9333ea;
     --border-color-progress-barr: #c5c5c5ff;
+    
+    /* VARIABLES PARA CAMPOS DEL FORMULARIO - MODO OSCURO */
+    --input-border: #b2b4b6;
+    --input-border-hover: #9333ea;
+    --input-border-focus: #9333ea;
+    --input-bg: #ffffff;
+    --input-text: #111827;
+    
+    /* VARIABLES PARA BOTONES DE VIOLENCIA - MODO OSCURO */
+    --violencia-btn-border: #d3d4d6;
+    --violencia-btn-bg: #ffffff;
+    --violencia-btn-hover-border: #9333ea;
+    --violencia-btn-hover-bg: #f3e8ff;
+    --violencia-btn-active-border: #9333ea;
+    --violencia-btn-active-bg: #e9d5ff;
 }
 
 body {
@@ -175,9 +205,11 @@ input[type="checkbox"] {
 
 /* Activo (modo oscuro) */
 [data-theme="dark"] .nav-item.active {
-    background: linear-gradient(135deg,
-            rgba(151, 120, 255, 0.15) 0%,
-            rgba(151, 120, 255, 0.10) 100%);
+    background: linear-gradient(
+        135deg,
+        rgba(151, 120, 255, 0.15) 0%,
+        rgba(151, 120, 255, 0.10) 100%
+    );
     color: #cbb8ff;
     border-left: 4px solid #9778ff;
     box-shadow: inset 0 0 20px rgba(151, 120, 255, 0.25);
@@ -194,9 +226,11 @@ input[type="checkbox"] {
 
 /* Hover del activo (modo oscuro) */
 [data-theme="dark"] .nav-item.active:hover {
-    background: linear-gradient(135deg,
-            rgba(151, 120, 255, 0.22) 0%,
-            rgba(151, 120, 255, 0.17) 100%);
+    background: linear-gradient(
+        135deg,
+        rgba(151, 120, 255, 0.22) 0%,
+        rgba(151, 120, 255, 0.17) 100%
+    );
     color: #e6dbff;
     border-left: 4px solid #b298ff;
     box-shadow: inset 0 0 25px rgba(151, 120, 255, 0.35);
@@ -209,8 +243,6 @@ input[type="checkbox"] {
 [data-theme="dark"] .nav-item.active:hover .nav-label {
     color: #e6dbff;
 }
-
-
 
 .flecha {
     stroke: var(--flecha-color);
@@ -274,6 +306,155 @@ input[type="checkbox"] {
     background-color: var(--border-color-progress-barr);
 }
 
+/* ===========================================
+   CAMPOS DEL FORMULARIO UNIFICADOS
+=========================================== */
+
+/* Todos los inputs de texto, números, teléfono, email, fecha */
+input[type="text"],
+input[type="number"],
+input[type="tel"],
+input[type="email"],
+input[type="date"],
+input[type="time"],
+select,
+textarea {
+    background-color: var(--input-bg) !important;
+    color: var(--input-text) !important;
+    border: 1px solid var(--input-border) !important;
+    border-radius: 0.5rem;
+    padding: 0.75rem;
+    transition: all 0.3s ease;
+}
+
+/* Estado hover para todos los campos */
+input[type="text"]:hover,
+input[type="number"]:hover,
+input[type="tel"]:hover,
+input[type="email"]:hover,
+input[type="date"]:hover,
+input[type="time"]:hover,
+select:hover,
+textarea:hover {
+    border-color: var(--input-border-hover) !important;
+}
+
+/* Estado focus para todos los campos */
+input[type="text"]:focus,
+input[type="number"]:focus,
+input[type="tel"]:focus,
+input[type="email"]:focus,
+input[type="date"]:focus,
+input[type="time"]:focus,
+select:focus,
+textarea:focus {
+    outline: none;
+    border-color: var(--input-border-focus) !important;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Focus en modo oscuro */
+[data-theme="dark"] input[type="text"]:focus,
+[data-theme="dark"] input[type="number"]:focus,
+[data-theme="dark"] input[type="tel"]:focus,
+[data-theme="dark"] input[type="email"]:focus,
+[data-theme="dark"] input[type="date"]:focus,
+[data-theme="dark"] input[type="time"]:focus,
+[data-theme="dark"] select:focus,
+[data-theme="dark"] textarea:focus {
+    box-shadow: 0 0 0 3px rgba(147, 51, 234, 0.1);
+}
+
+/* Placeholder styling */
+input::placeholder,
+textarea::placeholder {
+    color: #9ca3af;
+    opacity: 0.7;
+}
+
+[data-theme="dark"] input::placeholder,
+[data-theme="dark"] textarea::placeholder {
+    color: #6b7280;
+    opacity: 0.8;
+}
+
+/* ===========================================
+   BOTONES DE VIOLENCIA
+=========================================== */
+
+.violencia-btn {
+    background-color: var(--violencia-btn-bg) !important;
+    border: 2px solid var(--violencia-btn-border) !important;
+    color: var(--input-text) !important;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    text-align: center;
+}
+
+/* Hover en botones de violencia */
+.violencia-btn:hover {
+    border-color: var(--violencia-btn-hover-border) !important;
+    background-color: var(--violencia-btn-hover-bg) !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Estado activo/seleccionado */
+.violencia-btn.border-blue-500,
+.violencia-btn.border-2 {
+    border-color: var(--input-border-focus) !important;
+    background-color: var(--violencia-btn-active-bg) !important;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+}
+
+/* Estado activo en modo oscuro */
+[data-theme="dark"] .violencia-btn.border-blue-500,
+[data-theme="dark"] .violencia-btn.border-2 {
+    border-color: var(--input-border-focus) !important;
+    background-color: var(--violencia-btn-active-bg) !important;
+    box-shadow: 0 4px 12px rgba(147, 51, 234, 0.3);
+}
+
+/* Textos dentro de los botones de violencia */
+.violencia-btn .font-semibold {
+    color: var(--input-text);
+    font-weight: 600;
+}
+
+.violencia-btn .text-sm {
+    color: var(--input-text);
+    opacity: 0.7;
+}
+
+/* ===========================================
+   CONTENEDOR DE OPCIONES DE VIOLENCIA
+=========================================== */
+
+#opciones-violencia-container .border {
+    border-color: var(--input-border) !important;
+    background-color: var(--input-bg) !important;
+    transition: all 0.3s ease;
+}
+
+#opciones-violencia-container .bg-white {
+    background-color: var(--input-bg) !important;
+}
+
+#opciones-violencia-container .bg-gray-50 {
+    background-color: var(--input-bg) !important;
+}
+
+/* Checkboxes dentro de opciones de violencia */
+#opciones-violencia-container label {
+    color: var(--input-text) !important;
+}
+
+/* ===========================================
+   BOTÓN SIGUIENTE
+=========================================== */
+
 #nextBtn {
     background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%) !important;
     color: white !important;
@@ -283,19 +464,13 @@ input[type="checkbox"] {
     position: relative !important;
     overflow: hidden !important;
     transition: all 0.3s ease !important;
-
-    /* Tamaño pequeño como el primer ejemplo */
     padding: 0.5rem 1.5rem !important;
     border-radius: 0.5rem !important;
     box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3) !important;
-
-    /* Flex para alinear ícono y texto */
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
     gap: 0.5rem !important;
-
-    /* Texto más compacto */
     font-size: 0.875rem !important;
     letter-spacing: 0 !important;
 }
@@ -332,24 +507,16 @@ input[type="checkbox"] {
 
 /* Efecto de pulsación al hacer clic */
 @keyframes buttonClick {
-    0% {
-        transform: scale(1);
-    }
-
-    50% {
-        transform: scale(0.95);
-    }
-
-    100% {
-        transform: scale(1);
-    }
+    0% { transform: scale(1); }
+    50% { transform: scale(0.95); }
+    100% { transform: scale(1); }
 }
 
 #nextBtn:active {
     animation: buttonClick 0.2s ease !important;
 }
 
-/* Ícono del botón - más pequeño */
+/* Ícono del botón */
 #nextBtn svg {
     transition: all 0.3s ease !important;
     stroke: currentColor !important;
@@ -399,6 +566,10 @@ input[type="checkbox"] {
     box-shadow: 0 2px 8px rgba(75, 85, 99, 0.3) !important;
 }
 
+/* ===========================================
+   BOTÓN ANTERIOR
+=========================================== */
+
 #prevBtn {
     background-color: #535457;
     color: white;
@@ -409,47 +580,15 @@ input[type="checkbox"] {
     background-color: #3a3a3a;
 }
 
-/* Inputs del formulario */
-input[type="text"],
-input[type="tel"],
-input[type="email"],
-input[type="date"],
-select {
-    background-color: var(--card-bg);
-    color: var(--text-colorcrd);
-    border: 1px solid var(--border-modal);
-    border-radius: 0.5rem;
-    padding: 0.75rem;
-    transition: all 0.3s ease;
-}
-
-input[type="text"]:focus,
-input[type="tel"]:focus,
-input[type="email"]:focus,
-input[type="date"]:focus,
-select:focus {
-    outline: none;
-    border-color: var(--accent-color);
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-}
-
-[data-theme="dark"] input[type="text"]:focus,
-[data-theme="dark"] input[type="tel"]:focus,
-[data-theme="dark"] input[type="email"]:focus,
-[data-theme="dark"] input[type="date"]:focus,
-[data-theme="dark"] select:focus {
-    box-shadow: 0 0 0 3px rgba(147, 51, 234, 0.1);
-}
-
 /* Preguntas del cuestionario */
 #preguntasForm .border {
-    border-color: var(--border-modal);
-    background-color: var(--card-bg);
+    border-color: var(--input-border) !important;
+    background-color: var(--input-bg) !important;
     transition: all 0.3s ease;
 }
 
 #preguntasForm .border:hover {
-    border-color: var(--accent-color);
+    border-color: var(--input-border-focus);
     transform: translateY(-1px);
 }
 
@@ -458,11 +597,19 @@ select:focus {
     accent-color: var(--accent-color);
 }
 
+/* Labels y textos en modo oscuro */
+[data-theme="dark"] #preguntasForm .text-gray-800 {
+    color: var(--input-text) !important;
+}
+
+[data-theme="dark"] label {
+    color: var(--input-text) !important;
+}
+
 /* ========================================
-   DROPDOWN DE PERFIL - MODO CLARO Y OSCURO
+   DROPDOWN DE PERFIL
    ======================================== */
 
-/* Estilos base del dropdown - MODO CLARO */
 .dropdown {
     background-color: var(--dropdown-color);
     border-color: var(--border-color);
@@ -477,33 +624,27 @@ select:focus {
     border-color: rgba(108, 85, 150, 0.3);
 }
 
-/* Encabezado del dropdown - MODO CLARO */
 .dropdown-header {
     background-color: var(--card-bg);
     border-bottom: 1px solid var(--border-color);
 }
 
-/* Avatar border - MODO CLARO */
 .dropdown-avatar {
     border-color: var(--border-color);
 }
 
-/* Nombre de usuario - MODO CLARO */
 .dropdown-username {
     color: var(--text-colorcrd);
 }
 
-/* Rol del usuario - MODO CLARO */
 .dropdown-role {
     color: #6b7280;
 }
 
-/* Cuerpo del dropdown - MODO CLARO */
 .dropdown-body {
     background-color: var(--card-bg);
 }
 
-/* Botón de cerrar sesión - MODO CLARO */
 .dropdown-logout {
     color: #dc2626;
 }
@@ -516,39 +657,32 @@ select:focus {
    MODO OSCURO - DROPDOWN
    ======================================== */
 
-/* Dropdown principal - MODO OSCURO */
 [data-theme="dark"] .dropdown {
     background-color: #2a2240;
     border-color: #3d3454;
 }
 
-/* Encabezado del dropdown - MODO OSCURO */
 [data-theme="dark"] .dropdown-header {
     background-color: #2b2343;
     border-bottom: 1px solid #3d3454;
 }
 
-/* Avatar border - MODO OSCURO */
 [data-theme="dark"] .dropdown-avatar {
     border-color: #4b4563;
 }
 
-/* Nombre de usuario - MODO OSCURO */
 [data-theme="dark"] .dropdown-username {
     color: #f3f4f6;
 }
 
-/* Rol del usuario - MODO OSCURO */
 [data-theme="dark"] .dropdown-role {
     color: #9ca3af;
 }
 
-/* Cuerpo del dropdown - MODO OSCURO */
 [data-theme="dark"] .dropdown-body {
     background-color: #241c37;
 }
 
-/* Botón de cerrar sesión - MODO OSCURO */
 [data-theme="dark"] .dropdown-logout {
     color: #fca5a5;
 }
