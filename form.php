@@ -7,31 +7,6 @@
   <title>SIGEN - Sistema de Gestión Notarial</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="Style/form.css">
-  <style>
-    @media print {
-      .no-print {
-        display: none !important;
-      }
-
-      .print-only {
-        display: block !important;
-      }
-
-      body {
-        font-size: 12px;
-      }
-
-      .print-section {
-        margin: 20px;
-        padding: 15px;
-        border: 1px solid #000;
-      }
-    }
-
-    .print-only {
-      display: none;
-    }
-  </style>
 </head>
 
 <body>
@@ -768,7 +743,7 @@
           <div id="preguntasForm" class="space-y-6"></div>
         </div>
 
-        <!-- Paso 5: Información Adicional -->
+        <!-- Paso 6: Información Adicional -->
         <div class="step hidden">
           <h2 class="text-2xl font-semibold mb-4 text-gray-800">Información Adicional</h2>
           <div class="space-y-4">
@@ -788,7 +763,7 @@
           </div>
         </div>
 
-        <!-- Paso 6: Confirmación -->
+        <!-- Paso 7: Confirmación -->
         <!-- En el paso de confirmación, actualizar el resumen y comprobante -->
         <div class="step hidden">
           <h2 class="text-2xl font-semibold mb-6 text-gray-800">Confirmación y Comprobante</h2>
@@ -850,7 +825,7 @@
             </div>
 
             <div class="mt-6 text-center text-xs text-gray-500">
-              <p>Documento generado automáticamente - SIGEN © 2024</p>
+              <p>Documento generado automáticamente - SIGEN © 2025</p>
             </div>
           </div>
 

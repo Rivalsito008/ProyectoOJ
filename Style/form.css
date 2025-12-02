@@ -21,14 +21,14 @@
     --button-hover: #2563eb;
     --progress-bg: #3b82f6;
     --border-color-progress-barr: #cfcfcfff;
-    
+
     /* NUEVAS VARIABLES PARA CAMPOS DEL FORMULARIO */
     --input-border: #d1d5db;
     --input-border-hover: #3b82f6;
     --input-border-focus: #3b82f6;
     --input-bg: #ffffff;
     --input-text: #111827;
-    
+
     /* VARIABLES PARA BOTONES DE VIOLENCIA */
     --violencia-btn-border: #d1d5db;
     --violencia-btn-bg: #ffffff;
@@ -59,14 +59,14 @@
     --button-hover: #7c3aed;
     --progress-bg: #9333ea;
     --border-color-progress-barr: #c5c5c5ff;
-    
+
     /* VARIABLES PARA CAMPOS DEL FORMULARIO - MODO OSCURO */
     --input-border: #b2b4b6;
     --input-border-hover: #9333ea;
     --input-border-focus: #9333ea;
     --input-bg: #ffffff;
     --input-text: #111827;
-    
+
     /* VARIABLES PARA BOTONES DE VIOLENCIA - MODO OSCURO */
     --violencia-btn-border: #d3d4d6;
     --violencia-btn-bg: #ffffff;
@@ -205,11 +205,9 @@ input[type="checkbox"] {
 
 /* Activo (modo oscuro) */
 [data-theme="dark"] .nav-item.active {
-    background: linear-gradient(
-        135deg,
-        rgba(151, 120, 255, 0.15) 0%,
-        rgba(151, 120, 255, 0.10) 100%
-    );
+    background: linear-gradient(135deg,
+            rgba(151, 120, 255, 0.15) 0%,
+            rgba(151, 120, 255, 0.10) 100%);
     color: #cbb8ff;
     border-left: 4px solid #9778ff;
     box-shadow: inset 0 0 20px rgba(151, 120, 255, 0.25);
@@ -226,11 +224,9 @@ input[type="checkbox"] {
 
 /* Hover del activo (modo oscuro) */
 [data-theme="dark"] .nav-item.active:hover {
-    background: linear-gradient(
-        135deg,
-        rgba(151, 120, 255, 0.22) 0%,
-        rgba(151, 120, 255, 0.17) 100%
-    );
+    background: linear-gradient(135deg,
+            rgba(151, 120, 255, 0.22) 0%,
+            rgba(151, 120, 255, 0.17) 100%);
     color: #e6dbff;
     border-left: 4px solid #b298ff;
     box-shadow: inset 0 0 25px rgba(151, 120, 255, 0.35);
@@ -507,9 +503,17 @@ textarea::placeholder {
 
 /* Efecto de pulsación al hacer clic */
 @keyframes buttonClick {
-    0% { transform: scale(1); }
-    50% { transform: scale(0.95); }
-    100% { transform: scale(1); }
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(0.95);
+    }
+
+    100% {
+        transform: scale(1);
+    }
 }
 
 #nextBtn:active {
@@ -689,4 +693,28 @@ textarea::placeholder {
 
 [data-theme="dark"] .dropdown-logout:hover {
     background-color: rgba(127, 29, 29, 0.3);
+}
+
+@media print {
+    .no-print {
+        display: none !important;
+    }
+
+    .print-only {
+        display: block !important;
+    }
+
+    body {
+        font-size: 12px;
+    }
+
+    .print-section {
+        margin: 20px;
+        padding: 15px;
+        border: 1px solid #000;
+    }
+}
+
+.print-only {
+    display: none;
 }

@@ -760,3 +760,278 @@ tr:hover .risk-bar-table {
     max-width: 5rem !important;
 }
 td:nth-child(2) { min-width: 180px; }
+
+/* Botón DETALLES - Nuevo botón verde */
+.action-btn-details {
+    background: linear-gradient(135deg, #10b981, #059669) !important;
+    color: white !important;
+    border: 1px solid #059669;
+    position: relative;
+    overflow: hidden;
+}
+
+.action-btn-details::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 25%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    animation: shimmerUniversal 3s infinite linear;
+}
+
+.action-btn-details:hover {
+    background: linear-gradient(135deg, #059669, #047857) !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+}
+
+.action-btn-details:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 6px rgba(16, 185, 129, 0.3);
+}
+
+/* Estilos para acordeones del modal detalles */
+.accordion-header {
+    cursor: pointer;
+    outline: none;
+    user-select: none;
+}
+
+.accordion-header:active {
+    transform: scale(0.98);
+}
+
+.accordion-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.accordion-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.accordion-content:not(.hidden) {
+    overflow: visible;
+}
+
+.accordion-icon {
+    transition: transform 0.3s ease;
+}
+
+.accordion-icon.rotated {
+    transform: rotate(180deg);
+}
+
+/* Animación suave para el contenido del acordeón */
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.accordion-content:not(.hidden) > * {
+    animation: slideDown 0.3s ease-out;
+}
+
+/* Estilos para tablas dentro de acordeones */
+.accordion-content table {
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+
+.accordion-content table td {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+.accordion-content table td:first-child {
+    width: 33.333333%;
+    min-width: 150px;
+}
+
+.accordion-content table td:last-child {
+    width: 66.666667%;
+}
+
+/* Mejorar bordes de tablas en modo oscuro */
+[data-theme="dark"] .accordion-content table tbody tr {
+    border-color: #4b5563;
+}
+
+/* Asegurar que el contenido no se desborde */
+.accordion-content .overflow-x-auto {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Estilo para badges dentro de tablas */
+.accordion-content table .px-2 {
+    display: inline-block;
+    white-space: nowrap;
+}
+
+/* Botón DETALLES - Nuevo botón verde */
+.action-btn-details {
+    background: linear-gradient(135deg, #10b981, #059669) !important;
+    color: white !important;
+    border: 1px solid #059669;
+    position: relative;
+    overflow: hidden;
+}
+
+.action-btn-details::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 25%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    animation: shimmerUniversal 3s infinite linear;
+}
+
+.action-btn-details:hover {
+    background: linear-gradient(135deg, #059669, #047857) !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+}
+
+.action-btn-details:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 6px rgba(16, 185, 129, 0.3);
+}
+
+
+/* Estilos para el modal de detalles */
+#modalDetalles .modal-dialog {
+    display: flex;
+    flex-direction: column;
+    max-height: 90vh;
+    padding: 0 !important; /* Eliminar todo padding del contenedor */
+    overflow: hidden;
+}
+
+#modalDetalles .modal-dialog > div {
+    display: flex;
+    flex-direction: column;
+    max-height: 90vh;
+}
+
+/* Header del modal - debe cubrir todo el ancho */
+#modalDetalles .sticky.top-0 {
+    margin: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    border-radius: 12px 12px 0 0; /* Solo redondear esquinas superiores */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+/* Footer del modal - debe cubrir todo el ancho */
+#modalDetalles .sticky.bottom-0 {
+    margin: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    border-radius: 0 0 12px 12px; /* Solo redondear esquinas inferiores */
+    box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.05);
+}
+
+/* Contenido scrolleable entre header y footer */
+#modalDetalles .flex-1.overflow-y-auto {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+/* Estilos para acordeones del modal detalles */
+.accordion-header {
+    cursor: pointer;
+    outline: none;
+    user-select: none;
+}
+
+.accordion-header:active {
+    transform: scale(0.98);
+}
+
+.accordion-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.accordion-content:not(.hidden) {
+    overflow: visible;
+}
+
+.accordion-icon {
+    transition: transform 0.3s ease;
+}
+
+.accordion-icon.rotated {
+    transform: rotate(180deg);
+}
+
+/* Animación suave para el contenido del acordeón */
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.accordion-content:not(.hidden) > * {
+    animation: slideDown 0.3s ease-out;
+}
+
+/* Estilos para tablas dentro de acordeones */
+.accordion-content table {
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+
+.accordion-content table td {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+.accordion-content table td:first-child {
+    width: 33.333333%;
+    min-width: 150px;
+}
+
+.accordion-content table td:last-child {
+    width: 66.666667%;
+}
+
+/* Mejorar bordes de tablas en modo oscuro */
+[data-theme="dark"] .accordion-content table tbody tr {
+    border-color: #4b5563;
+}
+
+/* Asegurar que el contenido no se desborde */
+.accordion-content .overflow-x-auto {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Estilo para badges dentro de tablas */
+.accordion-content table .px-2 {
+    display: inline-block;
+    white-space: nowrap;
+}
