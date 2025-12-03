@@ -1,3 +1,23 @@
+// Configuración de Axios
+const API_BASE_URL = 'http://localhost:8000/api'; // Ajusta según tu URL
+
+const api = axios.create({
+    baseURL: API_BASE_URL,
+    headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+    }
+
+});
+// Manejo global de errores
+api.interceptors.response.use(
+    response => response,
+    error => {
+        console.error('Error de API:', error.response?.data || error.message);
+        return Promise.reject(error);
+    }
+);
+
 (function () {
     // Aplicar tema
     const t = localStorage.getItem('theme-preference') || 'auto';
@@ -16,85 +36,32 @@
     document.documentElement.style.setProperty('--contrast', contrast);
 })();
 
-// DATOS QUEMADOS DE TRIBUNALES (CORREGIDOS)
-const tribunales = [
-    {
-        id: 1,
-        nombre: "Sala de lo Constitucional",
-        tipo: "Sala de la Corte Suprema",
-        numeracion: "Único",
-        materia: "Constitucional",
-        departamento: "San Salvador",
-        municipio: "San Salvador Centro",
-        distrito: "San Salvador",
-        direccion: "Centro Judicial Isidro Menéndez",
-        estado: "Activo"
-    },
-    {
-        id: 2,
-        nombre: "Cámara Segunda de lo Civil",
-        tipo: "Cámara",
-        numeracion: "Segundo",
-        materia: "Civil",
-        departamento: "San Salvador",
-        municipio: "San Salvador Centro",
-        distrito: "San Salvador",
-        direccion: "Centro Judicial Isidro Menéndez",
-        estado: "Activo"
-    },
-    {
-        id: 3,
-        nombre: "Juzgado Tercero de Familia",
-        tipo: "Juzgado",
-        numeracion: "Tercero",
-        materia: "Familia",
-        departamento: "La Libertad",
-        municipio: "La Libertad Sur",
-        distrito: "Santa Tecla",
-        direccion: "Centro Judicial Integrado de Santa Tecla",
-        estado: "Inactivo"
-    },
-    {
-        id: 4,
-        nombre: "Tribunal Especializado de Sentencia",
-        tipo: "Tribunal Especializado",
-        numeracion: "Primero",
-        materia: "Penal (Sentencia)",
-        departamento: "San Salvador",
-        municipio: "San Salvador Centro",
-        distrito: "San Salvador",
-        direccion: "Centro Judicial Isidro Menéndez",
-        estado: "Activo"
-    },
-    {
-        id: 5,
-        nombre: "Juzgado de Paz",
-        tipo: "Juzgado de Paz",
-        numeracion: "Sin numeración",
-        materia: "Multipropósito",
-        departamento: "Santa Ana",
-        municipio: "Santa Ana Centro",
-        distrito: "Santa Ana",
-        direccion: "Palacio de Justicia de Santa Ana",
-        estado: "Activo"
-    }
-];
 
 // Cargar tablas cuando el DOM esté listo
-document.addEventListener('DOMContentLoaded', function () {
-    cargarTodasLasTablas();
+document.addEventListener('DOMContentLoaded', async function () {
+    // Cargar datos iniciales
+    await cargarSelectsConDatosReales();
+    await cargarTodasLasTablas();
     inicializarModal();
     inicializarTabs();
-    inicializarSelects();
+    
+    // Limpiar formulario al abrir modal
+    const openBtn = document.getElementById('openFormBtn');
+    if (openBtn) {
+        openBtn.addEventListener('click', () => {
+            limpiarFormulario();
+        });
+    }
 });
 
 function cargarTodasLasTablas() {
     cargarTablaPorEstado('todo');
-    cargarTablaPorEstado('activo');
-    cargarTablaPorEstado('inactivo');
+    // Si necesitas las otras pestañas, descomenta estas líneas:
+    // cargarTablaPorEstado('activo');
+    // cargarTablaPorEstado('inactivo');
 }
 
-function cargarTablaPorEstado(estado) {
+async function cargarTablaPorEstado(estado) {
     const tbodyId = `tabla${estado.charAt(0).toUpperCase() + estado.slice(1)}`;
     const tbody = document.getElementById(tbodyId);
 
@@ -103,59 +70,158 @@ function cargarTablaPorEstado(estado) {
         return;
     }
 
-    tbody.innerHTML = "";
+    tbody.innerHTML = "<tr><td colspan='9' class='px-6 py-8 text-center'>Cargando...</td></tr>";
 
-    // Filtrar tribunales según el estado
-    let tribunalesFiltrados = [];
+    try {
+        console.log('Haciendo petición a:', API_BASE_URL + '/tribunales');
+        
+        const response = await api.get('/tribunales');
+        
+        console.log('Respuesta completa:', response);
+        console.log('Status:', response.status);
+        console.log('Data:', response.data);
+        
+        // Intentar obtener los datos de diferentes estructuras posibles
+        let tribunales = [];
+        if (response.data.data) {
+            tribunales = response.data.data;
+        } else if (Array.isArray(response.data)) {
+            tribunales = response.data;
+        } else {
+            console.error('Estructura de datos no reconocida:', response.data);
+            throw new Error('Formato de respuesta no válido');
+        }
 
-    if (estado === 'todo') {
-        tribunalesFiltrados = tribunales;
-    } else {
-        tribunalesFiltrados = tribunales.filter(t =>
-            t.estado.toLowerCase() === estado.toLowerCase()
-        );
-    }
+        console.log('Tribunales obtenidos:', tribunales);
+        console.log('Cantidad:', tribunales.length);
 
-    if (tribunalesFiltrados.length === 0) {
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-            <td colspan="9" class="px-6 py-8 text-center text-gray-500 dark:text-gray-400 text-lg">
-                No hay tribunales con estado ${estado}
-            </td>
+        // Filtrar según estado
+        let tribunalesFiltrados = [];
+        if (estado === 'todo') {
+            tribunalesFiltrados = tribunales;
+        } else {
+            tribunalesFiltrados = tribunales.filter(t => 
+                t.estado && t.estado.toLowerCase() === estado.toLowerCase()
+            );
+        }
+
+        console.log('Tribunales filtrados:', tribunalesFiltrados);
+
+        tbody.innerHTML = "";
+
+        if (tribunalesFiltrados.length === 0) {
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+                <td colspan="9" class="px-6 py-8 text-center text-gray-500 dark:text-gray-400 text-lg">
+                    No hay tribunales ${estado !== 'todo' ? 'con estado ' + estado : 'registrados'}
+                </td>
+            `;
+            tbody.appendChild(tr);
+            return;
+        }
+
+        // Renderizar tribunales
+        tribunalesFiltrados.forEach(t => {
+            console.log('Renderizando tribunal:', t);
+            
+            const tr = document.createElement("tr");
+            tr.className = "border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors";
+            
+            // Funciones helper con validación mejorada
+            const getTipo = () => {
+                if (t.tipo_tribunal) {
+                    return t.tipo_tribunal.tipo || t.tipo_tribunal.tipo_tribunal || 'N/A';
+                }
+                return 'N/A';
+            };
+
+            const getNumeracion = () => {
+                if (t.numeracion_tribunal) {
+                    return t.numeracion_tribunal.numeracion_tribunal || 'Sin numeración';
+                }
+                return 'Sin numeración';
+            };
+
+            const getMateria = () => {
+                if (t.tipo_tribunal && t.tipo_tribunal.materia) {
+                    return t.tipo_tribunal.materia.materia || 'N/A';
+                }
+                return 'N/A';
+            };
+
+            const getDepartamento = () => {
+                if (t.distrito && t.distrito.municipio && t.distrito.municipio.departamento) {
+                    return t.distrito.municipio.departamento.departamento || 'N/A';
+                }
+                return 'N/A';
+            };
+
+            const getMunicipio = () => {
+                if (t.distrito && t.distrito.municipio) {
+                    return t.distrito.municipio.municipio || 'N/A';
+                }
+                return 'N/A';
+            };
+
+            const getDistrito = () => {
+                if (t.distrito) {
+                    return t.distrito.distrito || 'N/A';
+                }
+                return 'N/A';
+            };
+
+            tr.innerHTML = `
+                <td class="px-6 py-4 font-medium">${t.tribunal || 'Sin nombre'}</td>
+                <td class="px-6 py-4 text-center">${getTipo()}</td>
+                <td class="px-6 py-4">${getNumeracion()}</td>
+                <td class="px-6 py-4">${getMateria()}</td>
+                <td class="px-6 py-4">${getDepartamento()}</td>
+                <td class="px-6 py-4">${getMunicipio()}</td>
+                <td class="px-6 py-4">${getDistrito()}</td>
+                <td class="px-6 py-4">${t.direccion || 'No especificada'}</td>
+                <td class="px-6 py-4">
+                    <div class="flex space-x-2 justify-center">
+                        <button class="action-btn-view px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition">
+                            Editar
+                        </button>
+                        <button class="action-btn-delete px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition">
+                            Eliminar
+                        </button>
+                    </div>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+
+        agregarEventListenersABotones();
+
+    } catch (error) {
+        console.error('Error detallado:', {
+            message: error.message,
+            response: error.response,
+            status: error.response?.status,
+            data: error.response?.data
+        });
+        
+        let mensajeError = 'Error desconocido';
+        if (error.response) {
+            mensajeError = `Error ${error.response.status}: ${error.response.data.message || 'Error del servidor'}`;
+        } else if (error.request) {
+            mensajeError = 'No se pudo conectar con el servidor. Verifica que el backend esté corriendo en http://localhost:8000';
+        } else {
+            mensajeError = error.message;
+        }
+        
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="9" class="px-6 py-8 text-center text-red-500">
+                    ${mensajeError}
+                    <br>
+                    <small class="text-gray-500">Revisa la consola para más detalles</small>
+                </td>
+            </tr>
         `;
-        tbody.appendChild(tr);
-        return;
     }
-
-    tribunalesFiltrados.forEach(t => {
-        const tr = document.createElement("tr");
-        tr.className = "border-b border-gray-200 dark:border-gray-700 hover:bg-gradient-to-r hover:from-gray-50 hover:to-gray-50 dark:hover:from-gray-800 dark:hover:to-gray-700 transition-all duration-300";
-        tr.innerHTML = `
-            <td class="px-6 py-4 text-gray-900 dark:text-white font-medium">${t.nombre}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-center text-gray-900 dark:text-white">${t.tipo}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-gray-900 dark:text-white">${t.numeracion}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-gray-900 dark:text-white">${t.materia}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-gray-900 dark:text-white">${t.departamento}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-gray-900 dark:text-white">${t.municipio}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-gray-900 dark:text-white">${t.distrito}</td>
-            <td class="px-6 py-4 text-gray-900 dark:text-white">${t.direccion}</td>
-            <td class="px-6 py-4 whitespace-nowrap">
-                <div class="flex space-x-2">
-                    <button class="action-btn-view w-20 px-3 py-1 rounded-lg text-xs font-medium transition-all duration-200 shadow-sm relative overflow-hidden">
-                        Editar
-                    </button>
-                    <button class="action-btn-delete w-20 px-3 py-1 rounded-lg text-xs font-medium transition-all duration-200 shadow-sm relative overflow-hidden">
-                        Eliminar
-                    </button>
-                </div>
-            </td>
-        `;
-
-        tbody.appendChild(tr);
-    });
-
-    // Agregar event listeners a los botones después de crear la tabla
-    agregarEventListenersABotones();
 }
 
 // FUNCIÓN PARA INICIALIZAR MODAL
@@ -464,3 +530,271 @@ window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e =
         document.documentElement.setAttribute('data-theme', nuevoTema);
     }
 });
+
+// Función para guardar tribunal
+async function guardarTribunal(tribunalData) {
+    try {
+        const response = await api.post('/tribunales', tribunalData);
+        return response.data;
+    } catch (error) {
+        console.error('Error al guardar tribunal:', error);
+        throw error;
+    }
+}
+
+// Event listener para el botón guardar
+document.querySelector('.btn-save-tribu').addEventListener('click', async function () {
+    const tribunalData = {
+        tribunal: document.querySelector('input[type="text"]').value,
+        direccion: document.getElementById('direccion').value,
+        id_tipo_tribunal: obtenerIdTipoTribunal(document.getElementById('tipoTribunal').value),
+        id_numeracion_tribunal: obtenerIdNumeracion(document.getElementById('numeracion').value),
+        id_distrito: obtenerIdDistrito(document.getElementById('distrito').value),
+        estado: document.getElementById('estado').value
+    };
+
+    // Validar que todos los campos requeridos estén llenos
+    if (!tribunalData.tribunal || !tribunalData.direccion || !tribunalData.id_tipo_tribunal ||
+        !tribunalData.id_distrito) {
+        alert('Por favor complete todos los campos requeridos');
+        return;
+    }
+
+    try {
+        await guardarTribunal(tribunalData);
+        alert('Tribunal creado exitosamente');
+        // Cerrar modal y recargar tabla
+        document.getElementById('userFormModal').classList.add('hidden');
+        cargarTablaPorEstado('todo');
+
+        // Limpiar formulario
+        document.querySelector('input[type="text"]').value = '';
+        document.getElementById('direccion').value = '';
+
+    } catch (error) {
+        console.error('Error completo:', error);
+        alert('Error al crear tribunal: ' + (error.response?.data?.message || error.message));
+    }
+});
+
+// Variables globales para almacenar datos
+let tiposTribunal = [];
+let numeracionesTribunal = [];
+let distritosData = [];
+
+// Función mejorada para cargar datos de selects
+async function cargarDatosSelects() {
+    try {
+        // Cargar tipos de tribunal
+        const responseTipos = await api.get('/tipos-tribunal');
+        tiposTribunal = responseTipos.data.data || responseTipos.data;
+
+        // Cargar numeraciones
+        const responseNumeraciones = await api.get('/numeraciones-tribunal');
+        numeracionesTribunal = responseNumeraciones.data.data || responseNumeraciones.data;
+
+        // Cargar distritos con relaciones
+        const responseDistritos = await api.get('/distritos?with=municipio.departamento');
+        distritosData = responseDistritos.data.data || responseDistritos.data;
+
+        console.log('Datos cargados:', { tiposTribunal, numeracionesTribunal, distritosData });
+    } catch (error) {
+        console.error('Error al cargar datos de selects:', error);
+    }
+}
+
+// Función para obtener ID de tipo tribunal
+function obtenerIdTipoTribunal(nombreTipo) {
+    const tipo = tiposTribunal.find(t => t.tipo_tribunal === nombreTipo);
+    return tipo ? tipo.id_tipo_tribunal : null;
+}
+
+// Función para obtener ID de numeración
+function obtenerIdNumeracion(nombreNumeracion) {
+    if (!nombreNumeracion || nombreNumeracion === "Sin numeración") return null;
+    const numeracion = numeracionesTribunal.find(n => n.numeracion_tribunal === nombreNumeracion);
+    return numeracion ? numeracion.id_numeracion_tribunal : null;
+}
+
+// Función para obtener ID de distrito
+function obtenerIdDistrito(nombreDistrito) {
+    const distrito = distritosData.find(d => d.distrito === nombreDistrito);
+    return distrito ? distrito.id_distrito : null;
+}
+
+// Función para limpiar el formulario
+function limpiarFormulario() {
+    document.getElementById('nombreTribunal').value = '';
+    document.getElementById('tipoTribunal').value = '';
+    document.getElementById('numeracion').value = '';
+    document.getElementById('departamento').value = '';
+    document.getElementById('municipio').value = '';
+    document.getElementById('municipio').innerHTML = '<option value="">Seleccione un departamento primero...</option>';
+    document.getElementById('distrito').value = '';
+    document.getElementById('distrito').innerHTML = '<option value="">Seleccione un municipio primero...</option>';
+    document.getElementById('direccion').value = '';
+    document.getElementById('estado').value = 'Activo';
+}
+
+// Función para guardar tribunal
+async function guardarTribunal(tribunalData) {
+    try {
+        console.log('Enviando datos:', tribunalData);
+        const response = await api.post('/tribunales', tribunalData);
+        return response.data;
+    } catch (error) {
+        console.error('Error al guardar tribunal:', error);
+        if (error.response) {
+            console.error('Respuesta del error:', error.response.data);
+        }
+        throw error;
+    }
+}
+
+// Función para cargar los selects con datos reales del backend
+async function cargarSelectsConDatosReales() {
+    try {
+        // Cargar tipos de tribunal
+        const responseTipos = await api.get('/tipos-tribunal');
+        const tiposTribunal = responseTipos.data.data || responseTipos.data;
+        
+        const tipoSelect = document.getElementById('tipoTribunal');
+        tipoSelect.innerHTML = '<option value="">Seleccione un tipo...</option>';
+        tiposTribunal.forEach(tipo => {
+            tipoSelect.innerHTML += `<option value="${tipo.id_tipo_tribunal}">${tipo.tipo_tribunal}</option>`;
+        });
+
+        // Cargar numeraciones
+        const responseNumeraciones = await api.get('/numeraciones-tribunal');
+        const numeraciones = responseNumeraciones.data.data || responseNumeraciones.data;
+        
+        const numeracionSelect = document.getElementById('numeracion');
+        numeracionSelect.innerHTML = '<option value="">Seleccione numeración...</option>';
+        numeraciones.forEach(numeracion => {
+            numeracionSelect.innerHTML += `<option value="${numeracion.id_numeracion_tribunal}">${numeracion.numeracion_tribunal}</option>`;
+        });
+
+        // Cargar departamentos
+        const responseDepartamentos = await api.get('/departamentos');
+        const departamentos = responseDepartamentos.data.data || responseDepartamentos.data;
+        
+        const departamentoSelect = document.getElementById('departamento');
+        departamentoSelect.innerHTML = '<option value="">Seleccione un departamento...</option>';
+        departamentos.forEach(depto => {
+            departamentoSelect.innerHTML += `<option value="${depto.id_departamento}">${depto.departamento}</option>`;
+        });
+
+        console.log('Selects cargados correctamente');
+
+    } catch (error) {
+        console.error('Error al cargar datos para selects:', error);
+    }
+}
+
+// Función para cargar municipios según departamento
+async function cargarMunicipiosPorDepartamento(idDepartamento) {
+    try {
+        const response = await api.get(`/municipios?departamento_id=${idDepartamento}`);
+        const municipios = response.data.data || response.data;
+        
+        const municipioSelect = document.getElementById('municipio');
+        municipioSelect.innerHTML = '<option value="">Seleccione municipio...</option>';
+        
+        municipios.forEach(municipio => {
+            municipioSelect.innerHTML += `<option value="${municipio.id_municipio}">${municipio.municipio}</option>`;
+        });
+
+    } catch (error) {
+        console.error('Error al cargar municipios:', error);
+    }
+}
+
+// Función para cargar distritos según municipio
+async function cargarDistritosPorMunicipio(idMunicipio) {
+    try {
+        const response = await api.get(`/distritos?municipio_id=${idMunicipio}`);
+        const distritos = response.data.data || response.data;
+        
+        const distritoSelect = document.getElementById('distrito');
+        distritoSelect.innerHTML = '<option value="">Seleccione distrito...</option>';
+        
+        distritos.forEach(distrito => {
+            distritoSelect.innerHTML += `<option value="${distrito.id_distrito}">${distrito.distrito}</option>`;
+        });
+
+    } catch (error) {
+        console.error('Error al cargar distritos:', error);
+    }
+}
+
+// Event listener para el botón guardar
+document.addEventListener('DOMContentLoaded', function() {
+    const btnGuardar = document.querySelector('.btn-save-tribu');
+    
+    if (btnGuardar) {
+        btnGuardar.addEventListener('click', async function() {
+            // Recoger datos del formulario
+            const tribunalData = {
+                tribunal: document.getElementById('nombreTribunal').value,
+                direccion: document.getElementById('direccion').value,
+                id_tipo_tribunal: document.getElementById('tipoTribunal').value,
+                id_numeracion_tribunal: document.getElementById('numeracion').value,
+                id_distrito: document.getElementById('distrito').value,
+                estado: document.getElementById('estado').value
+            };
+
+            // Validar campos requeridos
+            if (!tribunalData.tribunal || !tribunalData.direccion || 
+                !tribunalData.id_tipo_tribunal || !tribunalData.id_numeracion_tribunal || 
+                !tribunalData.id_distrito) {
+                alert('Por favor complete todos los campos requeridos (*)');
+                return;
+            }
+
+            try {
+                await guardarTribunal(tribunalData);
+                alert('Tribunal creado exitosamente');
+                
+                // Cerrar modal
+                document.getElementById('userFormModal').classList.add('hidden');
+                
+                // Limpiar formulario
+                limpiarFormulario();
+                
+                // Recargar la tabla
+                cargarTablaPorEstado('todo');
+                
+            } catch (error) {
+                const errorMessage = error.response?.data?.message || error.message || 'Error desconocido';
+                alert('Error al crear tribunal: ' + errorMessage);
+            }
+        });
+    }
+
+    // Event listeners para selects dinámicos
+    const departamentoSelect = document.getElementById('departamento');
+    if (departamentoSelect) {
+        departamentoSelect.addEventListener('change', function() {
+            const idDepartamento = this.value;
+            if (idDepartamento) {
+                cargarMunicipiosPorDepartamento(idDepartamento);
+            } else {
+                document.getElementById('municipio').innerHTML = '<option value="">Seleccione un departamento primero...</option>';
+                document.getElementById('distrito').innerHTML = '<option value="">Seleccione un municipio primero...</option>';
+            }
+        });
+    }
+
+    const municipioSelect = document.getElementById('municipio');
+    if (municipioSelect) {
+        municipioSelect.addEventListener('change', function() {
+            const idMunicipio = this.value;
+            if (idMunicipio) {
+                cargarDistritosPorMunicipio(idMunicipio);
+            } else {
+                document.getElementById('distrito').innerHTML = '<option value="">Seleccione un municipio primero...</option>';
+            }
+        });
+    }
+});
+
