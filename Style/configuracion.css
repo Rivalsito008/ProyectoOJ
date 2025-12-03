@@ -8,7 +8,6 @@
     --titledashboard: #000000ff;
     --border-color-card: #d8d8d8ff;
     --contrast: 1;
-
     --hover-item: rgba(99, 99, 99, 0.1);
     --hover-hd: rgba(99, 99, 99, 0.1);
     --font-size: 16px;
@@ -32,7 +31,6 @@
     --hover-hd: rgba(108, 85, 150, 0.35);
     --flecha-color: #ffffffff;
     --hover-item: rgba(108, 85, 150, 0.35);
-
     --border-color-card: #b4b4b4ff;
     --dropdown-color: #ffffffff;
     --accent-color: #9333ea;
@@ -47,11 +45,8 @@ body {
     transition: all 0.3s ease;
 }
 
-/* ===== ELEMENTOS INTERACTIVOS CON COLORES DINÁMICOS ===== */
-input[type="range"] {
-    accent-color: var(--accent-color);
-}
-
+/* ===== ELEMENTOS INTERACTIVOS ===== */
+input[type="range"],
 input[type="radio"] {
     accent-color: var(--accent-color);
 }
@@ -68,6 +63,7 @@ input[type="radio"] {
 
 /* ===== SIDEBAR ===== */
 .sidebar {
+    width: 80px; /* Estado inicial SIEMPRE colapsado */
     transition: width 0.3s ease;
     background-color: var(--sidebar-bg);
     color: var(--text-colorsdb);
@@ -75,11 +71,11 @@ input[type="radio"] {
 }
 
 .sidebar-collapsed {
-    width: 80px;
+    width: 80px !important;
 }
 
 .sidebar-expanded {
-    width: 256px;
+    width: 256px !important;
 }
 
 .content {
@@ -87,24 +83,32 @@ input[type="radio"] {
     transition: margin-left 0.3s ease;
 }
 
-/* ===========================================
-   NAV ITEMS - MODO CLARO
-=========================================== */
+/* Ocultar labels cuando está colapsado */
+.sidebar-collapsed .nav-label,
+.sidebar-collapsed .hide-on-collapse {
+    display: none !important;
+    opacity: 0 !important;
+}
 
-/* Estado base */
+/* Mostrar labels cuando está expandido */
+.sidebar-expanded .nav-label,
+.sidebar-expanded .hide-on-collapse {
+    display: inline !important;
+    opacity: 1 !important;
+}
+
+/* ===== NAV ITEMS ===== */
 .nav-item {
     transition: all 0.25s ease;
     color: var(--text-colorsdb);
     border-radius: 0.5rem;
 }
 
-/* Hover (modo claro) */
 .nav-item:hover {
     background-color: var(--hover-item);
     color: var(--text-colorsdb);
 }
 
-/* Activo (modo claro) */
 .nav-item.active {
     background: linear-gradient(135deg, rgba(37, 99, 235, 0.12) 0%, rgba(59, 130, 246, 0.08) 100%);
     color: #3b82f6;
@@ -112,16 +116,13 @@ input[type="radio"] {
     box-shadow: inset 0 0 20px rgba(59, 130, 246, 0.15);
 }
 
-.nav-item.active svg {
-    stroke: #3b82f6;
-}
-
+.nav-item.active svg,
 .nav-item.active .nav-label {
     color: #3b82f6;
+    stroke: #3b82f6;
     font-weight: 600;
 }
 
-/* Hover del activo (modo claro) */
 .nav-item.active:hover {
     background: linear-gradient(135deg, rgba(37, 99, 235, 0.18) 0%, rgba(59, 130, 246, 0.14) 100%);
     color: #2563eb;
@@ -129,19 +130,13 @@ input[type="radio"] {
     box-shadow: inset 0 0 25px rgba(59, 130, 246, 0.2);
 }
 
-.nav-item.active:hover svg {
-    stroke: #2563eb;
-}
-
+.nav-item.active:hover svg,
 .nav-item.active:hover .nav-label {
+    stroke: #2563eb;
     color: #2563eb;
 }
 
-/* ===========================================
-   NAV ITEMS - MODO OSCURO
-=========================================== */
-
-/* Hover (modo oscuro) */
+/* NAV - Modo Oscuro */
 [data-theme="dark"] .nav-item:hover {
     background-color: var(--hover-item);
     color: #ffffff;
@@ -149,48 +144,41 @@ input[type="radio"] {
     transform: translateX(2px);
 }
 
-/* Activo (modo oscuro) */
 [data-theme="dark"] .nav-item.active {
-    background: linear-gradient(135deg,
-            rgba(151, 120, 255, 0.15) 0%,
-            rgba(151, 120, 255, 0.10) 100%);
+    background: linear-gradient(135deg, rgba(151, 120, 255, 0.15) 0%, rgba(151, 120, 255, 0.10) 100%);
     color: #cbb8ff;
     border-left: 4px solid #9778ff;
     box-shadow: inset 0 0 20px rgba(151, 120, 255, 0.25);
 }
 
-[data-theme="dark"] .nav-item.active svg {
-    stroke: #cbb8ff;
-}
-
+[data-theme="dark"] .nav-item.active svg,
 [data-theme="dark"] .nav-item.active .nav-label {
+    stroke: #cbb8ff;
     color: #cbb8ff;
-    font-weight: 600;
 }
 
-/* Hover del activo (modo oscuro) */
 [data-theme="dark"] .nav-item.active:hover {
-    background: linear-gradient(135deg,
-            rgba(151, 120, 255, 0.22) 0%,
-            rgba(151, 120, 255, 0.17) 100%);
+    background: linear-gradient(135deg, rgba(151, 120, 255, 0.22) 0%, rgba(151, 120, 255, 0.17) 100%);
     color: #e6dbff;
     border-left: 4px solid #b298ff;
     box-shadow: inset 0 0 25px rgba(151, 120, 255, 0.35);
 }
 
-[data-theme="dark"] .nav-item.active:hover svg {
-    stroke: #e6dbff;
-}
-
+[data-theme="dark"] .nav-item.active:hover svg,
 [data-theme="dark"] .nav-item.active:hover .nav-label {
+    stroke: #e6dbff;
     color: #e6dbff;
 }
 
+.flecha {
+    stroke: var(--flecha-color);
+    transition: stroke 0.3s ease;
+}
 
-
-/* ===== DROPDOWN ===== */
+/* ===== DROPDOWN DE PERFIL ===== */
 .dropdown {
     background-color: var(--dropdown-color);
+    border-color: var(--border-color);
     border-radius: 0.75rem;
     transition: all 0.3s ease;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
@@ -201,6 +189,36 @@ input[type="radio"] {
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
     border-color: rgba(108, 85, 150, 0.3);
 }
+
+.dropdown-header {
+    background-color: var(--card-bg);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.dropdown-avatar { border-color: var(--border-color); }
+.dropdown-username { color: var(--text-colorcrd); }
+.dropdown-role { color: #6b7280; }
+.dropdown-body { background-color: var(--card-bg); }
+.dropdown-logout { color: #dc2626; }
+.dropdown-logout:hover { background-color: #fef2f2; }
+
+/* Dropdown - Modo Oscuro */
+[data-theme="dark"] .dropdown {
+    background-color: #2a2240;
+    border-color: #3d3454;
+}
+
+[data-theme="dark"] .dropdown-header {
+    background-color: #2b2343;
+    border-bottom: 1px solid #3d3454;
+}
+
+[data-theme="dark"] .dropdown-avatar { border-color: #4b4563; }
+[data-theme="dark"] .dropdown-username { color: #f3f4f6; }
+[data-theme="dark"] .dropdown-role { color: #9ca3af; }
+[data-theme="dark"] .dropdown-body { background-color: #241c37; }
+[data-theme="dark"] .dropdown-logout { color: #fca5a5; }
+[data-theme="dark"] .dropdown-logout:hover { background-color: rgba(127, 29, 29, 0.3); }
 
 /* ===== CARDS ===== */
 .card {
@@ -218,11 +236,6 @@ input[type="radio"] {
     background: linear-gradient(145deg, #fff, #fff);
 }
 
-.flecha {
-    stroke: var(--flecha-color);
-    transition: stroke 0.3s ease;
-}
-
 /* ===== HEADER ===== */
 .header-bg {
     background-color: var(--sidebar-bg);
@@ -235,11 +248,6 @@ input[type="radio"] {
     border-radius: 0.75rem;
     color: #ffffff;
     box-shadow: inset 0 0 8px rgba(255, 255, 255, 0.1);
-    transform: none;
-}
-
-.hidden {
-    display: none;
 }
 
 .titledashboard {
@@ -247,12 +255,16 @@ input[type="radio"] {
     transition: color 0.3s ease;
 }
 
+#profileButton:hover {
+    background-color: var(--hover-hd);
+}
+
+/* ===== ANIMACIONES ===== */
 @keyframes slideDown {
     from {
         opacity: 0;
         transform: translateY(-10px);
     }
-
     to {
         opacity: 1;
         transform: translateY(0);
@@ -263,111 +275,13 @@ input[type="radio"] {
     animation: slideDown 0.2s ease-out;
 }
 
-#profileButton:hover {
-    background-color: var(--hover-hd);
+@keyframes buttonClick {
+    0% { transform: scale(1); }
+    50% { transform: scale(0.95); }
+    100% { transform: scale(1); }
 }
 
-/* ========================================
-   DROPDOWN DE PERFIL - MODO CLARO Y OSCURO
-   ======================================== */
-
-/* Estilos base del dropdown - MODO CLARO */
-.dropdown {
-    background-color: var(--dropdown-color);
-    border-color: var(--border-color);
-    border-radius: 0.75rem;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-}
-
-.dropdown:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-    border-color: rgba(108, 85, 150, 0.3);
-}
-
-/* Encabezado del dropdown - MODO CLARO */
-.dropdown-header {
-    background-color: var(--card-bg);
-    border-bottom: 1px solid var(--border-color);
-}
-
-/* Avatar border - MODO CLARO */
-.dropdown-avatar {
-    border-color: var(--border-color);
-}
-
-/* Nombre de usuario - MODO CLARO */
-.dropdown-username {
-    color: var(--text-colorcrd);
-}
-
-/* Rol del usuario - MODO CLARO */
-.dropdown-role {
-    color: #6b7280;
-}
-
-/* Cuerpo del dropdown - MODO CLARO */
-.dropdown-body {
-    background-color: var(--card-bg);
-}
-
-/* Botón de cerrar sesión - MODO CLARO */
-.dropdown-logout {
-    color: #dc2626;
-}
-
-.dropdown-logout:hover {
-    background-color: #fef2f2;
-}
-
-/* ========================================
-   MODO OSCURO - DROPDOWN
-   ======================================== */
-
-/* Dropdown principal - MODO OSCURO */
-[data-theme="dark"] .dropdown {
-    background-color: #2a2240;
-    border-color: #3d3454;
-}
-
-/* Encabezado del dropdown - MODO OSCURO */
-[data-theme="dark"] .dropdown-header {
-    background-color: #2b2343;
-    border-bottom: 1px solid #3d3454;
-}
-
-/* Avatar border - MODO OSCURO */
-[data-theme="dark"] .dropdown-avatar {
-    border-color: #4b4563;
-}
-
-/* Nombre de usuario - MODO OSCURO */
-[data-theme="dark"] .dropdown-username {
-    color: #f3f4f6;
-}
-
-/* Rol del usuario - MODO OSCURO */
-[data-theme="dark"] .dropdown-role {
-    color: #9ca3af;
-}
-
-/* Cuerpo del dropdown - MODO OSCURO */
-[data-theme="dark"] .dropdown-body {
-    background-color: #241c37;
-}
-
-/* Botón de cerrar sesión - MODO OSCURO */
-[data-theme="dark"] .dropdown-logout {
-    color: #fca5a5;
-}
-
-[data-theme="dark"] .dropdown-logout:hover {
-    background-color: rgba(127, 29, 29, 0.3);
-}
-
-
-/* ===== BOTÓN CONFIGURACIONES===== */
+/* ===== BOTÓN CONFIGURACIONES ===== */
 .btn-config {
     background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%) !important;
     color: white !important;
@@ -377,19 +291,13 @@ input[type="radio"] {
     position: relative !important;
     overflow: hidden !important;
     transition: all 0.3s ease !important;
-
-    /* Tamaño igual al botón siguiente */
     padding: 0.5rem 1.5rem !important;
     border-radius: 0.5rem !important;
     box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3) !important;
-
-    /* Flex para alinear ícono y texto */
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
     gap: 0.5rem !important;
-
-    /* Texto más compacto */
     font-size: 0.875rem !important;
     letter-spacing: 0 !important;
 }
@@ -421,15 +329,9 @@ input[type="radio"] {
 .btn-config:active {
     transform: translateY(0) !important;
     box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3) !important;
-    transition: all 0.1s ease !important;
-}
-
-/* Efecto de pulsación al hacer clic */
-.btn-perfil:active {
     animation: buttonClick 0.2s ease !important;
 }
 
-/* Ícono del botón - más pequeño */
 .btn-config svg {
     transition: all 0.3s ease !important;
     stroke: currentColor !important;
@@ -459,7 +361,7 @@ input[type="radio"] {
     display: none !important;
 }
 
-/* ===== MODO OSCURO - BOTÓN GUARDAR NUEVO USUARIO ===== */
+/* Modo Oscuro - Botón Config */
 [data-theme="dark"] .btn-config {
     background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%) !important;
     box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3) !important;
@@ -479,17 +381,5 @@ input[type="radio"] {
     box-shadow: 0 2px 8px rgba(75, 85, 99, 0.3) !important;
 }
 
-/* Animación de pulsación */
-@keyframes buttonClick {
-    0% {
-        transform: scale(1);
-    }
-
-    50% {
-        transform: scale(0.95);
-    }
-
-    100% {
-        transform: scale(1);
-    }
-}
+/* ===== UTILIDADES ===== */
+.hidden { display: none; }
