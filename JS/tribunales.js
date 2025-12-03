@@ -312,7 +312,12 @@ async function abrirModalEditar(idTribunal) {
         await llenarFormularioEdicion(tribunal);
         
     } catch (error) {
-        alert('Error al cargar los datos del tribunal');
+        Swal.fire({
+            icon: 'error',
+            title: 'Error al cargar',
+            text: 'No se pudieron cargar los datos del tribunal',
+            confirmButtonColor: '#3B82F6'
+        });
         cerrarModal();
     }
 }
@@ -455,11 +460,21 @@ function agregarEventListenersABotones() {
                 this.style.transform = 'scale(1)';
             }, 150);
 
-            const confirmMessage = estadoActual === 'Activo' 
-                ? `¿Estás seguro de que quieres DESACTIVAR el tribunal "${nombreTribunal}"?`
-                : `¿Estás seguro de que quieres ACTIVAR el tribunal "${nombreTribunal}"?`;
+            const esActivo = estadoActual === 'Activo';
             
-            if (confirm(confirmMessage)) {
+            const result = await Swal.fire({
+                title: esActivo ? '¿Desactivar tribunal?' : '¿Activar tribunal?',
+                html: `¿Estás seguro de que quieres <strong>${esActivo ? 'DESACTIVAR' : 'ACTIVAR'}</strong> el tribunal<br><strong>"${nombreTribunal}"</strong>?`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: esActivo ? '#EF4444' : '#3cd455ff',
+                cancelButtonColor: '#6B7280',
+                confirmButtonText: esActivo ? 'Sí, desactivar' : 'Sí, activar',
+                cancelButtonText: 'Cancelar',
+                reverseButtons: true
+            });
+            
+            if (result.isConfirmed) {
                 try {
                     this.textContent = 'Cambiando...';
                     this.disabled = true;
@@ -480,7 +495,14 @@ function agregarEventListenersABotones() {
                     }
                     
                     this.disabled = false;
-                    alert(resultado.message || `Estado cambiado a ${nuevoEstado}`);
+                    
+                    await Swal.fire({
+                        icon: 'success',
+                        title: '¡Estado actualizado!',
+                        text: resultado.message || `El tribunal ahora está ${nuevoEstado}`,
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
                     
                     const tabActivo = document.querySelector('.browser-tab.active');
                     if (tabActivo) {
@@ -491,7 +513,12 @@ function agregarEventListenersABotones() {
                     }
                     
                 } catch (error) {
-                    alert('Error al cambiar el estado del tribunal: ' + (error.response?.data?.message || error.message));
+                    await Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: error.response?.data?.message || 'No se pudo cambiar el estado del tribunal',
+                        confirmButtonColor: '#3B82F6'
+                    });
                     
                     this.disabled = false;
                     this.textContent = estadoActual === 'Activo' ? 'Desactivar' : 'Activar';
@@ -522,7 +549,12 @@ async function guardarOActualizarTribunal() {
 
     if (!tribunalData.tribunal || !tribunalData.direccion || 
         !tribunalData.id_tipo_tribunal || !tribunalData.id_distrito) {
-        alert('Por favor complete todos los campos requeridos (*)');
+        await Swal.fire({
+            icon: 'warning',
+            title: 'Campos incompletos',
+            text: 'Por favor complete todos los campos requeridos (*)',
+            confirmButtonColor: '#3B82F6'
+        });
         return;
     }
 
@@ -535,10 +567,22 @@ async function guardarOActualizarTribunal() {
         
         if (modoEdicion && tribunalEnEdicion) {
             resultado = await actualizarTribunal(tribunalEnEdicion, tribunalData);
-            alert('Tribunal actualizado exitosamente');
+            await Swal.fire({
+                icon: 'success',
+                title: '¡Actualizado!',
+                text: 'Tribunal actualizado exitosamente',
+                timer: 2000,
+                showConfirmButton: false
+            });
         } else {
             resultado = await guardarTribunal(tribunalData);
-            alert('Tribunal creado exitosamente');
+            await Swal.fire({
+                icon: 'success',
+                title: '¡Creado!',
+                text: 'Tribunal creado exitosamente',
+                timer: 2000,
+                showConfirmButton: false
+            });
         }
         
         cerrarModal();
@@ -553,7 +597,12 @@ async function guardarOActualizarTribunal() {
         
     } catch (error) {
         const errorMessage = error.response?.data?.message || error.message || 'Error desconocido';
-        alert('Error: ' + errorMessage);
+        await Swal.fire({
+            icon: 'error',
+            title: 'Error al guardar',
+            text: errorMessage,
+            confirmButtonColor: '#3B82F6'
+        });
     } finally {
         botonGuardar.textContent = modoEdicion ? 'Actualizar Tribunal' : 'Guardar Tribunal';
         botonGuardar.disabled = false;
