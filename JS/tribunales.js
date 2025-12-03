@@ -1,5 +1,5 @@
 // Configuración de Axios
-const API_BASE_URL = 'http://localhost:8000/api'; // Ajusta según tu URL
+const API_BASE_URL = 'http://localhost:8000/api';
 
 const api = axios.create({
     baseURL: API_BASE_URL,
@@ -7,8 +7,8 @@ const api = axios.create({
         'Content-Type': 'application/json',
         'Accept': 'application/json'
     }
-
 });
+
 // Manejo global de errores
 api.interceptors.response.use(
     response => response,
@@ -18,8 +18,8 @@ api.interceptors.response.use(
     }
 );
 
+// Aplicar tema y preferencias al cargar
 (function () {
-    // Aplicar tema
     const t = localStorage.getItem('theme-preference') || 'auto';
     let f = t;
     if (t === 'auto') {
@@ -27,25 +27,26 @@ api.interceptors.response.use(
     }
     document.documentElement.setAttribute('data-theme', f);
 
-    // Aplicar tamaño de fuente
     const fontSize = localStorage.getItem('font-size') || '16';
     document.documentElement.style.setProperty('--font-size', fontSize + 'px');
 
-    // Aplicar contraste
     const contrast = localStorage.getItem('contrast') || '1';
     document.documentElement.style.setProperty('--contrast', contrast);
 })();
 
+// Variables globales para almacenar datos
+let tiposTribunal = [];
+let numeracionesTribunal = [];
+let departamentosData = [];
 
-// Cargar tablas cuando el DOM esté listo
+// Cargar cuando el DOM esté listo
 document.addEventListener('DOMContentLoaded', async function () {
-    // Cargar datos iniciales
     await cargarSelectsConDatosReales();
     await cargarTodasLasTablas();
     inicializarModal();
     inicializarTabs();
     
-    // Limpiar formulario al abrir modal
+    // Evento para abrir modal
     const openBtn = document.getElementById('openFormBtn');
     if (openBtn) {
         openBtn.addEventListener('click', () => {
@@ -56,9 +57,6 @@ document.addEventListener('DOMContentLoaded', async function () {
 
 function cargarTodasLasTablas() {
     cargarTablaPorEstado('todo');
-    // Si necesitas las otras pestañas, descomenta estas líneas:
-    // cargarTablaPorEstado('activo');
-    // cargarTablaPorEstado('inactivo');
 }
 
 async function cargarTablaPorEstado(estado) {
@@ -73,39 +71,34 @@ async function cargarTablaPorEstado(estado) {
     tbody.innerHTML = "<tr><td colspan='9' class='px-6 py-8 text-center'>Cargando...</td></tr>";
 
     try {
-        console.log('Haciendo petición a:', API_BASE_URL + '/tribunales');
-        
         const response = await api.get('/tribunales');
         
-        console.log('Respuesta completa:', response);
-        console.log('Status:', response.status);
-        console.log('Data:', response.data);
+        console.log('Respuesta completa de API:', response.data);
         
-        // Intentar obtener los datos de diferentes estructuras posibles
         let tribunales = [];
-        if (response.data.data) {
+        if (response.data && response.data.data) {
             tribunales = response.data.data;
+            console.log('Datos encontrados en response.data.data:', tribunales);
         } else if (Array.isArray(response.data)) {
             tribunales = response.data;
+            console.log('Datos encontrados en response.data (array):', tribunales);
         } else {
             console.error('Estructura de datos no reconocida:', response.data);
             throw new Error('Formato de respuesta no válido');
         }
-
-        console.log('Tribunales obtenidos:', tribunales);
-        console.log('Cantidad:', tribunales.length);
 
         // Filtrar según estado
         let tribunalesFiltrados = [];
         if (estado === 'todo') {
             tribunalesFiltrados = tribunales;
         } else {
-            tribunalesFiltrados = tribunales.filter(t => 
-                t.estado && t.estado.toLowerCase() === estado.toLowerCase()
-            );
+            tribunalesFiltrados = tribunales.filter(t => {
+                const estadoTribunal = t.estado || 'Activo';
+                return estadoTribunal.toLowerCase() === estado.toLowerCase();
+            });
         }
 
-        console.log('Tribunales filtrados:', tribunalesFiltrados);
+        console.log(`Mostrando ${tribunalesFiltrados.length} tribunales para estado: ${estado}`);
 
         tbody.innerHTML = "";
 
@@ -122,12 +115,10 @@ async function cargarTablaPorEstado(estado) {
 
         // Renderizar tribunales
         tribunalesFiltrados.forEach(t => {
-            console.log('Renderizando tribunal:', t);
-            
             const tr = document.createElement("tr");
             tr.className = "border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors";
             
-            // Funciones helper con validación mejorada
+            // Funciones helper
             const getTipo = () => {
                 if (t.tipo_tribunal) {
                     return t.tipo_tribunal.tipo || t.tipo_tribunal.tipo_tribunal || 'N/A';
@@ -170,22 +161,41 @@ async function cargarTablaPorEstado(estado) {
                 return 'N/A';
             };
 
+            // IMPORTANTE: Verificar exactamente cómo viene el estado del JSON
+            const estadoTribunal = t.estado || 'Activo';
+            console.log(`Tribunal ${t.tribunal}: estado en JSON = "${estadoTribunal}"`);
+            
+            // CORRECCIÓN INVERTIDA: 
+            // - Si está "Activo" → botón "Desactivar" (rojo)
+            // - Si está "Inactivo" → botón "Activar" (verde)
+            const esActivo = estadoTribunal === 'Activo';
+            const textoBoton = esActivo ? 'Desactivar' : 'Activar';
+            const colorBoton = esActivo ? 'bg-red-500 hover:bg-red-600' : 'bg-green-500 hover:bg-green-600';
+
+            // Agregar clase para estado en la fila (si está inactivo)
+            if (!esActivo) {
+                tr.classList.add('opacity-60');
+            }
+
             tr.innerHTML = `
-                <td class="px-6 py-4 font-medium">${t.tribunal || 'Sin nombre'}</td>
-                <td class="px-6 py-4 text-center">${getTipo()}</td>
-                <td class="px-6 py-4">${getNumeracion()}</td>
-                <td class="px-6 py-4">${getMateria()}</td>
-                <td class="px-6 py-4">${getDepartamento()}</td>
-                <td class="px-6 py-4">${getMunicipio()}</td>
-                <td class="px-6 py-4">${getDistrito()}</td>
-                <td class="px-6 py-4">${t.direccion || 'No especificada'}</td>
+                <td class="px-6 py-4 font-medium ${!esActivo ? 'text-gray-400' : ''}">${t.tribunal || 'Sin nombre'}</td>
+                <td class="px-6 py-4 text-center ${!esActivo ? 'text-gray-400' : ''}">${getTipo()}</td>
+                <td class="px-6 py-4 ${!esActivo ? 'text-gray-400' : ''}">${getNumeracion()}</td>
+                <td class="px-6 py-4 ${!esActivo ? 'text-gray-400' : ''}">${getMateria()}</td>
+                <td class="px-6 py-4 ${!esActivo ? 'text-gray-400' : ''}">${getDepartamento()}</td>
+                <td class="px-6 py-4 ${!esActivo ? 'text-gray-400' : ''}">${getMunicipio()}</td>
+                <td class="px-6 py-4 ${!esActivo ? 'text-gray-400' : ''}">${getDistrito()}</td>
+                <td class="px-6 py-4 ${!esActivo ? 'text-gray-400' : ''}">${t.direccion || 'No especificada'}</td>
                 <td class="px-6 py-4">
                     <div class="flex space-x-2 justify-center">
                         <button class="action-btn-view px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition">
                             Editar
                         </button>
-                        <button class="action-btn-delete px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition">
-                            Eliminar
+                        <button class="action-btn-toggle-estado px-3 py-1 rounded transition text-white ${colorBoton}"
+                                data-id="${t.id_tribunal}"
+                                data-estado="${estadoTribunal}"
+                                data-nombre="${t.tribunal}">
+                            ${textoBoton}
                         </button>
                     </div>
                 </td>
@@ -196,12 +206,7 @@ async function cargarTablaPorEstado(estado) {
         agregarEventListenersABotones();
 
     } catch (error) {
-        console.error('Error detallado:', {
-            message: error.message,
-            response: error.response,
-            status: error.response?.status,
-            data: error.response?.data
-        });
+        console.error('Error detallado:', error);
         
         let mensajeError = 'Error desconocido';
         if (error.response) {
@@ -243,12 +248,10 @@ function inicializarModal() {
 
         closeBtn.addEventListener('click', closeModal);
 
-        // Cerrar modal al hacer clic fuera
         window.addEventListener('click', (e) => {
             if (e.target === modal) closeModal();
         });
 
-        // Cerrar modal con ESC
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape' && modal.classList.contains('flex')) {
                 closeModal();
@@ -266,35 +269,28 @@ function inicializarTabs() {
         tab.addEventListener('click', () => {
             const tabName = tab.getAttribute('data-tab');
 
-            // Remover active de todos los tabs
             tabs.forEach(t => {
                 t.classList.remove('active');
-                // Resetear transformaciones en los indicadores
                 const indicator = t.querySelector('.tab-indicator');
                 if (indicator) {
                     indicator.style.transform = 'scale(1)';
                 }
             });
 
-            // Remover active de todos los contenidos
             contents.forEach(c => c.classList.remove('active'));
 
-            // Agregar active al tab clickeado
             tab.classList.add('active');
 
-            // Aplicar transformación solo al indicador activo
             const activeIndicator = tab.querySelector('.tab-indicator');
             if (activeIndicator) {
                 activeIndicator.style.transform = 'scale(1.1)';
             }
 
-            // Agregar active al contenido correspondiente
             const targetContent = document.getElementById(tabName);
             if (targetContent) {
                 targetContent.classList.add('active');
             }
 
-            // Recargar la tabla correspondiente
             if (tabName === 'Todo') {
                 cargarTablaPorEstado('todo');
             } else if (tabName === 'activo') {
@@ -306,347 +302,130 @@ function inicializarTabs() {
     });
 }
 
-// ESTRUCTURA CORREGIDA: DEPARTAMENTO -> MUNICIPIO -> DISTRITO
-const estructuraTerritorial = {
-    "Ahuachapán": {
-        "Ahuachapán Norte": ["Atiquizaya", "El Refugio", "San Lorenzo", "Turín"],
-        "Ahuachapán Centro": ["Ahuachapán", "Apaneca", "Concepción de Ataco", "Tacuba"],
-        "Ahuachapán Sur": ["Guaymango", "Jujutla", "San Francisco Menendez", "San Pedro Puxtla"]
-    },
-    "San Salvador": {
-        "San Salvador Norte": ["Aguilares", "El Paisnal", "Guazapa"],
-        "San Salvador Oeste": ["Apopa", "Nejapa"],
-        "San Salvador Este": ["Ilopango", "San Martín", "Soyapango", "Tonacatepeque"],
-        "San Salvador Centro": ["Ayutuxtepeque", "Mejicanos", "San Salvador", "Cuscatancingo", "Ciudad Delgado"],
-        "San Salvador Sur": ["Panchimalco", "Rosario de Mora", "San Marcos", "Santo Tomás", "Santiago Texacuangos"]
-    },
-    "La Libertad": {
-        "La Libertad Norte": ["Quezaltepeque", "San Matías", "San Pablo Tacachico"],
-        "La Libertad Centro": ["San Juan Opico", "Ciudad Arce"],
-        "La Libertad Oeste": ["Colón", "Jayaque", "Sacacoyo", "Tepecoyo", "Talnique"],
-        "La Libertad Este": ["Antiguo Cuscatlán", "Huizucar", "Nuevo Cuscatlán", "San José Villanueva", "Zaragoza"],
-        "La Libertad Costa": ["Chiltiupán", "Jicalapa", "La Libertad", "Tamanique", "Teotepeque"],
-        "La Libertad Sur": ["Comasagua", "Santa Tecla"]
-    },
-    "Chalatenango": {
-        "Chalatenango Norte": ["La Palma", "Citalá", "San Ignacio"],
-        "Chalatenango Centro": ["Nueva Concepción", "Tejutla", "La Reina", "Agua Caliente", "Dulce Nombre de María", "El Paraíso", "San Francisco Morazán", "San Rafael", "Santa Rita", "San Fernando"],
-        "Chalatenango Sur": ["Chalatenango", "Arcatao", "Azacualpa", "Comalapa", "Concepción Quezaltepeque", "El Carrizal", "La Laguna", "Las Vueltas", "Nombre de Jesús", "Nueva Trinidad", "Ojos de Agua", "Potonico", "San Antonio de La Cruz", "San Antonio Los Ranchos", "San Francisco Lempa", "San Isidro Labrador", "San José Cancasque", "San Miguel de Mercedes", "San José Las Flores", "San Luis del Carmen"]
-    },
-    "Cuscatlán": {
-        "Cuscatlán Norte": ["Suchitoto", "San José Guayabal", "Oratorio de Concepción", "San Bartolomé Perulapán", "San Pedro Perulapán"],
-        "Cuscatlán Sur": ["Cojutepeque", "San Rafael Cedros", "Candelaria", "Monte San Juan", "El Carmen", "San Cristóbal", "Santa Cruz Michapa", "San Ramón", "El Rosario", "Santa Cruz Analquito", "Tenancingo"]
-    },
-    "Cabañas": {
-        "Cabañas Este": ["Sensuntepeque", "Victoria", "Dolores", "Guacotecti", "San Isidro"],
-        "Cabañas Oeste": ["Ilobasco", "Tejutepeque", "Jutiapa", "Cinquera"]
-    },
-    "La Paz": {
-        "La Paz Oeste": ["Cuyultitán", "Olocuilta", "San Juan Talpa", "San Luis Talpa", "San Pedro Masahuat", "Tapalhuaca", "San Francisco Chinameca"],
-        "La Paz Centro": ["El Rosario", "Jerusalén", "Mercedes La Ceiba", "Paraíso de Osorio", "San Antonio Masahuat", "San Emigdio", "San Juan Tepezontes", "San Luis La Herradura", "San Miguel Tepezontes", "San Pedro Nonualco", "Santa María Ostuma", "Santiago Nonualco"],
-        "La Paz Este": ["San Juan Nonualco", "San Rafael Obrajuelo", "Zacatecoluca"]
-    },
-    "La Unión": {
-        "La Unión Norte": ["Anamorós", "Bolivar", "Concepción de Oriente", "El Sauce", "Lislique", "Nueva Esparta", "Pasaquina", "Polorós", "San José La Fuente", "Santa Rosa de Lima"],
-        "La Unión Sur": ["Conchagua", "El Carmen", "Intipucá", "La Unión", "Meanguera del Golfo", "San Alejo", "Yayantique", "Yucuaiquín"]
-    },
-    "Usulután": {
-        "Usulután Norte": ["Santiago de María", "Alegría", "Berlín", "Mercedes Umaña", "Jucuapa", "El Triunfo", "Estanzuelas", "San Buenaventura", "Nueva Granada"],
-        "Usulután Este": ["Usulután", "Jucuarán", "San Dionisio", "Concepción Batres", "Santa María", "Ozatlán", "Tecapán", "Santa Elena", "California", "Ereguayquín"],
-        "Usulután Oeste": ["Jiquilisco", "Puerto El Triunfo", "San Agustín", "San Francisco Javier"]
-    },
-    "Sonsonate": {
-        "Sonsonate Norte": ["Juayúa", "Nahuizalco", "Salcoatitán", "Santa Catarina Masahuat"],
-        "Sonsonate Centro": ["Sonsonate", "Sonzacate", "Nahulingo", "San Antonio del Monte", "Santo Domingo de Guzmán"],
-        "Sonsonate Este": ["Izalco", "Armenia", "Caluco", "San Julián", "Cuisnahuat", "Santa Isabel Ishuatán"],
-        "Sonsonate Oeste": ["Acajutla"]
-    },
-    "Santa Ana": {
-        "Santa Ana Norte": ["Masahuat", "Metapán", "Santa Rosa Guachipilín", "Texistepeque"],
-        "Santa Ana Centro": ["Santa Ana"],
-        "Santa Ana Este": ["Coatepeque", "El Congo"],
-        "Santa Ana Oeste": ["Candelaria de la Frontera", "Chalchuapa", "El Porvenir", "San Antonio Pajonal", "San Sebastián Salitrillo", "Santiago de La Frontera"]
-    },
-    "San Vicente": {
-        "San Vicente Norte": ["Apastepeque", "Santa Clara", "San Ildefonso", "San Esteban Catarina", "San Sebastián", "San Lorenzo", "Santo Domingo"],
-        "San Vicente Sur": ["San Vicente", "Guadalupe", "Verapaz", "Tepetitán", "Tecoluca", "San Cayetano Istepeque"]
-    },
-    "San Miguel": {
-        "San Miguel Norte": ["Ciudad Barrios", "Sesori", "Nuevo Edén de San Juan", "San Gerardo", "San Luis de La Reina", "Carolina", "San Antonio del Mosco", "Chapeltique"],
-        "San Miguel Centro": ["San Miguel", "Comacarán", "Uluazapa", "Moncagua", "Quelepa", "Chirilagua"],
-        "San Miguel Oeste": ["Chinameca", "Nueva Guadalupe", "Lolotique", "San Jorge", "San Rafael Oriente", "El Tránsito"]
-    },
-    "Morazán": {
-        "Morazán Norte": ["Arambala", "Cacaopera", "Corinto", "El Rosario", "Joateca", "Jocoaitique", "Meanguera", "Perquín", "San Fernando", "San Isidro", "Torola"],
-        "Morazán Sur": ["Chilanga", "Delicias de Concepción", "El Divisadero", "Gualococti", "Guatajiagua", "Jocoro", "Lolotiquillo", "Osicala", "San Carlos", "San Francisco Gotera", "San Simón", "Sensembra", "Sociedad", "Yamabal", "Yoloaiquín"]
-    }
-};
-
-// FUNCIÓN PARA INICIALIZAR SELECTS DINÁMICOS
-function inicializarSelects() {
-    /* ---------------------------------------------------------
-       1. MUNICIPIOS según departamento
-    --------------------------------------------------------- */
-    const departamentoSelect = document.getElementById("departamento");
-    if (departamentoSelect) {
-        departamentoSelect.addEventListener("change", function () {
-            const depto = this.value;
-            const municipioSelect = document.getElementById("municipio");
-            const distritoSelect = document.getElementById("distrito");
-
-            // Limpiar selects
-            municipioSelect.innerHTML = "<option value=''>Seleccione municipio...</option>";
-            distritoSelect.innerHTML = "<option value=''>Seleccione un municipio primero...</option>";
-
-            if (estructuraTerritorial[depto]) {
-                // Llenar municipios
-                Object.keys(estructuraTerritorial[depto]).forEach(municipio => {
-                    municipioSelect.innerHTML += `<option value="${municipio}">${municipio}</option>`;
-                });
-            }
-        });
-    }
-
-    /* ---------------------------------------------------------
-       2. DISTRITOS según municipio
-    --------------------------------------------------------- */
-    const municipioSelect = document.getElementById("municipio");
-    if (municipioSelect) {
-        municipioSelect.addEventListener("change", function () {
-            const depto = document.getElementById("departamento").value;
-            const municipio = this.value;
-            const distritoSelect = document.getElementById("distrito");
-
-            distritoSelect.innerHTML = "<option value=''>Seleccione distrito...</option>";
-
-            if (estructuraTerritorial[depto] && estructuraTerritorial[depto][municipio]) {
-                estructuraTerritorial[depto][municipio].forEach(distrito => {
-                    distritoSelect.innerHTML += `<option value="${distrito}">${distrito}</option>`;
-                });
-            }
-        });
-    }
-
-    /* ---------------------------------------------------------
-       3. Materias según tipo de tribunal
-    --------------------------------------------------------- */
-    const materiasPorTipo = {
-        "Sala de lo Constitucional": ["Constitucional"],
-        "Sala de lo Civil": ["Civil"],
-        "Sala de lo Penal": ["Penal"],
-        "Sala de lo Contencioso Administrativo": ["Contencioso Administrativo"],
-
-        "Cámara Civil": ["Civil"],
-        "Cámara Penal": ["Penal"],
-        "Cámara de Familia": ["Familia"],
-        "Cámara de lo Laboral": ["Laboral"],
-        "Cámara de lo Contencioso Administrativo": ["Contencioso Administrativo"],
-        "Cámara de lo Medio Ambiente": ["Medio Ambiente"],
-        "Cámara Especializada para una Vida Libre de Violencia y Discriminación para las Mujeres": ["Violencia contra la Mujer"],
-        "Cámara Especializada de Extinción de Dominio": ["Extinción de Dominio"],
-        "Cámara Especializada de Menores": ["Menores"],
-
-        "Juzgado Especializado de Instrucción": ["Penal (Instrucción)"],
-        "Tribunal Especializado de Sentencia": ["Penal (Sentencia)"],
-        "Juzgado Especializado para una Vida Libre de Violencia y Discriminación para las Mujeres": ["Violencia contra la Mujer"],
-        "Tribunal Especializado para una Vida Libre de Violencia y Discriminación para las Mujeres": ["Violencia contra la Mujer"],
-        "Juzgado Especializado de Extinción de Dominio": ["Extinción de Dominio"],
-        "Tribunal Especializado de Extinción de Dominio": ["Extinción de Dominio"],
-        "Juzgado Especializado de Menores": ["Menores"],
-
-        "Juzgado de lo Civil": ["Civil"],
-        "Juzgado de lo Mercantil": ["Mercantil"],
-        "Juzgado de Familia": ["Familia"],
-        "Juzgado de lo Laboral": ["Laboral"],
-        "Juzgado de Instrucción": ["Penal"],
-        "Juzgado de Sentencia": ["Penal"],
-        "Juzgado de Medio Ambiente": ["Medio Ambiente"],
-        "Juzgado de Ejecución de la Pena": ["Ejecución de Penal"],
-        "Juzgado de Vigilancia Penitenciaria": ["Vigilancia Penitenciaria"],
-        "Juzgado de Menores": ["Menores"],
-
-        "Juzgado de Paz": ["Multipropósito"]
-    };
-
-    const tipoTribunalSelect = document.getElementById("tipoTribunal");
-    if (tipoTribunalSelect) {
-        tipoTribunalSelect.addEventListener("change", function () {
-            const tipo = this.value;
-            const materiaSelect = document.getElementById("materia");
-
-            materiaSelect.innerHTML = "";
-
-            if (materiasPorTipo[tipo]) {
-                materiasPorTipo[tipo].forEach(mat => {
-                    materiaSelect.innerHTML += `<option>${mat}</option>`;
-                });
-            } else {
-                materiaSelect.innerHTML = `<option>No definido</option>`;
-            }
-        });
-    }
-}
-
 function agregarEventListenersABotones() {
     // Botones Editar
     const botonesEditar = document.querySelectorAll('.action-btn-view');
     botonesEditar.forEach(boton => {
         boton.addEventListener('click', function (e) {
             e.preventDefault();
-            // Animación de click
             this.style.transform = 'scale(0.95)';
             setTimeout(() => {
                 this.style.transform = 'scale(1)';
             }, 150);
-
-            console.log('Editar tribunal');
+            console.log('Editar tribunal - ID:', this.closest('tr').querySelector('.action-btn-toggle-estado').getAttribute('data-id'));
         });
     });
 
-    // Botones Eliminar
-    const botonesEliminar = document.querySelectorAll('.action-btn-delete');
-    botonesEliminar.forEach(boton => {
-        boton.addEventListener('click', function (e) {
+    // Botones Toggle Estado (Activar/Desactivar) - CORREGIDO (INVERTIDO)
+    const botonesToggleEstado = document.querySelectorAll('.action-btn-toggle-estado');
+    botonesToggleEstado.forEach(boton => {
+        boton.addEventListener('click', async function (e) {
             e.preventDefault();
+            const idTribunal = this.getAttribute('data-id');
+            const estadoActual = this.getAttribute('data-estado');
+            const nombreTribunal = this.getAttribute('data-nombre');
+            
+            console.log(`Cambiando estado del tribunal: ${nombreTribunal} (ID: ${idTribunal})`);
+            console.log(`Estado actual: ${estadoActual}`);
+
             // Animación de click
             this.style.transform = 'scale(0.95)';
             setTimeout(() => {
                 this.style.transform = 'scale(1)';
             }, 150);
 
-            console.log('Eliminar tribunal');
-            if (confirm('¿Estás seguro de que quieres eliminar este tribunal?')) {
-                // Lógica de eliminación
+            // CORRECCIÓN: Mensaje invertido
+            const confirmMessage = estadoActual === 'Activo' 
+                ? `¿Estás seguro de que quieres DESACTIVAR el tribunal "${nombreTribunal}"?`
+                : `¿Estás seguro de que quieres ACTIVAR el tribunal "${nombreTribunal}"?`;
+            
+            if (confirm(confirmMessage)) {
+                try {
+                    // Mostrar indicador de carga
+                    const originalText = this.textContent;
+                    this.textContent = 'Cambiando...';
+                    this.disabled = true;
+                    
+                    // Llamar a la función corregida
+                    const resultado = await toggleEstadoTribunal(idTribunal);
+                    
+                    console.log('Respuesta de la API:', resultado);
+                    
+                    // Verificar si la respuesta contiene el nuevo estado
+                    const nuevoEstado = resultado.data?.estado || (estadoActual === 'Activo' ? 'Inactivo' : 'Activo');
+                    
+                    console.log(`Nuevo estado: ${nuevoEstado}`);
+                    
+                    // Actualizar el botón visualmente
+                    this.setAttribute('data-estado', nuevoEstado);
+                    
+                    // CORRECCIÓN INVERTIDA: 
+                    // - Si NUEVO estado es "Inactivo" → botón "Activar" (verde)
+                    // - Si NUEVO estado es "Activo" → botón "Desactivar" (rojo)
+                    if (nuevoEstado === 'Inactivo') {
+                        // Tribunal ahora está INACTIVO → mostrar botón "Activar" (verde)
+                        this.classList.remove('bg-red-500', 'hover:bg-red-600');
+                        this.classList.add('bg-green-500', 'hover:bg-green-600');
+                        this.textContent = 'Activar';
+                        // Marcar la fila como inactiva
+                        this.closest('tr').classList.add('opacity-60');
+                        this.closest('tr').querySelectorAll('td:not(:last-child)').forEach(td => {
+                            td.classList.add('text-gray-400');
+                        });
+                    } else {
+                        // Tribunal ahora está ACTIVO → mostrar botón "Desactivar" (rojo)
+                        this.classList.remove('bg-green-500', 'hover:bg-green-600');
+                        this.classList.add('bg-red-500', 'hover:bg-red-600');
+                        this.textContent = 'Desactivar';
+                        // Quitar marca de inactivo
+                        this.closest('tr').classList.remove('opacity-60');
+                        this.closest('tr').querySelectorAll('td:not(:last-child)').forEach(td => {
+                            td.classList.remove('text-gray-400');
+                        });
+                    }
+                    
+                    this.disabled = false;
+                    
+                    // Mostrar mensaje de éxito
+                    alert(resultado.message || `Estado cambiado a ${nuevoEstado}`);
+                    
+                    // Recargar la tabla para reflejar cambios (solo si está en una pestaña filtrada)
+                    const tabActivo = document.querySelector('.browser-tab.active');
+                    if (tabActivo) {
+                        const tabName = tabActivo.getAttribute('data-tab');
+                        if (tabName !== 'Todo') {
+                            // Si está en pestaña filtrada, recargar esa pestaña
+                            await cargarTablaPorEstado(tabName.toLowerCase());
+                        }
+                    }
+                    
+                } catch (error) {
+                    console.error('Error al cambiar estado:', error);
+                    alert('Error al cambiar el estado del tribunal: ' + (error.response?.data?.message || error.message));
+                    
+                    // Restaurar botón
+                    this.disabled = false;
+                    // Restaurar texto basado en estado actual
+                    this.textContent = estadoActual === 'Activo' ? 'Desactivar' : 'Activar';
+                }
             }
         });
     });
 }
 
-// Detectar cambios en preferencia de sistema (para modo auto)
-window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
-    const temaActual = localStorage.getItem('theme-preference') || 'auto';
-    if (temaActual === 'auto') {
-        const nuevoTema = e.matches ? 'dark' : 'light';
-        document.documentElement.setAttribute('data-theme', nuevoTema);
-    }
-});
-
-// Función para guardar tribunal
-async function guardarTribunal(tribunalData) {
+// Función para cambiar el estado del tribunal
+async function toggleEstadoTribunal(idTribunal) {
     try {
-        const response = await api.post('/tribunales', tribunalData);
+        console.log(`Enviando PATCH a: ${API_BASE_URL}/tribunales/${idTribunal}/cambiar-estado`);
+        const response = await api.patch(`/tribunales/${idTribunal}/cambiar-estado`);
         return response.data;
     } catch (error) {
-        console.error('Error al guardar tribunal:', error);
-        throw error;
-    }
-}
-
-// Event listener para el botón guardar
-document.querySelector('.btn-save-tribu').addEventListener('click', async function () {
-    const tribunalData = {
-        tribunal: document.querySelector('input[type="text"]').value,
-        direccion: document.getElementById('direccion').value,
-        id_tipo_tribunal: obtenerIdTipoTribunal(document.getElementById('tipoTribunal').value),
-        id_numeracion_tribunal: obtenerIdNumeracion(document.getElementById('numeracion').value),
-        id_distrito: obtenerIdDistrito(document.getElementById('distrito').value),
-        estado: document.getElementById('estado').value
-    };
-
-    // Validar que todos los campos requeridos estén llenos
-    if (!tribunalData.tribunal || !tribunalData.direccion || !tribunalData.id_tipo_tribunal ||
-        !tribunalData.id_distrito) {
-        alert('Por favor complete todos los campos requeridos');
-        return;
-    }
-
-    try {
-        await guardarTribunal(tribunalData);
-        alert('Tribunal creado exitosamente');
-        // Cerrar modal y recargar tabla
-        document.getElementById('userFormModal').classList.add('hidden');
-        cargarTablaPorEstado('todo');
-
-        // Limpiar formulario
-        document.querySelector('input[type="text"]').value = '';
-        document.getElementById('direccion').value = '';
-
-    } catch (error) {
-        console.error('Error completo:', error);
-        alert('Error al crear tribunal: ' + (error.response?.data?.message || error.message));
-    }
-});
-
-// Variables globales para almacenar datos
-let tiposTribunal = [];
-let numeracionesTribunal = [];
-let distritosData = [];
-
-// Función mejorada para cargar datos de selects
-async function cargarDatosSelects() {
-    try {
-        // Cargar tipos de tribunal
-        const responseTipos = await api.get('/tipos-tribunal');
-        tiposTribunal = responseTipos.data.data || responseTipos.data;
-
-        // Cargar numeraciones
-        const responseNumeraciones = await api.get('/numeraciones-tribunal');
-        numeracionesTribunal = responseNumeraciones.data.data || responseNumeraciones.data;
-
-        // Cargar distritos con relaciones
-        const responseDistritos = await api.get('/distritos?with=municipio.departamento');
-        distritosData = responseDistritos.data.data || responseDistritos.data;
-
-        console.log('Datos cargados:', { tiposTribunal, numeracionesTribunal, distritosData });
-    } catch (error) {
-        console.error('Error al cargar datos de selects:', error);
-    }
-}
-
-// Función para obtener ID de tipo tribunal
-function obtenerIdTipoTribunal(nombreTipo) {
-    const tipo = tiposTribunal.find(t => t.tipo_tribunal === nombreTipo);
-    return tipo ? tipo.id_tipo_tribunal : null;
-}
-
-// Función para obtener ID de numeración
-function obtenerIdNumeracion(nombreNumeracion) {
-    if (!nombreNumeracion || nombreNumeracion === "Sin numeración") return null;
-    const numeracion = numeracionesTribunal.find(n => n.numeracion_tribunal === nombreNumeracion);
-    return numeracion ? numeracion.id_numeracion_tribunal : null;
-}
-
-// Función para obtener ID de distrito
-function obtenerIdDistrito(nombreDistrito) {
-    const distrito = distritosData.find(d => d.distrito === nombreDistrito);
-    return distrito ? distrito.id_distrito : null;
-}
-
-// Función para limpiar el formulario
-function limpiarFormulario() {
-    document.getElementById('nombreTribunal').value = '';
-    document.getElementById('tipoTribunal').value = '';
-    document.getElementById('numeracion').value = '';
-    document.getElementById('departamento').value = '';
-    document.getElementById('municipio').value = '';
-    document.getElementById('municipio').innerHTML = '<option value="">Seleccione un departamento primero...</option>';
-    document.getElementById('distrito').value = '';
-    document.getElementById('distrito').innerHTML = '<option value="">Seleccione un municipio primero...</option>';
-    document.getElementById('direccion').value = '';
-    document.getElementById('estado').value = 'Activo';
-}
-
-// Función para guardar tribunal
-async function guardarTribunal(tribunalData) {
-    try {
-        console.log('Enviando datos:', tribunalData);
-        const response = await api.post('/tribunales', tribunalData);
-        return response.data;
-    } catch (error) {
-        console.error('Error al guardar tribunal:', error);
-        if (error.response) {
-            console.error('Respuesta del error:', error.response.data);
-        }
+        console.error('Error detallado en toggleEstadoTribunal:', {
+            url: error.config?.url,
+            status: error.response?.status,
+            data: error.response?.data,
+            message: error.message
+        });
         throw error;
     }
 }
@@ -656,7 +435,7 @@ async function cargarSelectsConDatosReales() {
     try {
         // Cargar tipos de tribunal
         const responseTipos = await api.get('/tipos-tribunal');
-        const tiposTribunal = responseTipos.data.data || responseTipos.data;
+        tiposTribunal = responseTipos.data.data || responseTipos.data;
         
         const tipoSelect = document.getElementById('tipoTribunal');
         tipoSelect.innerHTML = '<option value="">Seleccione un tipo...</option>';
@@ -666,28 +445,80 @@ async function cargarSelectsConDatosReales() {
 
         // Cargar numeraciones
         const responseNumeraciones = await api.get('/numeraciones-tribunal');
-        const numeraciones = responseNumeraciones.data.data || responseNumeraciones.data;
+        numeracionesTribunal = responseNumeraciones.data.data || responseNumeraciones.data;
         
         const numeracionSelect = document.getElementById('numeracion');
         numeracionSelect.innerHTML = '<option value="">Seleccione numeración...</option>';
-        numeraciones.forEach(numeracion => {
+        numeracionSelect.innerHTML += '<option value="">Sin numeración</option>';
+        numeracionesTribunal.forEach(numeracion => {
             numeracionSelect.innerHTML += `<option value="${numeracion.id_numeracion_tribunal}">${numeracion.numeracion_tribunal}</option>`;
         });
 
         // Cargar departamentos
         const responseDepartamentos = await api.get('/departamentos');
-        const departamentos = responseDepartamentos.data.data || responseDepartamentos.data;
+        departamentosData = responseDepartamentos.data.data || responseDepartamentos.data;
         
         const departamentoSelect = document.getElementById('departamento');
         departamentoSelect.innerHTML = '<option value="">Seleccione un departamento...</option>';
-        departamentos.forEach(depto => {
+        departamentosData.forEach(depto => {
             departamentoSelect.innerHTML += `<option value="${depto.id_departamento}">${depto.departamento}</option>`;
         });
+
+        // Configurar eventos para selects dependientes
+        configurarSelectsDependientes();
 
         console.log('Selects cargados correctamente');
 
     } catch (error) {
         console.error('Error al cargar datos para selects:', error);
+    }
+}
+
+// Función para configurar selects dependientes
+function configurarSelectsDependientes() {
+    const departamentoSelect = document.getElementById('departamento');
+    const municipioSelect = document.getElementById('municipio');
+    const distritoSelect = document.getElementById('distrito');
+
+    if (departamentoSelect) {
+        departamentoSelect.addEventListener('change', async function() {
+            const idDepartamento = this.value;
+            municipioSelect.innerHTML = '<option value="">Seleccione municipio...</option>';
+            distritoSelect.innerHTML = '<option value="">Seleccione distrito...</option>';
+            
+            if (idDepartamento) {
+                await cargarMunicipiosPorDepartamento(idDepartamento);
+            }
+        });
+    }
+
+    if (municipioSelect) {
+        municipioSelect.addEventListener('change', async function() {
+            const idMunicipio = this.value;
+            distritoSelect.innerHTML = '<option value="">Seleccione distrito...</option>';
+            
+            if (idMunicipio) {
+                await cargarDistritosPorMunicipio(idMunicipio);
+            }
+        });
+    }
+
+    // Configurar tipo tribunal para cargar materias
+    const tipoTribunalSelect = document.getElementById('tipoTribunal');
+    const materiaSelect = document.getElementById('materia');
+    
+    if (tipoTribunalSelect && materiaSelect) {
+        tipoTribunalSelect.addEventListener('change', function() {
+            const tipoId = this.value;
+            const tipo = tiposTribunal.find(t => t.id_tipo_tribunal == tipoId);
+            
+            materiaSelect.innerHTML = '';
+            if (tipo && tipo.materia) {
+                materiaSelect.innerHTML = `<option value="${tipo.materia.id_materia}">${tipo.materia.materia}</option>`;
+            } else {
+                materiaSelect.innerHTML = '<option value="">No definido</option>';
+            }
+        });
     }
 }
 
@@ -727,6 +558,20 @@ async function cargarDistritosPorMunicipio(idMunicipio) {
     }
 }
 
+// Función para limpiar el formulario
+function limpiarFormulario() {
+    document.getElementById('nombreTribunal').value = '';
+    document.getElementById('tipoTribunal').value = '';
+    document.getElementById('numeracion').value = '';
+    document.getElementById('departamento').value = '';
+    document.getElementById('municipio').value = '';
+    document.getElementById('municipio').innerHTML = '<option value="">Seleccione un departamento primero...</option>';
+    document.getElementById('distrito').value = '';
+    document.getElementById('distrito').innerHTML = '<option value="">Seleccione un municipio primero...</option>';
+    document.getElementById('direccion').value = '';
+    document.getElementById('estado').value = 'Activo';
+}
+
 // Event listener para el botón guardar
 document.addEventListener('DOMContentLoaded', function() {
     const btnGuardar = document.querySelector('.btn-save-tribu');
@@ -738,15 +583,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 tribunal: document.getElementById('nombreTribunal').value,
                 direccion: document.getElementById('direccion').value,
                 id_tipo_tribunal: document.getElementById('tipoTribunal').value,
-                id_numeracion_tribunal: document.getElementById('numeracion').value,
+                id_numeracion_tribunal: document.getElementById('numeracion').value || null,
                 id_distrito: document.getElementById('distrito').value,
                 estado: document.getElementById('estado').value
             };
 
             // Validar campos requeridos
             if (!tribunalData.tribunal || !tribunalData.direccion || 
-                !tribunalData.id_tipo_tribunal || !tribunalData.id_numeracion_tribunal || 
-                !tribunalData.id_distrito) {
+                !tribunalData.id_tipo_tribunal || !tribunalData.id_distrito) {
                 alert('Por favor complete todos los campos requeridos (*)');
                 return;
             }
@@ -770,31 +614,29 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
-
-    // Event listeners para selects dinámicos
-    const departamentoSelect = document.getElementById('departamento');
-    if (departamentoSelect) {
-        departamentoSelect.addEventListener('change', function() {
-            const idDepartamento = this.value;
-            if (idDepartamento) {
-                cargarMunicipiosPorDepartamento(idDepartamento);
-            } else {
-                document.getElementById('municipio').innerHTML = '<option value="">Seleccione un departamento primero...</option>';
-                document.getElementById('distrito').innerHTML = '<option value="">Seleccione un municipio primero...</option>';
-            }
-        });
-    }
-
-    const municipioSelect = document.getElementById('municipio');
-    if (municipioSelect) {
-        municipioSelect.addEventListener('change', function() {
-            const idMunicipio = this.value;
-            if (idMunicipio) {
-                cargarDistritosPorMunicipio(idMunicipio);
-            } else {
-                document.getElementById('distrito').innerHTML = '<option value="">Seleccione un municipio primero...</option>';
-            }
-        });
-    }
 });
 
+// Función para guardar tribunal
+async function guardarTribunal(tribunalData) {
+    try {
+        console.log('Enviando datos para crear tribunal:', tribunalData);
+        const response = await api.post('/tribunales', tribunalData);
+        console.log('Tribunal creado exitosamente:', response.data);
+        return response.data;
+    } catch (error) {
+        console.error('Error al guardar tribunal:', error);
+        if (error.response) {
+            console.error('Respuesta del error:', error.response.data);
+        }
+        throw error;
+    }
+}
+
+// Detectar cambios en preferencia de sistema (para modo auto)
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+    const temaActual = localStorage.getItem('theme-preference') || 'auto';
+    if (temaActual === 'auto') {
+        const nuevoTema = e.matches ? 'dark' : 'light';
+        document.documentElement.setAttribute('data-theme', nuevoTema);
+    }
+});git 

@@ -27,14 +27,6 @@
                         <div class="tab-indicator bg-blue-500"></div>
                         <span class="tab-label">Todos</span>
                     </div>
-                    <!--                     <div class="browser-tab" data-tab="activo">
-                        <div class="tab-indicator bg-green-500"></div>
-                        <span class="tab-label">Estado activo</span>
-                    </div>
-                    <div class="browser-tab" data-tab="inactivo">
-                        <div class="tab-indicator bg-red-500"></div>
-                        <span class="tab-label">Estado Inactivo</span>
-                    </div> -->
                 </div>
 
                 <div class="tab-content-wrapper">
@@ -59,50 +51,6 @@
                             </table>
                         </div>
                     </div>
-
-                    <!--                     <div class="tab-content" id="activo">
-                        <div class="relative overflow-x-auto">
-                            <table class="w-full text-sm text-left">
-                                <thead class="text-xs uppercase">
-                                    <tr>
-                                        <th class="px-6 py-3">Nombre</th>
-                                        <th class="px-6 py-3">Tipo</th>
-                                        <th class="px-6 py-3">Numeración</th>
-                                        <th class="px-6 py-3">Materia</th>
-                                        <th class="px-6 py-3">Departamento</th>
-                                        <th class="px-6 py-3">Municipio</th>
-                                        <th class="px-6 py-3">Distrito</th>
-                                        <th class="px-6 py-3">Dirección</th>
-                                        <th class="px-6 py-3 text-center">Acciones</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="tablaActivo">
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                    <div class="tab-content" id="inactivo">
-                        <div class="relative overflow-x-auto">
-                            <table class="w-full text-sm text-left">
-                                <thead class="text-xs uppercase">
-                                    <tr>
-                                        <th class="px-6 py-3">Nombre</th>
-                                        <th class="px-6 py-3">Tipo</th>
-                                        <th class="px-6 py-3">Numeración</th>
-                                        <th class="px-6 py-3">Materia</th>
-                                        <th class="px-6 py-3">Departamento</th>
-                                        <th class="px-6 py-3">Municipio</th>
-                                        <th class="px-6 py-3">Distrito</th>
-                                        <th class="px-6 py-3">Dirección</th>
-                                        <th class="px-6 py-3 text-center">Acciones</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="tablaInactivo">
-                                </tbody>
-                            </table>
-                        </div>
-                    </div -->
                 </div>
             </div>
 

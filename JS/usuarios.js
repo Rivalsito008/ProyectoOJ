@@ -112,7 +112,10 @@ function cargarTablaPorNivel(nivel) {
                 rolClass = "bg-gray-500 text-white";
         }
 
-        // En la función cargarTablaPorNivel, modifica la celda de acciones:
+        // Determinar texto y color para el botón de activar/desactivar
+        const botonTexto = p.estado.toLowerCase() === 'activo' ? 'Desactivar' : 'Activar';
+        const botonColor = p.estado.toLowerCase() === 'activo' ? 'bg-red-500 hover:bg-red-600' : 'bg-green-500 hover:bg-green-600';
+
         tr.innerHTML = `
     <td class="px-6 py-4 text-gray-900 dark:text-white font-medium">${p.nombre}</td>
     <td class="px-6 py-4 whitespace-nowrap text-gray-900 dark:text-white">${p.apellido}</td>
@@ -132,8 +135,10 @@ function cargarTablaPorNivel(nivel) {
             <button class="action-btn-view w-20 px-3 py-1 rounded-lg text-xs font-medium transition-all duration-200 shadow-sm relative overflow-hidden">
                 Editar
             </button>
-            <button class="action-btn-delete w-20 px-3 py-1 rounded-lg text-xs font-medium transition-all duration-200 shadow-sm relative overflow-hidden">
-                Eliminar
+            <button class="action-btn-toggle-estado w-20 px-3 py-1 rounded-lg text-xs font-medium transition-all duration-200 shadow-sm relative overflow-hidden text-white ${botonColor}"
+                    data-id="${p.id}"
+                    data-estado="${p.estado}">
+                ${botonTexto}
             </button>
         </div>
     </td>
@@ -235,21 +240,76 @@ function agregarEventListenersABotones() {
         });
     });
 
-    // Botones Eliminar
-    const botonesEliminar = document.querySelectorAll('.action-btn-delete');
-    botonesEliminar.forEach(boton => {
+    // Botones Toggle Estado (Activar/Desactivar)
+    const botonesToggleEstado = document.querySelectorAll('.action-btn-toggle-estado');
+    botonesToggleEstado.forEach(boton => {
         boton.addEventListener('click', function (e) {
             e.preventDefault();
+            const idUsuario = this.getAttribute('data-id');
+            const estadoActual = this.getAttribute('data-estado');
+            const nuevoEstado = estadoActual.toLowerCase() === 'activo' ? 'Inactivo' : 'Activo';
+            
             // Animación de click
             this.style.transform = 'scale(0.95)';
             setTimeout(() => {
                 this.style.transform = 'scale(1)';
             }, 150);
 
-            // Aquí iría la lógica para eliminar
-            console.log('Eliminar usuario');
-            if (confirm('¿Estás seguro de que quieres eliminar este usuario?')) {
-                // Lógica de eliminación
+            const confirmMessage = estadoActual.toLowerCase() === 'activo' 
+                ? '¿Estás seguro de que quieres desactivar este usuario?'
+                : '¿Estás seguro de que quieres activar este usuario?';
+            
+            if (confirm(confirmMessage)) {
+                // Encontrar el usuario en el array
+                const usuarioIndex = usuarios.findIndex(u => u.id == idUsuario);
+                if (usuarioIndex !== -1) {
+                    // Actualizar estado en el array
+                    usuarios[usuarioIndex].estado = nuevoEstado;
+                    usuarios[usuarioIndex].nivel = nuevoEstado.toLowerCase();
+                    
+                    // Actualizar el botón visualmente
+                    this.setAttribute('data-estado', nuevoEstado);
+                    
+                    if (nuevoEstado === 'Inactivo') {
+                        this.classList.remove('bg-red-500', 'hover:bg-red-600');
+                        this.classList.add('bg-green-500', 'hover:bg-green-600');
+                        this.textContent = 'Activar';
+                    } else {
+                        this.classList.remove('bg-green-500', 'hover:bg-green-600');
+                        this.classList.add('bg-red-500', 'hover:bg-red-600');
+                        this.textContent = 'Desactivar';
+                    }
+                    
+                    // También actualizar el badge de estado
+                    const fila = this.closest('tr');
+                    const estadoBadge = fila.querySelector('.state-badge-shimmer:last-of-type');
+                    
+                    if (estadoBadge) {
+                        estadoBadge.textContent = nuevoEstado;
+                        if (nuevoEstado === 'Inactivo') {
+                            estadoBadge.classList.remove('bg-green-500');
+                            estadoBadge.classList.add('bg-red-600');
+                        } else {
+                            estadoBadge.classList.remove('bg-red-600');
+                            estadoBadge.classList.add('bg-green-500');
+                        }
+                    }
+                    
+                    // Recargar la tabla para reflejar cambios
+                    const tabActivo = document.querySelector('.browser-tab.active');
+                    if (tabActivo) {
+                        const tabName = tabActivo.getAttribute('data-tab');
+                        if (tabName === 'Todo') {
+                            cargarTablaPorNivel('todo');
+                        } else if (tabName === 'activo') {
+                            cargarTablaPorNivel('activo');
+                        } else if (tabName === 'inactivo') {
+                            cargarTablaPorNivel('inactivo');
+                        }
+                    }
+                    
+                    console.log(`Usuario ${idUsuario} cambiado a estado: ${nuevoEstado}`);
+                }
             }
         });
     });
@@ -263,3 +323,19 @@ window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e =
         document.documentElement.setAttribute('data-theme', nuevoTema);
     }
 });
+
+// Función para limpiar formulario (si existe)
+function limpiarFormulario() {
+    // Si tienes un formulario para crear usuarios
+    const nombreInput = document.getElementById('nombre');
+    const apellidoInput = document.getElementById('apellido');
+    const emailInput = document.getElementById('email');
+    const rolSelect = document.getElementById('rol');
+    const estadoSelect = document.getElementById('estado');
+    
+    if (nombreInput) nombreInput.value = '';
+    if (apellidoInput) apellidoInput.value = '';
+    if (emailInput) emailInput.value = '';
+    if (rolSelect) rolSelect.value = '';
+    if (estadoSelect) estadoSelect.value = 'Activo';
+}

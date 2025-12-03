@@ -688,8 +688,9 @@ function renderTablaFiltrada() {
                     <button onclick="abrirModalDetalles(${JSON.stringify(v).replace(/"/g, '&quot;')})" class="action-btn-details w-20 px-3 py-1 rounded-lg text-sm font-medium transition-all duration-200 shadow-sm relative overflow-hidden">
                         Detalles
                     </button>                  
-                    <button class="action-btn-delete w-20 px-3 py-1 rounded-lg text-sm font-medium transition-all duration-200 shadow-sm relative overflow-hidden">
-                        Eliminar
+                    <button onclick="toggleEstadoVictima('${v.nombre}', '${v.estado}')" 
+                            class="action-btn-toggle-estado w-24 px-3 py-1 rounded-lg text-sm font-medium transition-all duration-200 shadow-sm relative overflow-hidden ${v.estado === 'Activo' ? 'bg-red-500 hover:bg-red-600' : 'bg-green-500 hover:bg-green-600'} text-white">
+                        ${v.estado === 'Activo' ? 'Desactivar' : 'Activar'}
                     </button>
                 </div>
             </td>
@@ -1528,3 +1529,27 @@ document.addEventListener('keydown', function (e) {
         cerrarModalDetalles();
     }
 });
+
+// ===================================================================
+// FUNCIÓN PARA TOGGLE DE ESTADO DE VÍCTIMA
+// ===================================================================
+function toggleEstadoVictima(nombre, estadoActual) {
+    const nuevoEstado = estadoActual === 'Activo' ? 'Inactivo' : 'Activo';
+    const mensaje = estadoActual === 'Activo' 
+        ? '¿Estás seguro de que quieres desactivar este caso?' 
+        : '¿Estás seguro de que quieres activar este caso?';
+    
+    if (confirm(mensaje)) {
+        // Encontrar y actualizar la víctima en el array
+        const victima = victimas.find(v => v.nombre === nombre);
+        if (victima) {
+            victima.estado = nuevoEstado;
+            
+            // Recargar la tabla actual
+            aplicarFiltros();
+            
+            // Mostrar notificación
+            alert(`Caso ${nuevoEstado.toLowerCase()} exitosamente`);
+        }
+    }
+}

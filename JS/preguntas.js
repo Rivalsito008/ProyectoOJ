@@ -140,6 +140,10 @@ function cargarTablaPorNivel(nivel) {
                 riesgoClass = "bg-gray-500 text-white";
         }
 
+        // Determinar texto y color para el botón de activar/desactivar
+        const botonTexto = p.estado.toLowerCase() === 'activo' ? 'Desactivar' : 'Activar';
+        const botonColor = p.estado.toLowerCase() === 'activo' ? 'bg-red-500 hover:bg-red-600' : 'bg-green-500 hover:bg-green-600';
+
         tr.innerHTML = `
             <td class="px-6 py-4 text-gray-900 dark:text-white font-medium">${p.pregunta}</td>
             <td class="px-6 py-4 whitespace-nowrap text-center text-gray-900 dark:text-white">${p.ambito}</td>
@@ -164,8 +168,10 @@ function cargarTablaPorNivel(nivel) {
                     <button class="action-btn-view w-20 px-3 py-1 rounded-lg text-xs font-medium transition-all duration-200 shadow-sm relative overflow-hidden">
                         Editar
                     </button>
-                    <button class="action-btn-delete w-20 px-3 py-1 rounded-lg text-xs font-medium transition-all duration-200 shadow-sm relative overflow-hidden">
-                        Eliminar
+                    <button class="action-btn-toggle-estado w-20 px-3 py-1 rounded-lg text-xs font-medium transition-all duration-200 shadow-sm relative overflow-hidden text-white ${botonColor}"
+                            data-id="${p.id}"
+                            data-estado="${p.estado}">
+                        ${botonTexto}
                     </button>
                 </div>
             </td>
@@ -198,21 +204,73 @@ function agregarEventListenersABotones() {
         });
     });
 
-    // Botones Eliminar
-    const botonesEliminar = document.querySelectorAll('.action-btn-delete');
-    botonesEliminar.forEach(boton => {
+    // Botones Toggle Estado (Activar/Desactivar)
+    const botonesToggleEstado = document.querySelectorAll('.action-btn-toggle-estado');
+    botonesToggleEstado.forEach(boton => {
         boton.addEventListener('click', function (e) {
             e.preventDefault();
+            const idPregunta = this.getAttribute('data-id');
+            const estadoActual = this.getAttribute('data-estado');
+            const nuevoEstado = estadoActual.toLowerCase() === 'activo' ? 'Inactivo' : 'Activo';
+            
             // Animación de click
             this.style.transform = 'scale(0.95)';
             setTimeout(() => {
                 this.style.transform = 'scale(1)';
             }, 150);
 
-            // Aquí iría la lógica para eliminar
-            console.log('Eliminar pregunta');
-            if (confirm('¿Estás seguro de que quieres eliminar esta pregunta?')) {
-                // Lógica de eliminación
+            const confirmMessage = estadoActual.toLowerCase() === 'activo' 
+                ? '¿Estás seguro de que quieres desactivar esta pregunta?'
+                : '¿Estás seguro de que quieres activar esta pregunta?';
+            
+            if (confirm(confirmMessage)) {
+                // Encontrar la pregunta en el array
+                const preguntaIndex = preguntas.findIndex(p => p.id == idPregunta);
+                if (preguntaIndex !== -1) {
+                    // Actualizar estado en el array
+                    preguntas[preguntaIndex].estado = nuevoEstado;
+                    
+                    // Actualizar el botón visualmente
+                    this.setAttribute('data-estado', nuevoEstado);
+                    
+                    if (nuevoEstado === 'Inactivo') {
+                        this.classList.remove('bg-red-500', 'hover:bg-red-600');
+                        this.classList.add('bg-green-500', 'hover:bg-green-600');
+                        this.textContent = 'Activar';
+                    } else {
+                        this.classList.remove('bg-green-500', 'hover:bg-green-600');
+                        this.classList.add('bg-red-500', 'hover:bg-red-600');
+                        this.textContent = 'Desactivar';
+                    }
+                    
+                    // También actualizar el badge de estado
+                    const fila = this.closest('tr');
+                    const estadoBadge = fila.querySelector('.state-badge-shimmer:last-of-type');
+                    
+                    if (estadoBadge) {
+                        estadoBadge.textContent = nuevoEstado;
+                        if (nuevoEstado === 'Inactivo') {
+                            estadoBadge.classList.remove('bg-green-500');
+                            estadoBadge.classList.add('bg-red-600');
+                        } else {
+                            estadoBadge.classList.remove('bg-red-600');
+                            estadoBadge.classList.add('bg-green-500');
+                        }
+                    }
+                    
+                    // Recargar la tabla para reflejar cambios
+                    const tabActivo = document.querySelector('.browser-tab.active');
+                    if (tabActivo) {
+                        const tabName = tabActivo.getAttribute('data-tab');
+                        if (tabName === 'todo') {
+                            cargarTablaPorNivel('todo');
+                        } else {
+                            cargarTablaPorNivel(tabName);
+                        }
+                    }
+                    
+                    console.log(`Pregunta ${idPregunta} cambiada a estado: ${nuevoEstado}`);
+                }
             }
         });
     });
@@ -377,8 +435,21 @@ function guardarPregunta(e) {
         ambito: ambito,
         nivel: riesgo.charAt(0).toUpperCase() + riesgo.slice(1), // Capitalizar
         estado: estado,
+        puntaje: obtenerPuntajePorNivel(riesgo), // Obtener puntaje basado en nivel
         fechaCreacion: new Date().toISOString()
     };
+
+    // Función para obtener puntaje según nivel
+    function obtenerPuntajePorNivel(nivel) {
+        switch(nivel.toLowerCase()) {
+            case 'bajo': return '1 pts';
+            case 'moderado': return '2 pts';
+            case 'alto': return '3 pts';
+            case 'extremo': return '4 pts';
+            case 'activadora': return '100 pts';
+            default: return '0 pts';
+        }
+    }
 
     // Aquí puedes enviar los datos a tu backend
     console.log('Pregunta guardada:', nuevaPregunta);
@@ -464,6 +535,10 @@ function agregarPreguntaATabla(pregunta) {
             riesgoClass = "bg-gray-500 text-white";
     }
 
+    // Determinar texto y color para el botón de activar/desactivar
+    const botonTexto = pregunta.estado.toLowerCase() === 'activo' ? 'Desactivar' : 'Activar';
+    const botonColor = pregunta.estado.toLowerCase() === 'activo' ? 'bg-red-500 hover:bg-red-600' : 'bg-green-500 hover:bg-green-600';
+
     const tr = document.createElement("tr");
     tr.className = "border-b border-gray-200 dark:border-gray-700 hover:bg-gradient-to-r hover:from-gray-50 hover:to-gray-50 dark:hover:from-gray-800 dark:hover:to-gray-700 transition-all duration-300";
 
@@ -491,8 +566,10 @@ function agregarPreguntaATabla(pregunta) {
                 <button class="action-btn-view w-20 px-3 py-1 rounded-lg text-xs font-medium transition-all duration-200 shadow-sm relative overflow-hidden">
                     Editar
                 </button>
-                <button class="action-btn-delete w-20 px-3 py-1 rounded-lg text-xs font-medium transition-all duration-200 shadow-sm relative overflow-hidden">
-                    Eliminar
+                <button class="action-btn-toggle-estado w-20 px-3 py-1 rounded-lg text-xs font-medium transition-all duration-200 shadow-sm relative overflow-hidden text-white ${botonColor}"
+                        data-id="${pregunta.id}"
+                        data-estado="${pregunta.estado}">
+                    ${botonTexto}
                 </button>
             </div>
         </td>

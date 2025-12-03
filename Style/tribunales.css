@@ -14,8 +14,8 @@
     --font-size: 16px;
     --text-colorcrd: #111827;
     --text-colorhd: #111827;
-    --text-colorhd: #111827;
     --dropdown-color: #ffffff;
+    --flecha-color: #000000ff;
 }
 
 [data-theme="dark"] {
@@ -31,7 +31,6 @@
     --hover-hd: rgba(108, 85, 150, 0.35);
     --flecha-color: #ffffffff;
     --hover-item: rgba(108, 85, 150, 0.35);
-
     --border-color-card: #b4b4b4ff;
     --dropdown-color: #ffffffff;
 }
@@ -128,9 +127,7 @@ NAV ITEMS - MODO OSCURO
 
 /* Activo (modo oscuro) */
 [data-theme="dark"] .nav-item.active {
-    background: linear-gradient(135deg,
-            rgba(151, 120, 255, 0.15) 0%,
-            rgba(151, 120, 255, 0.10) 100%);
+    background: linear-gradient(135deg, rgba(151, 120, 255, 0.15) 0%, rgba(151, 120, 255, 0.10) 100%);
     color: #cbb8ff;
     border-left: 4px solid #9778ff;
     box-shadow: inset 0 0 20px rgba(151, 120, 255, 0.25);
@@ -147,9 +144,7 @@ NAV ITEMS - MODO OSCURO
 
 /* Hover del activo (modo oscuro) */
 [data-theme="dark"] .nav-item.active:hover {
-    background: linear-gradient(135deg,
-            rgba(151, 120, 255, 0.22) 0%,
-            rgba(151, 120, 255, 0.17) 100%);
+    background: linear-gradient(135deg, rgba(151, 120, 255, 0.22) 0%, rgba(151, 120, 255, 0.17) 100%);
     color: #e6dbff;
     border-left: 4px solid #b298ff;
     box-shadow: inset 0 0 25px rgba(151, 120, 255, 0.35);
@@ -175,7 +170,6 @@ NAV ITEMS - MODO OSCURO
     transform: translateY(-2px);
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
     border-color: rgba(108, 85, 150, 0.3);
-    /* leve cambio al pasar el mouse */
 }
 
 .flecha {
@@ -293,6 +287,18 @@ NAV ITEMS - MODO OSCURO
     padding: 40px;
     border-radius: 12px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    animation: fadeInContent 0.6s ease;
+}
+
+@keyframes fadeInContent {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .tab-content {
@@ -301,14 +307,13 @@ NAV ITEMS - MODO OSCURO
 
 .tab-content.active {
     display: block;
-    animation: fadeIn 0.3s ease;
+    animation: fadeIn 0.5s ease;
 }
 
 @keyframes fadeIn {
     from {
         opacity: 0;
     }
-
     to {
         opacity: 1;
     }
@@ -318,6 +323,18 @@ NAV ITEMS - MODO OSCURO
 table {
     background-color: var(--card-bg);
     color: var(--text-colorcrd);
+    animation: tableAppear 0.8s ease;
+}
+
+@keyframes tableAppear {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 thead {
@@ -325,15 +342,60 @@ thead {
     color: var(--text-colorcrd);
 }
 
+/* ¡EFECTO ESPECTACULAR AQUÍ! */
 tbody tr {
     background-color: var(--card-bg);
     border-bottom: 1px solid var(--border-color);
+    animation: slideInRow 0.6s ease backwards;
+}
+
+/* Animación de entrada escalonada para filas */
+@keyframes slideInRow {
+    from {
+        opacity: 0;
+        transform: translateX(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Retrasos escalonados para cada fila */
+tbody tr:nth-child(1) { animation-delay: 0.1s; }
+tbody tr:nth-child(2) { animation-delay: 0.2s; }
+tbody tr:nth-child(3) { animation-delay: 0.3s; }
+tbody tr:nth-child(4) { animation-delay: 0.4s; }
+tbody tr:nth-child(5) { animation-delay: 0.5s; }
+tbody tr:nth-child(6) { animation-delay: 0.6s; }
+tbody tr:nth-child(7) { animation-delay: 0.7s; }
+tbody tr:nth-child(8) { animation-delay: 0.8s; }
+tbody tr:nth-child(9) { animation-delay: 0.9s; }
+tbody tr:nth-child(10) { animation-delay: 1.0s; }
+
+/* Efecto hover mejorado para filas */
+tbody tr:hover {
+    transform: translateX(5px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
 }
 
 /* ===== MODAL ===== */
 .modal-content {
     background-color: var(--card-bg);
     color: var(--text-colorcrd);
+    animation: modalSlideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-30px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
 }
 
 .modal-header {
@@ -346,31 +408,47 @@ tbody tr {
     border-top: 1px solid var(--border-modal);
 }
 
-input,
-select {
-    background-color: var(--card-bg);
-    color: var(--text-colorcrd);
-    border-color: var(--border-modal);
+.modal-animate {
+    animation: slideDown 0.3s ease-out;
 }
 
-.modal-animate {
-    animation: slideDown 0.2s ease-out;
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 #profileButton:hover {
     background-color: var(--hover-hd);
 }
 
+/* ===== INPUTS Y FORMULARIOS ===== */
 input,
 select,
 textarea {
     background-color: var(--card-bg);
     color: var(--text-colorcrd);
     border: 1px solid #d1d5db;
-    /* Gris claro */
     border-radius: 8px;
     padding: 10px 12px;
-    transition: all 0.2s ease;
+    transition: all 0.3s ease;
+    animation: inputAppear 0.5s ease backwards;
+}
+
+@keyframes inputAppear {
+    from {
+        opacity: 0;
+        transform: translateY(5px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 /* Modo oscuro para inputs */
@@ -385,9 +463,22 @@ input:focus,
 select:focus,
 textarea:focus {
     border-color: #3b82f6 !important;
-    /* Azul */
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
     outline: none;
+    transform: translateY(-2px);
+    animation: inputFocus 0.3s ease;
+}
+
+@keyframes inputFocus {
+    0% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-3px);
+    }
+    100% {
+        transform: translateY(-2px);
+    }
 }
 
 /* Focus morado en modo oscuro */
@@ -395,22 +486,32 @@ textarea:focus {
 [data-theme="dark"] select:focus,
 [data-theme="dark"] textarea:focus {
     border-color: #a855f7 !important;
-    /* Morado */
     box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.25);
-    outline: none;
 }
 
 /* ========================================
-DROPDOWN DE PERFIL - MODO CLARO Y OSCURO
+DROPDOWN DE PERFIL
 ======================================== */
 
-/* Estilos base del dropdown - MODO CLARO */
+/* Estilos base del dropdown */
 .dropdown {
     background-color: var(--dropdown-color);
     border-color: var(--border-color);
     border-radius: 0.75rem;
     transition: all 0.3s ease;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    animation: dropdownAppear 0.4s ease;
+}
+
+@keyframes dropdownAppear {
+    from {
+        opacity: 0;
+        transform: translateY(-10px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
 }
 
 .dropdown:hover {
@@ -419,33 +520,33 @@ DROPDOWN DE PERFIL - MODO CLARO Y OSCURO
     border-color: rgba(108, 85, 150, 0.3);
 }
 
-/* Encabezado del dropdown - MODO CLARO */
+/* Encabezado del dropdown */
 .dropdown-header {
     background-color: var(--card-bg);
     border-bottom: 1px solid var(--border-color);
 }
 
-/* Avatar border - MODO CLARO */
+/* Avatar border */
 .dropdown-avatar {
     border-color: var(--border-color);
 }
 
-/* Nombre de usuario - MODO CLARO */
+/* Nombre de usuario */
 .dropdown-username {
     color: var(--text-colorcrd);
 }
 
-/* Rol del usuario - MODO CLARO */
+/* Rol del usuario */
 .dropdown-role {
     color: #6b7280;
 }
 
-/* Cuerpo del dropdown - MODO CLARO */
+/* Cuerpo del dropdown */
 .dropdown-body {
     background-color: var(--card-bg);
 }
 
-/* Botón de cerrar sesión - MODO CLARO */
+/* Botón de cerrar sesión */
 .dropdown-logout {
     color: #dc2626;
 }
@@ -454,43 +555,33 @@ DROPDOWN DE PERFIL - MODO CLARO Y OSCURO
     background-color: #fef2f2;
 }
 
-/* ========================================
-MODO OSCURO - DROPDOWN
-======================================== */
-
-/* Dropdown principal - MODO OSCURO */
+/* MODO OSCURO - DROPDOWN */
 [data-theme="dark"] .dropdown {
     background-color: #2a2240;
     border-color: #3d3454;
 }
 
-/* Encabezado del dropdown - MODO OSCURO */
 [data-theme="dark"] .dropdown-header {
     background-color: #2b2343;
     border-bottom: 1px solid #3d3454;
 }
 
-/* Avatar border - MODO OSCURO */
 [data-theme="dark"] .dropdown-avatar {
     border-color: #4b4563;
 }
 
-/* Nombre de usuario - MODO OSCURO */
 [data-theme="dark"] .dropdown-username {
     color: #f3f4f6;
 }
 
-/* Rol del usuario - MODO OSCURO */
 [data-theme="dark"] .dropdown-role {
     color: #9ca3af;
 }
 
-/* Cuerpo del dropdown - MODO OSCURO */
 [data-theme="dark"] .dropdown-body {
     background-color: #241c37;
 }
 
-/* Botón de cerrar sesión - MODO OSCURO */
 [data-theme="dark"] .dropdown-logout {
     color: #fca5a5;
 }
@@ -499,8 +590,7 @@ MODO OSCURO - DROPDOWN
     background-color: rgba(127, 29, 29, 0.3);
 }
 
-
-/* ===== BOTÓN GUARDAR NUEVO USUARIO - CON ESTILOS DEL BOTÓN SIGUIENTE ===== */
+/* ===== BOTÓN GUARDAR ===== */
 .btn-save-tribu {
     background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%) !important;
     color: white !important;
@@ -509,22 +599,27 @@ MODO OSCURO - DROPDOWN
     font-weight: 500 !important;
     position: relative !important;
     overflow: hidden !important;
-    transition: all 0.3s ease !important;
-
-    /* Tamaño igual al botón siguiente */
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
     padding: 0.5rem 1.5rem !important;
     border-radius: 0.5rem !important;
     box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3) !important;
-
-    /* Flex para alinear ícono y texto */
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
     gap: 0.5rem !important;
-
-    /* Texto más compacto */
     font-size: 0.875rem !important;
-    letter-spacing: 0 !important;
+    animation: buttonAppear 0.6s ease backwards;
+}
+
+@keyframes buttonAppear {
+    from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
 }
 
 /* Efecto de brillo deslizante */
@@ -536,7 +631,7 @@ MODO OSCURO - DROPDOWN
     width: 100% !important;
     height: 100% !important;
     background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent) !important;
-    transition: left 0.5s !important;
+    transition: left 0.6s ease !important;
     z-index: 1 !important;
 }
 
@@ -547,31 +642,26 @@ MODO OSCURO - DROPDOWN
 /* Estados del botón */
 .btn-save-tribu:hover {
     background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%) !important;
-    transform: translateY(-2px) !important;
-    box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4) !important;
+    transform: translateY(-3px) scale(1.05) !important;
+    box-shadow: 0 12px 30px rgba(59, 130, 246, 0.4) !important;
 }
 
 .btn-save-tribu:active {
-    transform: translateY(0) !important;
+    transform: translateY(0) scale(0.98) !important;
     box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3) !important;
-    transition: all 0.1s ease !important;
+    animation: buttonClick 0.3s ease !important;
 }
 
-/* Efecto de pulsación al hacer clic */
-.btn-save-tribu:active {
-    animation: buttonClick 0.2s ease !important;
-}
-
-/* Ícono del botón - más pequeño */
+/* Ícono del botón */
 .btn-save-tribu svg {
-    transition: all 0.3s ease !important;
+    transition: all 0.4s ease !important;
     stroke: currentColor !important;
     width: 1rem !important;
     height: 1rem !important;
 }
 
 .btn-save-tribu:hover svg {
-    transform: translateX(2px) !important;
+    transform: translateX(3px) rotate(5deg) !important;
 }
 
 /* Estado deshabilitado */
@@ -592,7 +682,7 @@ MODO OSCURO - DROPDOWN
     display: none !important;
 }
 
-/* ===== MODO OSCURO - BOTÓN GUARDAR NUEVO USUARIO ===== */
+/* MODO OSCURO - BOTÓN GUARDAR */
 [data-theme="dark"] .btn-save-tribu {
     background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%) !important;
     box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3) !important;
@@ -600,7 +690,7 @@ MODO OSCURO - DROPDOWN
 
 [data-theme="dark"] .btn-save-tribu:hover {
     background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%) !important;
-    box-shadow: 0 8px 25px rgba(139, 92, 246, 0.5) !important;
+    box-shadow: 0 12px 30px rgba(139, 92, 246, 0.5) !important;
 }
 
 [data-theme="dark"] .btn-save-tribu:active {
@@ -612,17 +702,23 @@ MODO OSCURO - DROPDOWN
     box-shadow: 0 2px 8px rgba(75, 85, 99, 0.3) !important;
 }
 
-/* Animación de pulsación */
-@keyframes buttonClick {
-    0% {
-        transform: scale(1);
-    }
+/* ===== BADGES ===== */
+.state-badge-shimmer {
+    color: white !important;
+    border-radius: 0.5rem !important;
+    font-weight: 600 !important;
+    padding: 0.25rem 0.75rem !important;
+    text-align: center !important;
+    animation: badgeAppear 0.5s ease backwards;
+}
 
-    50% {
-        transform: scale(0.95);
+@keyframes badgeAppear {
+    from {
+        opacity: 0;
+        transform: scale(0.8);
     }
-
-    100% {
+    to {
+        opacity: 1;
         transform: scale(1);
     }
 }
@@ -630,70 +726,63 @@ MODO OSCURO - DROPDOWN
 /* Colores para tipos de tribunal */
 .state-badge-shimmer.bg-purple-600 {
     background: linear-gradient(135deg, #7c3aed, #6d28d9, #7c3aed) !important;
-    color: white !important;
     border: 1px solid #5b21b6;
-    box-shadow: 0 2px 6px rgba(124, 58, 237, 0.4);
+    box-shadow: 0 2px 8px rgba(124, 58, 237, 0.4);
 }
 
 .state-badge-shimmer.bg-blue-600 {
     background: linear-gradient(135deg, #2563eb, #1d4ed8, #2563eb) !important;
-    color: white !important;
     border: 1px solid #1e40af;
-    box-shadow: 0 2px 6px rgba(37, 99, 235, 0.4);
+    box-shadow: 0 2px 8px rgba(37, 99, 235, 0.4);
 }
 
 .state-badge-shimmer.bg-orange-500 {
     background: linear-gradient(135deg, #f97316, #ea580c, #f97316) !important;
-    color: white !important;
     border: 1px solid #c2410c;
-    box-shadow: 0 2px 6px rgba(249, 115, 22, 0.4);
+    box-shadow: 0 2px 8px rgba(249, 115, 22, 0.4);
 }
 
 .state-badge-shimmer.bg-teal-500 {
     background: linear-gradient(135deg, #14b8a6, #0d9488, #14b8a6) !important;
-    color: white !important;
     border: 1px solid #0f766e;
-    box-shadow: 0 2px 6px rgba(20, 184, 166, 0.4);
+    box-shadow: 0 2px 8px rgba(20, 184, 166, 0.4);
 }
 
 /* Colores para materias */
 .state-badge-shimmer.bg-red-500 {
     background: linear-gradient(135deg, #ef4444, #dc2626, #ef4444) !important;
-    color: white !important;
     border: 1px solid #b91c1c;
-    box-shadow: 0 2px 6px rgba(239, 68, 68, 0.4);
+    box-shadow: 0 2px 8px rgba(239, 68, 68, 0.4);
 }
 
 .state-badge-shimmer.bg-gray-700 {
     background: linear-gradient(135deg, #374151, #1f2937, #374151) !important;
-    color: white !important;
     border: 1px solid #111827;
-    box-shadow: 0 2px 6px rgba(55, 65, 81, 0.4);
+    box-shadow: 0 2px 8px rgba(55, 65, 81, 0.4);
 }
 
 .state-badge-shimmer.bg-pink-500 {
     background: linear-gradient(135deg, #ec4899, #db2777, #ec4899) !important;
-    color: white !important;
     border: 1px solid #be185d;
-    box-shadow: 0 2px 6px rgba(236, 72, 153, 0.4);
+    box-shadow: 0 2px 8px rgba(236, 72, 153, 0.4);
 }
 
 .state-badge-shimmer.bg-yellow-600 {
     background: linear-gradient(135deg, #d97706, #b45309, #d97706) !important;
-    color: white !important;
     border: 1px solid #92400e;
-    box-shadow: 0 2px 6px rgba(217, 119, 6, 0.4);
+    box-shadow: 0 2px 8px rgba(217, 119, 6, 0.4);
 }
 
 /* Efecto hover para todos los badges */
 .state-badge-shimmer:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
 }
 
-/* ===== ESTILOS PARA BOTONES DE ACCIONES CON SHIMMER ===== */
+/* ===== BOTONES DE ACCIÓN ===== */
 
-/* Botón VER/EDITAR - Modo claro (celeste) */
+/* Botón VER/EDITAR - Base */
 .action-btn-view {
     background: linear-gradient(135deg, #3b82f6, #1d4ed8, #3b82f6) !important;
     color: white !important;
@@ -702,18 +791,88 @@ MODO OSCURO - DROPDOWN
     overflow: hidden;
     font-weight: 600;
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-    transition: all 0.3s ease;
-    box-shadow: 0 2px 4px rgba(37, 99, 235, 0.3);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 3px 8px rgba(37, 99, 235, 0.3);
     border-radius: 8px !important;
     padding: 8px 12px !important;
     font-size: 12px !important;
     cursor: pointer !important;
     width: 80px !important;
+    display: inline-block !important;
+    text-align: center !important;
+    animation: buttonSlideIn 0.6s ease backwards;
 }
 
-/* Efecto shimmer continuo para botones */
+@keyframes buttonSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(15px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Botón ACTIVAR/DESACTIVAR - Base */
+.action-btn-toggle-estado {
+    position: relative;
+    overflow: hidden;
+    font-weight: 600;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 8px !important;
+    padding: 8px 12px !important;
+    font-size: 12px !important;
+    cursor: pointer !important;
+    width: 80px !important;
+    display: inline-block !important;
+    text-align: center !important;
+    border: 1px solid;
+    animation: buttonSlideIn 0.6s ease backwards;
+}
+
+/* Estado DESACTIVAR (rojo) */
+.action-btn-toggle-estado[data-estado="Activo"],
+.action-btn-toggle-estado[data-estado="activo"] {
+    background: linear-gradient(135deg, #ef4444, #dc2626, #ef4444) !important;
+    color: white !important;
+    border-color: #dc2626 !important;
+    box-shadow: 0 3px 8px rgba(239, 68, 68, 0.3);
+    animation: pulseRed 2s infinite;
+}
+
+@keyframes pulseRed {
+    0%, 100% {
+        box-shadow: 0 3px 8px rgba(239, 68, 68, 0.3);
+    }
+    50% {
+        box-shadow: 0 3px 15px rgba(239, 68, 68, 0.5);
+    }
+}
+
+/* Estado ACTIVAR (verde) */
+.action-btn-toggle-estado[data-estado="Inactivo"],
+.action-btn-toggle-estado[data-estado="inactivo"] {
+    background: linear-gradient(135deg, #17d336, #059624, #17d336) !important;
+    color: white !important;
+    border-color: #059669 !important;
+    box-shadow: 0 3px 8px rgba(16, 185, 129, 0.3);
+    animation: pulseGreen 2s infinite;
+}
+
+@keyframes pulseGreen {
+    0%, 100% {
+        box-shadow: 0 3px 8px rgba(16, 185, 129, 0.3);
+    }
+    50% {
+        box-shadow: 0 3px 15px rgba(16, 185, 129, 0.5);
+    }
+}
+
+/* Efecto shimmer continuo */
 .action-btn-view::before,
-.action-btn-delete::before {
+.action-btn-toggle-estado::before {
     content: '';
     position: absolute;
     top: 0;
@@ -725,95 +884,129 @@ MODO OSCURO - DROPDOWN
     animation-delay: 0s;
 }
 
+/* Efecto de luz al hacer hover */
+.action-btn-view:hover::after,
+.action-btn-toggle-estado:hover::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at center, rgba(255, 255, 255, 0.2) 0%, transparent 70%);
+    animation: lightEffect 0.6s ease;
+}
+
+@keyframes lightEffect {
+    0% {
+        opacity: 0;
+        transform: scale(0.5);
+    }
+    50% {
+        opacity: 0.3;
+    }
+    100% {
+        opacity: 0;
+        transform: scale(1.5);
+    }
+}
+
+/* Hover para botón EDITAR */
 .action-btn-view:hover {
     background: linear-gradient(135deg, #2563eb, #1e40af, #2563eb) !important;
-    transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(37, 99, 235, 0.4);
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 8px 20px rgba(37, 99, 235, 0.4);
 }
 
-.action-btn-view:active {
-    transform: translateY(0);
-    box-shadow: 0 2px 6px rgba(37, 99, 235, 0.3);
-    animation: buttonClick 0.2s ease;
+/* Hover para botón DESACTIVAR */
+.action-btn-toggle-estado[data-estado="Activo"]:hover,
+.action-btn-toggle-estado[data-estado="activo"]:hover {
+    background: linear-gradient(135deg, #dc2626, #b91c1c, #dc2626) !important;
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 8px 20px rgba(220, 38, 38, 0.4);
+    animation: none;
 }
 
-/* Botón VER/EDITAR - Modo oscuro (morado) */
+/* Hover para botón ACTIVAR */
+.action-btn-toggle-estado[data-estado="Inactivo"]:hover,
+.action-btn-toggle-estado[data-estado="inactivo"]:hover {
+    background: linear-gradient(135deg, #17d336, #059624, #17d336) !important;
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 8px 20px rgba(5, 150, 105, 0.4);
+    animation: none;
+}
+
+/* Active state para todos los botones */
+.action-btn-view:active,
+.action-btn-toggle-estado:active {
+    transform: translateY(0) scale(0.95);
+    animation: buttonClick 0.3s ease;
+}
+
+/* Animación de cambio de estado */
+@keyframes stateChange {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(0.9);
+        opacity: 0.7;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.state-change-animation {
+    animation: stateChange 0.5s ease;
+}
+
+/* Botón EDITAR - Modo oscuro */
 [data-theme="dark"] .action-btn-view {
     background: linear-gradient(135deg, #8b5cf6, #7c3aed, #8b5cf6) !important;
-    color: white !important;
-    border: 1px solid #7c3aed;
-    box-shadow: 0 2px 4px rgba(139, 92, 246, 0.3);
+    border-color: #7c3aed !important;
+    box-shadow: 0 3px 8px rgba(139, 92, 246, 0.3);
 }
 
 [data-theme="dark"] .action-btn-view:hover {
     background: linear-gradient(135deg, #7c3aed, #6d28d9, #7c3aed) !important;
-    box-shadow: 0 6px 16px rgba(139, 92, 246, 0.5);
+    box-shadow: 0 8px 20px rgba(139, 92, 246, 0.5);
 }
 
-/* Botón ELIMINAR - Modo claro (rojo) */
-.action-btn-delete {
+/* Botón ACTIVAR/DESACTIVAR - Modo oscuro */
+[data-theme="dark"] .action-btn-toggle-estado[data-estado="Activo"],
+[data-theme="dark"] .action-btn-toggle-estado[data-estado="activo"] {
     background: linear-gradient(135deg, #ef4444, #dc2626, #ef4444) !important;
-    color: white !important;
-    border: 1px solid #dc2626;
-    position: relative;
-    overflow: hidden;
-    font-weight: 600;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-    transition: all 0.3s ease;
-    box-shadow: 0 2px 4px rgba(239, 68, 68, 0.3);
-    border-radius: 8px !important;
-    padding: 8px 12px !important;
-    font-size: 12px !important;
-    cursor: pointer !important;
-    width: 80px !important;
+    border-color: #dc2626 !important;
+    box-shadow: 0 3px 8px rgba(239, 68, 68, 0.3);
 }
 
-.action-btn-delete:hover {
-    background: linear-gradient(135deg, #dc2626, #b91c1c, #dc2626) !important;
-    transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(220, 38, 38, 0.4);
+[data-theme="dark"] .action-btn-toggle-estado[data-estado="Inactivo"],
+[data-theme="dark"] .action-btn-toggle-estado[data-estado="inactivo"] {
+    background: linear-gradient(135deg, #17d336, #059624, #17d336) !important;
+    border-color: #05961d !important;
+    box-shadow: 0 3px 8px rgba(16, 185, 129, 0.3);
 }
 
-.action-btn-delete:active {
-    transform: translateY(0);
-    box-shadow: 0 2px 6px rgba(220, 38, 38, 0.3);
-    animation: buttonClick 0.2s ease;
-}
-
-/* Botón ELIMINAR - Modo oscuro (rojo) */
-[data-theme="dark"] .action-btn-delete {
-    background: linear-gradient(135deg, #ef4444, #dc2626, #ef4444) !important;
-    color: white !important;
-    border: 1px solid #dc2626;
-    box-shadow: 0 2px 4px rgba(239, 68, 68, 0.3);
-}
-
-[data-theme="dark"] .action-btn-delete:hover {
-    background: linear-gradient(135deg, #dc2626, #b91c1c, #dc2626) !important;
-    box-shadow: 0 6px 16px rgba(220, 38, 38, 0.5);
-}
-
-/* Animación de shimmer universal */
+/* Animaciones principales */
 @keyframes shimmerUniversal {
     0% {
         left: -100%;
     }
-
     100% {
         left: 400%;
     }
 }
 
-/* Animación de pulsación */
 @keyframes buttonClick {
     0% {
         transform: scale(1);
     }
-
     50% {
-        transform: scale(0.95);
+        transform: scale(0.9);
     }
-
     100% {
         transform: scale(1);
     }
@@ -821,6 +1014,42 @@ MODO OSCURO - DROPDOWN
 
 /* Para modo oscuro, ajustar la intensidad del brillo */
 [data-theme="dark"] .action-btn-view::before,
-[data-theme="dark"] .action-btn-delete::before {
+[data-theme="dark"] .action-btn-toggle-estado::before {
     background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+}
+
+/* Transiciones suaves para todo */
+* {
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+    .action-btn-view,
+    .action-btn-toggle-estado {
+        padding: 6px 10px !important;
+        font-size: 11px !important;
+        width: 70px !important;
+    }
+    
+    .state-badge-shimmer {
+        font-size: 11px;
+        padding: 2px 8px !important;
+    }
+    
+    /* Ajustar animaciones para mobile */
+    tbody tr {
+        animation: slideInRowMobile 0.5s ease backwards;
+    }
+    
+    @keyframes slideInRowMobile {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
 }
