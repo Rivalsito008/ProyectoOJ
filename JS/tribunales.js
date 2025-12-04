@@ -47,11 +47,27 @@ let tribunalEnEdicion = null;
 // INICIALIZACIÓN EN DOMContentLoaded
 // ============================================
 document.addEventListener('DOMContentLoaded', async function () {
+
+    // Mostrar SweetAlert de carga
+    Swal.fire({
+        title: 'Cargando tribunales...',
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+        allowEnterKey: false,
+        showConfirmButton: false,
+        didOpen: () => {
+            Swal.showLoading();
+        }
+    });
+
     await cargarSelectsConDatosReales();
     await cargarTodasLasTablas();
     inicializarModal();
     inicializarTabs();
     
+    // Cerrar el SweetAlert cuando todo haya cargado
+    Swal.close();
+
     // Botón para CREAR nuevo tribunal
     const openBtn = document.getElementById('openFormBtn');
     if (openBtn) {
@@ -465,7 +481,7 @@ function agregarEventListenersABotones() {
             const result = await Swal.fire({
                 title: esActivo ? '¿Desactivar tribunal?' : '¿Activar tribunal?',
                 html: `¿Estás seguro de que quieres <strong>${esActivo ? 'DESACTIVAR' : 'ACTIVAR'}</strong> el tribunal<br><strong>"${nombreTribunal}"</strong>?`,
-                icon: 'warning',
+                icon: 'question',
                 showCancelButton: true,
                 confirmButtonColor: esActivo ? '#EF4444' : '#3cd455ff',
                 cancelButtonColor: '#6B7280',
