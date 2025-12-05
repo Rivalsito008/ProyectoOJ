@@ -222,7 +222,12 @@ async function cargarPreguntasDesdeAPI() {
     } catch (error) {
         console.error('Error al cargar preguntas:', error);
         cerrarCargando();
-        mostrarError('No se pudieron cargar las preguntas. Revisa la conexión con el servidor.');
+        // Limpiar array de preguntas para que las tablas muestren el error
+        preguntas = [];
+        
+        // Actualizar todas las tablas para mostrar el mensaje de error
+        cargarTodasLasTablas();
+        
         return [];
     }
 }
@@ -249,6 +254,18 @@ function cargarTablaPorNivel(nivel) {
     }
 
     tbody.innerHTML = "";
+
+    // Si no hay preguntas cargadas, mostrar mensaje de error de conexión
+    if (!preguntas || preguntas.length === 0) {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+            <td colspan="6" class="px-6 py-8 text-center text-red-500">
+                No se pudo conectar con el servidor. Verifica que el backend esté corriendo en http://localhost:8000
+            </td>
+        `;
+        tbody.appendChild(tr);
+        return;
+    }
 
     // Filtrar preguntas según el nivel
     let preguntasFiltradas = [];
@@ -521,23 +538,43 @@ function obtenerNombreAmbito(idAmbito) {
 // -------------------------------
 // MANEJO DE FORMULARIOS Y MODALES
 // -------------------------------
-async function cargarPreguntaParaEditar(id) {
+async function cargarPreguntasDesdeAPI() {
     try {
-        mostrarCargando('Cargando pregunta...');
+        console.log('Cargando preguntas desde API...');
+        mostrarCargando('Cargando preguntas...');
         
-        const pregunta = await obtenerPreguntaPorId(id);
+        const response = await api.get('/preguntas');
+        preguntas = response.data.data || response.data;
         
+        console.log(`${preguntas.length} preguntas cargadas`);
+        console.log('Muestra de pregunta:', preguntas[0]);
+        
+        // Cerrar el loading ANTES de actualizar las tablas
         cerrarCargando();
         
-        // Mostrar modal de edición
-        mostrarModalEdicion(pregunta);
+        // Actualizar todas las tablas
+        cargarTodasLasTablas();
         
-        return pregunta;
+        return preguntas;
     } catch (error) {
+        console.error('Error al cargar preguntas:', error);
+        
+        // Cerrar el loading ANTES de mostrar el error
         cerrarCargando();
-        console.error(' Error al cargar pregunta para editar:', error);
-        mostrarError('No se pudo cargar la pregunta para editar');
-        throw error;
+        
+        // Esperar un momento para que se cierre completamente el loading
+        await new Promise(resolve => setTimeout(resolve, 100));
+        
+        // Mostrar error
+        mostrarError('No se pudieron cargar las preguntas. Revisa la conexión con el servidor.');
+        
+        // Limpiar array de preguntas para que las tablas muestren el error
+        preguntas = [];
+        
+        // Actualizar todas las tablas para mostrar el mensaje de error
+        cargarTodasLasTablas();
+        
+        return [];
     }
 }
 
@@ -683,7 +720,7 @@ async function guardarPregunta(e) {
         limpiarFormulario();
         
     } catch (error) {
-        console.error('❌ Error al guardar pregunta:', error);
+        console.error('Error al guardar pregunta:', error);
         // El error ya se maneja en las funciones individuales
     }
 }

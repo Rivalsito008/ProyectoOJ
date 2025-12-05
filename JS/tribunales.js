@@ -47,7 +47,6 @@ let tribunalEnEdicion = null;
 // INICIALIZACIÓN EN DOMContentLoaded
 // ============================================
 document.addEventListener('DOMContentLoaded', async function () {
-
     // Mostrar SweetAlert de carga
     Swal.fire({
         title: 'Cargando tribunales...',
@@ -60,13 +59,27 @@ document.addEventListener('DOMContentLoaded', async function () {
         }
     });
 
-    await cargarSelectsConDatosReales();
-    await cargarTodasLasTablas();
-    inicializarModal();
-    inicializarTabs();
-    
-    // Cerrar el SweetAlert cuando todo haya cargado
-    Swal.close();
+    try {
+        await cargarSelectsConDatosReales();
+        await cargarTodasLasTablas();
+        inicializarModal();
+        inicializarTabs();
+        
+        // Cerrar el SweetAlert cuando todo haya cargado
+        Swal.close();
+    } catch (error) {
+        // Mostrar error si no se pueden cargar los tribunales
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'No se pudieron cargar los tribunales. Revisa la conexión con el servidor.',
+            confirmButtonColor: '#3B82F6'
+        }).then(() => {
+            // Cerrar el loading si estaba abierto
+            Swal.close();
+        });
+        return; // Salir para no continuar con la inicialización
+    }
 
     // Botón para CREAR nuevo tribunal
     const openBtn = document.getElementById('openFormBtn');
@@ -231,14 +244,19 @@ async function cargarTablaPorEstado(estado) {
 
     } catch (error) {
         let mensajeError = 'Error desconocido';
+        let mostrarSweetAlert = false;
+        
         if (error.response) {
             mensajeError = `Error ${error.response.status}: ${error.response.data.message || 'Error del servidor'}`;
         } else if (error.request) {
+            // Este es el caso de error de conexión (backend no responde)
             mensajeError = 'No se pudo conectar con el servidor. Verifica que el backend esté corriendo en http://localhost:8000';
+            mostrarSweetAlert = true;
         } else {
             mensajeError = error.message;
         }
         
+        // Mostrar error en la tabla
         tbody.innerHTML = `
             <tr>
                 <td colspan="9" class="px-6 py-8 text-center text-red-500">
@@ -246,6 +264,16 @@ async function cargarTablaPorEstado(estado) {
                 </td>
             </tr>
         `;
+        
+        // Mostrar SweetAlert para errores de conexión
+        if (mostrarSweetAlert) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'No se pudieron cargar los tribunales. Revisa la conexión con el servidor.',
+                confirmButtonColor: '#3B82F6'
+            });
+        }
     }
 }
 
