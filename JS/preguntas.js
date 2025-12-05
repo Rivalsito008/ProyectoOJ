@@ -1,3 +1,46 @@
+// ===============================
+// SISTEMA DE MODO OSCURO (IGUAL AL DE TRIBUNALES)
+// ===============================
+// Aplicar tema y preferencias al cargar (IIFE - se ejecuta inmediatamente)
+(function () {
+    const t = localStorage.getItem('theme-preference') || 'auto';
+    let f = t;
+    if (t === 'auto') {
+        f = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+    document.documentElement.setAttribute('data-theme', f);
+
+    // Aplicar clase 'dark' si el tema es oscuro (para compatibilidad con Tailwind)
+    if (f === 'dark') {
+        document.documentElement.classList.add('dark');
+    } else {
+        document.documentElement.classList.remove('dark');
+    }
+
+    // Opcional: Sistema de tamaño de fuente y contraste
+    const fontSize = localStorage.getItem('font-size') || '16';
+    document.documentElement.style.setProperty('--font-size', fontSize + 'px');
+
+    const contrast = localStorage.getItem('contrast') || '1';
+    document.documentElement.style.setProperty('--contrast', contrast);
+})();
+
+// Detectar cambios en preferencia de sistema (para modo auto)
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+    const temaActual = localStorage.getItem('theme-preference') || 'auto';
+    if (temaActual === 'auto') {
+        const nuevoTema = e.matches ? 'dark' : 'light';
+        document.documentElement.setAttribute('data-theme', nuevoTema);
+        
+        // Actualizar clase dark para Tailwind
+        if (nuevoTema === 'dark') {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+    }
+});
+
 // -------------------------------
 // CONFIGURACIÓN DE AXIOS - VERSIÓN MEJORADA
 // -------------------------------
