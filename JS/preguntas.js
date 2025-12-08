@@ -1,46 +1,3 @@
-// ===============================
-// SISTEMA DE MODO OSCURO (IGUAL AL DE TRIBUNALES)
-// ===============================
-// Aplicar tema y preferencias al cargar (IIFE - se ejecuta inmediatamente)
-(function () {
-    const t = localStorage.getItem('theme-preference') || 'auto';
-    let f = t;
-    if (t === 'auto') {
-        f = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-    }
-    document.documentElement.setAttribute('data-theme', f);
-
-    // Aplicar clase 'dark' si el tema es oscuro (para compatibilidad con Tailwind)
-    if (f === 'dark') {
-        document.documentElement.classList.add('dark');
-    } else {
-        document.documentElement.classList.remove('dark');
-    }
-
-    // Opcional: Sistema de tamaño de fuente y contraste
-    const fontSize = localStorage.getItem('font-size') || '16';
-    document.documentElement.style.setProperty('--font-size', fontSize + 'px');
-
-    const contrast = localStorage.getItem('contrast') || '1';
-    document.documentElement.style.setProperty('--contrast', contrast);
-})();
-
-// Detectar cambios en preferencia de sistema (para modo auto)
-window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
-    const temaActual = localStorage.getItem('theme-preference') || 'auto';
-    if (temaActual === 'auto') {
-        const nuevoTema = e.matches ? 'dark' : 'light';
-        document.documentElement.setAttribute('data-theme', nuevoTema);
-        
-        // Actualizar clase dark para Tailwind
-        if (nuevoTema === 'dark') {
-            document.documentElement.classList.add('dark');
-        } else {
-            document.documentElement.classList.remove('dark');
-        }
-    }
-});
-
 // -------------------------------
 // CONFIGURACIÓN DE AXIOS - VERSIÓN MEJORADA
 // -------------------------------
@@ -265,12 +222,7 @@ async function cargarPreguntasDesdeAPI() {
     } catch (error) {
         console.error('Error al cargar preguntas:', error);
         cerrarCargando();
-        // Limpiar array de preguntas para que las tablas muestren el error
-        preguntas = [];
-        
-        // Actualizar todas las tablas para mostrar el mensaje de error
-        cargarTodasLasTablas();
-        
+        mostrarError('No se pudieron cargar las preguntas. Revisa la conexión con el servidor.');
         return [];
     }
 }
@@ -297,18 +249,6 @@ function cargarTablaPorNivel(nivel) {
     }
 
     tbody.innerHTML = "";
-
-    // Si no hay preguntas cargadas, mostrar mensaje de error de conexión
-    if (!preguntas || preguntas.length === 0) {
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-            <td colspan="6" class="px-6 py-8 text-center text-red-500">
-                No se pudo conectar con el servidor. Verifica que el backend esté corriendo en http://localhost:8000
-            </td>
-        `;
-        tbody.appendChild(tr);
-        return;
-    }
 
     // Filtrar preguntas según el nivel
     let preguntasFiltradas = [];
@@ -581,43 +521,23 @@ function obtenerNombreAmbito(idAmbito) {
 // -------------------------------
 // MANEJO DE FORMULARIOS Y MODALES
 // -------------------------------
-async function cargarPreguntasDesdeAPI() {
+async function cargarPreguntaParaEditar(id) {
     try {
-        console.log('Cargando preguntas desde API...');
-        mostrarCargando('Cargando preguntas...');
+        mostrarCargando('Cargando pregunta...');
         
-        const response = await api.get('/preguntas');
-        preguntas = response.data.data || response.data;
+        const pregunta = await obtenerPreguntaPorId(id);
         
-        console.log(`${preguntas.length} preguntas cargadas`);
-        console.log('Muestra de pregunta:', preguntas[0]);
-        
-        // Cerrar el loading ANTES de actualizar las tablas
         cerrarCargando();
         
-        // Actualizar todas las tablas
-        cargarTodasLasTablas();
+        // Mostrar modal de edición
+        mostrarModalEdicion(pregunta);
         
-        return preguntas;
+        return pregunta;
     } catch (error) {
-        console.error('Error al cargar preguntas:', error);
-        
-        // Cerrar el loading ANTES de mostrar el error
         cerrarCargando();
-        
-        // Esperar un momento para que se cierre completamente el loading
-        await new Promise(resolve => setTimeout(resolve, 100));
-        
-        // Mostrar error
-        mostrarError('No se pudieron cargar las preguntas. Revisa la conexión con el servidor.');
-        
-        // Limpiar array de preguntas para que las tablas muestren el error
-        preguntas = [];
-        
-        // Actualizar todas las tablas para mostrar el mensaje de error
-        cargarTodasLasTablas();
-        
-        return [];
+        console.error('❌ Error al cargar pregunta para editar:', error);
+        mostrarError('No se pudo cargar la pregunta para editar');
+        throw error;
     }
 }
 
@@ -763,7 +683,7 @@ async function guardarPregunta(e) {
         limpiarFormulario();
         
     } catch (error) {
-        console.error('Error al guardar pregunta:', error);
+        console.error('❌ Error al guardar pregunta:', error);
         // El error ya se maneja en las funciones individuales
     }
 }
