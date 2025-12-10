@@ -1,9 +1,8 @@
-// -------------------------------
-// CONFIGURACIÓN DE AXIOS - VERSIÓN MEJORADA
-// -------------------------------
+// ============================================
+// CONFIGURACIÓN DE AXIOS
+// ============================================
 const API_BASE_URL = 'http://localhost:8000/api';
 
-// Crear instancia de Axios con configuración específica
 const api = axios.create({
     baseURL: API_BASE_URL,
     headers: {
@@ -12,163 +11,127 @@ const api = axios.create({
     }
 });
 
-// Interceptor para requests
-api.interceptors.request.use(
-    config => {
-        // Agregar token de autenticación si existe
-        const token = localStorage.getItem('auth_token');
-        if (token) {
-            config.headers.Authorization = `Bearer ${token}`;
-        }
-        
-        // Agregar timestamp para evitar cache en GET
-        if (config.method === 'get') {
-            config.params = {
-                ...config.params,
-                _t: Date.now()
-            };
-        }
-        
-        console.log(`[${config.method?.toUpperCase()}] ${config.url}`);
-        return config;
-    },
-    error => {
-        console.error('Error en request:', error);
-        return Promise.reject(error);
-    }
-);
-
-// Interceptor para responses
+// Manejo global de errores
 api.interceptors.response.use(
-    response => {
-        console.log(`[${response.status}] ${response.config.url}`);
-        return response;
-    },
+    response => response,
     error => {
-        const { response } = error;
-        
-        if (!response) {
-            console.error('Error de red/conexion');
-            mostrarError('No hay conexión con el servidor. Verifica tu internet.');
-            return Promise.reject(error);
-        }
-        
-        const { status, data } = response;
-        
-        // Manejo específico de errores HTTP
-        switch (status) {
-            case 401:
-                console.error('No autorizado - Token expirado o invalido');
-                mostrarError('Tu sesión ha expirado. Por favor, inicia sesión nuevamente.');
-                break;
-                
-            case 403:
-                console.error('Acceso prohibido');
-                mostrarError('No tienes permisos para realizar esta acción.');
-                break;
-                
-            case 404:
-                console.error('Recurso no encontrado');
-                mostrarError('El recurso solicitado no existe.');
-                break;
-                
-            case 422:
-                console.error('Error de validacion:', data.errors);
-                const errores = Object.values(data.errors || {}).flat().join('\n');
-                mostrarError('Errores de validación:\n' + errores);
-                break;
-                
-            case 500:
-                console.error('Error interno del servidor');
-                mostrarError('Error interno del servidor. Por favor, intenta más tarde.');
-                break;
-                
-            default:
-                console.error(`Error ${status}:`, data);
-                mostrarError(data?.message || `Error ${status}: ${data?.error || 'Error desconocido'}`);
-        }
-        
+        console.error('Error de API:', error.response?.data || error.message);
         return Promise.reject(error);
     }
 );
 
-// -------------------------------
+// ============================================
 // VARIABLES GLOBALES
-// -------------------------------
+// ============================================
 let preguntas = [];
-let nivelesRiesgoMap = {}; // Cache de niveles de riesgo cargados desde API
-let ambitosMap = {}; // Cache de ámbitos cargados desde API
+let nivelesRiesgoMap = {};
+let ambitosMap = {};
 
-// -------------------------------
-// FUNCIONES DE UTILIDAD
-// -------------------------------
-function escapeHtml(text) {
-    if (!text) return '';
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
-}
+// Variables para modo edición
+let modoEdicion = false;
+let preguntaEnEdicion = null;
 
-function mostrarExito(mensaje) {
-    Swal.fire({
-        icon: 'success',
-        title: '¡Éxito!',
-        text: mensaje,
-        timer: 2000,
-        showConfirmButton: false
-    });
-}
+// Variable para controlar si ya se mostró el error
+let errorMostrado = false;
 
-function mostrarError(mensaje) {
-    Swal.fire({
-        icon: 'error',
-        title: 'Error',
-        text: mensaje,
-        confirmButtonColor: '#3B82F6'
-    });
-}
-
-function mostrarCargando(mensaje = 'Cargando...') {
-    Swal.fire({
-        title: mensaje,
+// ============================================
+// INICIALIZACIÓN EN DOMContentLoaded
+// ============================================
+document.addEventListener('DOMContentLoaded', async function () {
+    // Mostrar SweetAlert de carga
+    const loadingSwal = Swal.fire({
+        title: 'Cargando preguntas...',
         allowOutsideClick: false,
+        allowEscapeKey: false,
+        allowEnterKey: false,
         showConfirmButton: false,
         didOpen: () => {
             Swal.showLoading();
         }
     });
-}
 
-function cerrarCargando() {
-    Swal.close();
-}
+    try {
+        await cargarDatosIniciales();
+        inicializarModal();
+        inicializarTabs();
+        
+        // Cerrar el SweetAlert cuando todo haya cargado
+        Swal.close();
+        errorMostrado = false;
+        
+    } catch (error) {
+        console.error('Error crítico en inicialización:', error);
+        
+        // Cerrar el loading
+        if (Swal.isVisible()) {
+            Swal.close();
+        }
+        
+        // Mostrar error solo si no se ha mostrado antes
+        if (!errorMostrado) {
+            errorMostrado = true;
+            
+            // Usar un delay para asegurar que el loading se cierre
+            await new Promise(resolve => setTimeout(resolve, 200));
+            
+            await Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                html: '<p class="text-lg">No se pudieron cargar las preguntas. Revisa la conexión con el servidor.</p>',
+                confirmButtonColor: '#EF4444',
+                confirmButtonText: 'Entendido',
+                allowOutsideClick: false
+            });
+        }
+        
+        return;
+    }
 
-// -------------------------------
-// FUNCIONES PARA CARGAR DATOS DESDE API
-// -------------------------------
+    // Botón para CREAR nueva pregunta
+    const openBtn = document.getElementById('openQuestionBtn');
+    if (openBtn) {
+        openBtn.replaceWith(openBtn.cloneNode(true));
+        const newOpenBtn = document.getElementById('openQuestionBtn');
+        newOpenBtn.addEventListener('click', () => {
+            abrirModalCrear();
+        });
+    }
+    
+    // Botón para GUARDAR/ACTUALIZAR
+    const btnGuardar = document.getElementById('btnGuardarPregunta');
+    if (btnGuardar) {
+        btnGuardar.replaceWith(btnGuardar.cloneNode(true));
+        const newBtnGuardar = document.getElementById('btnGuardarPregunta');
+        newBtnGuardar.addEventListener('click', async function(e) {
+            e.preventDefault();
+            
+            if (this.disabled) return;
+            
+            await guardarOActualizarPregunta();
+        });
+    }
+});
+
+// ============================================
+// FUNCIONES PARA CARGAR DATOS INICIALES
+// ============================================
 async function cargarDatosIniciales() {
     try {
-        console.log('Cargando datos iniciales...');
-        
-        // Cargar niveles de riesgo y ámbitos desde API si existen endpoints
-        // Por ahora usamos valores estáticos que coinciden con tu BD
+        // Cargar catálogos
         await cargarNivelesRiesgo();
         await cargarAmbitos();
         
         // Cargar preguntas
         await cargarPreguntasDesdeAPI();
         
-        console.log('Datos iniciales cargados correctamente');
     } catch (error) {
         console.error('Error al cargar datos iniciales:', error);
-        mostrarError('No se pudieron cargar los datos iniciales. Recarga la página.');
+        throw error;
     }
 }
 
 async function cargarNivelesRiesgo() {
     try {
-        // Mapeo según tu base de datos
-        // Estos IDs deben coincidir con los de tu tabla nivel_riesgo
         nivelesRiesgoMap = {
             'bajo': { id: 1, nombre: 'Bajo', valor_puntaje: 1 },
             'moderado': { id: 2, nombre: 'Moderado', valor_puntaje: 2 },
@@ -176,18 +139,13 @@ async function cargarNivelesRiesgo() {
             'extremo': { id: 4, nombre: 'Extremo', valor_puntaje: 4 },
             'activadora': { id: 5, nombre: 'Activadora', valor_puntaje: 100 }
         };
-        
-        console.log('Niveles de riesgo cargados:', nivelesRiesgoMap);
     } catch (error) {
-        console.error('Error al cargar niveles de riesgo:', error);
         throw error;
     }
 }
 
 async function cargarAmbitos() {
     try {
-        // Mapeo según tu base de datos (ACTUALIZADO)
-        // Estos IDs deben coincidir con los de tu tabla ambito
         ambitosMap = {
             'Conducta del Agresor': 1,
             'Contexto de la Violencia': 2,
@@ -195,48 +153,31 @@ async function cargarAmbitos() {
             'Vulnerabilidad de Víctima': 4,
             'Riesgos de la Víctima': 5
         };
-        
-        console.log('Ambitos cargados:', ambitosMap);
     } catch (error) {
-        console.error('Error al cargar ambitos:', error);
         throw error;
     }
 }
 
 async function cargarPreguntasDesdeAPI() {
     try {
-        console.log('Cargando preguntas desde API...');
-        mostrarCargando('Cargando preguntas...');
-        
         const response = await api.get('/preguntas');
         preguntas = response.data.data || response.data;
-        
-        console.log(`${preguntas.length} preguntas cargadas`);
-        console.log('Muestra de pregunta:', preguntas[0]);
         
         // Actualizar todas las tablas
         cargarTodasLasTablas();
         
-        cerrarCargando();
         return preguntas;
     } catch (error) {
         console.error('Error al cargar preguntas:', error);
-        cerrarCargando();
-        mostrarError('No se pudieron cargar las preguntas. Revisa la conexión con el servidor.');
-        return [];
+        throw error;
     }
 }
 
-// -------------------------------
+// ============================================
 // FUNCIONES PARA CARGAR TABLAS
-// -------------------------------
+// ============================================
 function cargarTodasLasTablas() {
     cargarTablaPorNivel('todo');
-    cargarTablaPorNivel('bajo');
-    cargarTablaPorNivel('moderado');
-    cargarTablaPorNivel('alto');
-    cargarTablaPorNivel('extremo');
-    cargarTablaPorNivel('activadora');
 }
 
 function cargarTablaPorNivel(nivel) {
@@ -244,162 +185,534 @@ function cargarTablaPorNivel(nivel) {
     const tbody = document.getElementById(tbodyId);
 
     if (!tbody) {
-        console.error(`No se encontro el tbody con id: ${tbodyId}`);
+        console.error(`No se encontró el tbody con id: ${tbodyId}`);
         return;
     }
 
-    tbody.innerHTML = "";
+    tbody.innerHTML = "<tr><td colspan='6' class='px-6 py-8 text-center'>Cargando...</td></tr>";
 
-    // Filtrar preguntas según el nivel
-    let preguntasFiltradas = [];
+    try {
+        // Filtrar preguntas según el nivel
+        let preguntasFiltradas = [];
 
-    if (nivel === 'todo') {
-        preguntasFiltradas = preguntas;
-    } else {
-        // Normalizar nombre del nivel para comparar
-        preguntasFiltradas = preguntas.filter(p => {
-            const nivelPregunta = (p.nivel_riesgo || '').toLowerCase().trim();
-            const nivelBuscado = nivel.toLowerCase().trim();
-            return nivelPregunta === nivelBuscado;
-        });
-    }
-
-    if (preguntasFiltradas.length === 0) {
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-            <td colspan="6" class="px-6 py-8 text-center text-gray-500 dark:text-gray-400 text-lg">
-                ${nivel === 'todo' ? 'No hay preguntas' : `No hay preguntas de nivel ${nivel}`}
-            </td>
-        `;
-        tbody.appendChild(tr);
-        return;
-    }
-
-    preguntasFiltradas.forEach(p => {
-        const tr = document.createElement("tr");
-        // Clase mejorada para los bordes en ambos modos
-        tr.className = "border-b border-gray-200 dark:border-gray-700 hover:bg-gradient-to-r hover:from-gray-50 hover:to-gray-50 dark:hover:from-gray-800 dark:hover:to-gray-700 transition-all duration-300";
-
-        // Determinar clases CSS según el nivel de riesgo
-        let riesgoClass = "";
-        let riesgoText = p.nivel_riesgo || 'Sin nivel';
-
-        switch ((p.nivel_riesgo || '').toLowerCase()) {
-            case 'bajo':
-                riesgoClass = "bg-green-500";
-                break;
-            case 'moderado':
-                riesgoClass = "bg-yellow-500";
-                break;
-            case 'alto':
-                riesgoClass = "bg-orange-500";
-                break;
-            case 'extremo':
-                riesgoClass = "bg-red-600";
-                break;
-            case 'activadora':
-                riesgoClass = "bg-[#8B0000]";
-                riesgoText = "Activador";
-                break;
-            default:
-                riesgoClass = "bg-gray-500";
+        if (nivel === 'todo') {
+            preguntasFiltradas = preguntas;
+        } else {
+            preguntasFiltradas = preguntas.filter(p => {
+                const nivelPregunta = (p.nivel_riesgo || '').toLowerCase().trim();
+                const nivelBuscado = nivel.toLowerCase().trim();
+                return nivelPregunta === nivelBuscado;
+            });
         }
 
-        // Determinar estado actual y clase para badge de estado
-        const estadoActual = (p.estado || 'Inactivo').toLowerCase();
-        const estadoBadgeClass = estadoActual === 'activo' ? 'bg-green-600' : 'bg-red-600';
+        tbody.innerHTML = "";
+
+        if (preguntasFiltradas.length === 0) {
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+                <td colspan="6" class="px-6 py-8 text-center text-gray-500 dark:text-gray-400 text-lg">
+                    No hay preguntas ${nivel !== 'todo' ? 'de nivel ' + nivel : 'registradas'}
+                </td>
+            `;
+            tbody.appendChild(tr);
+            return;
+        }
+
+        // Renderizar preguntas
+        preguntasFiltradas.forEach(p => {
+            const tr = document.createElement("tr");
+            tr.className = "border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors";
+
+            // Determinar clase de riesgo
+            let riesgoClass = "";
+            let riesgoText = p.nivel_riesgo || 'Sin nivel';
+
+            switch ((p.nivel_riesgo || '').toLowerCase()) {
+                case 'bajo':
+                    riesgoClass = "bg-green-500";
+                    break;
+                case 'moderado':
+                    riesgoClass = "bg-yellow-500";
+                    break;
+                case 'alto':
+                    riesgoClass = "bg-orange-500";
+                    break;
+                case 'extremo':
+                    riesgoClass = "bg-red-600";
+                    break;
+                case 'activadora':
+                    riesgoClass = "bg-[#8B0000]";
+                    riesgoText = "Activadora";
+                    break;
+                default:
+                    riesgoClass = "bg-gray-500";
+            }
+
+            const estadoActual = (p.estado || 'Inactivo').toLowerCase();
+            const estadoNormalizado = estadoActual.trim().toLowerCase();
+            const esActivo = estadoNormalizado === 'activo';
+            
+            const textoBoton = esActivo ? 'Desactivar' : 'Activar';
+            const colorBoton = esActivo ? 'bg-red-500 hover:bg-red-600' : 'bg-green-500 hover:bg-green-600';
+
+            const puntajeFormateado = p.puntaje !== null && p.puntaje !== undefined ? `${p.puntaje} pts` : '0 pts';
+
+            tr.innerHTML = `
+                <td class="px-6 py-4 font-medium">${escapeHtml(p.pregunta || '')}</td>
+                <td class="px-6 py-4 text-center">${escapeHtml(p.ambito || 'N/A')}</td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <span class="inline-flex items-center justify-center w-20 px-3 py-1 rounded-full text-xs font-semibold text-white ${riesgoClass}">
+                        ${riesgoText}
+                    </span>
+                </td>
+                <td class="px-6 py-4 text-center font-semibold">
+                    ${puntajeFormateado}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <span class="inline-flex items-center justify-center w-20 px-3 py-1 rounded-full text-xs font-semibold text-white ${colorBoton.split(' ')[0]}">
+                        ${p.estado || 'Inactivo'}
+                    </span>
+                </td>
+                <td class="px-6 py-4">
+                    <div class="flex space-x-2 justify-center">
+                        <button class="action-btn-view px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
+                                data-id="${p.id}">
+                            Editar
+                        </button>
+                        <button class="action-btn-toggle-estado px-3 py-1 rounded transition text-white ${colorBoton}"
+                                data-id="${p.id}"
+                                data-estado="${p.estado || 'Inactivo'}"
+                                data-pregunta="${escapeHtml(p.pregunta || '')}">
+                            ${textoBoton}
+                        </button>
+                    </div>
+                </td>
+            `;
+
+            tbody.appendChild(tr);
+        });
+
+        agregarEventListenersABotones();
+
+    } catch (error) {
+        console.error('Error al cargar preguntas:', error);
         
-        // Formatear puntaje
-        const puntajeFormateado = p.puntaje !== null && p.puntaje !== undefined ? `${p.puntaje} pts` : '0 pts';
-
-        tr.innerHTML = `
-            <td class="px-6 py-4 text-gray-900 dark:text-white font-medium">${escapeHtml(p.pregunta || '')}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-center text-gray-900 dark:text-white">${escapeHtml(p.ambito || 'N/A')}</td>
-            <td class="px-6 py-4 whitespace-nowrap">
-                <span class="inline-flex items-center justify-center w-20 px-3 py-1 rounded-full text-xs font-semibold relative overflow-hidden state-badge-shimmer ${riesgoClass}">
-                    ${riesgoText}
-                </span>
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-semibold text-gray-700 dark:text-gray-300">
-                ${puntajeFormateado}
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap">
-                <span class="state-badge-shimmer inline-flex items-center justify-center w-20 px-3 py-1 rounded-full text-xs font-semibold relative overflow-hidden ${estadoBadgeClass} border-0 shadow-sm">
-                    ${p.estado || 'Inactivo'}
-                </span>
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap">
-                <div class="flex space-x-2">
-                    <button class="action-btn-view"
-                            data-id="${p.id}">
-                        Editar
-                    </button>
-                    <button class="action-btn-toggle-estado"
-                            data-id="${p.id}"
-                            data-estado="${p.estado || 'Inactivo'}">
-                        ${estadoActual === 'activo' ? 'Desactivar' : 'Activar'}
-                    </button>
-                </div>
-            </td>
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="6" class="px-6 py-8 text-center">
+                    <div class="flex flex-col items-center justify-center space-y-3">
+                        <svg class="w-16 h-16 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <p class="text-red-500 text-xl font-bold">Error al cargar preguntas</p>
+                        <p class="text-gray-500 text-sm">Verifica la conexión con el servidor</p>
+                    </div>
+                </td>
+            </tr>
         `;
-
-        tbody.appendChild(tr);
-    });
-
-    // Agregar event listeners a los nuevos botones
-    agregarEventListenersABotones();
+        
+        throw error;
+    }
 }
 
-// -------------------------------
-// FUNCIONES CRUD CON AXIOS
-// -------------------------------
+// ============================================
+// FUNCIONES PARA MODAL
+// ============================================
+function inicializarModal() {
+    const closeBtn = document.getElementById('closeQuestionBtn');
+    const cancelBtn = document.getElementById('cancelQuestionBtn');
+    const modal = document.getElementById('questionFormModal');
+
+    if (closeBtn && modal) {
+        const closeModal = () => {
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            modoEdicion = false;
+            preguntaEnEdicion = null;
+            limpiarFormulario();
+        };
+
+        closeBtn.addEventListener('click', closeModal);
+        if (cancelBtn) cancelBtn.addEventListener('click', closeModal);
+
+        window.addEventListener('click', (e) => {
+            if (e.target === modal) closeModal();
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && modal.classList.contains('flex')) {
+                closeModal();
+            }
+        });
+    }
+}
+
+function abrirModalCrear() {
+    modoEdicion = false;
+    preguntaEnEdicion = null;
+    limpiarFormulario();
+    
+    const modalTitle = document.querySelector('#questionFormModal h2');
+    if (modalTitle) {
+        modalTitle.textContent = 'Nueva Pregunta';
+    }
+    
+    const btnGuardar = document.getElementById('btnGuardarPregunta');
+    if (btnGuardar) {
+        btnGuardar.textContent = 'Guardar Pregunta';
+    }
+    
+    const modal = document.getElementById('questionFormModal');
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+}
+
+async function abrirModalEditar(idPregunta) {
+    modoEdicion = true;
+    preguntaEnEdicion = idPregunta;
+    
+    try {
+        const modal = document.getElementById('questionFormModal');
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+        
+        const modalTitle = document.querySelector('#questionFormModal h2');
+        if (modalTitle) {
+            modalTitle.textContent = 'Editar Pregunta';
+        }
+        
+        const btnGuardar = document.getElementById('btnGuardarPregunta');
+        if (btnGuardar) {
+            btnGuardar.textContent = 'Actualizar Pregunta';
+        }
+        
+        const response = await api.get(`/preguntas/${idPregunta}`);
+        const pregunta = response.data.data || response.data;
+        
+        await llenarFormularioEdicion(pregunta);
+        
+    } catch (error) {
+        await Swal.fire({
+            icon: 'error',
+            title: 'Error al cargar',
+            text: 'No se pudieron cargar los datos de la pregunta',
+            confirmButtonColor: '#3B82F6'
+        });
+        cerrarModal();
+    }
+}
+
+function cerrarModal() {
+    const modal = document.getElementById('questionFormModal');
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+    
+    modoEdicion = false;
+    preguntaEnEdicion = null;
+    limpiarFormulario();
+}
+
+async function llenarFormularioEdicion(pregunta) {
+    // Campo pregunta
+    const inputPregunta = document.getElementById('pregunta');
+    if (inputPregunta) {
+        inputPregunta.value = pregunta.pregunta || '';
+    }
+    
+    // Select ámbito
+    const selectAmbito = document.getElementById('ambito');
+    if (selectAmbito && pregunta.ambito) {
+        const ambitoBuscado = pregunta.ambito.trim();
+        for (let i = 0; i < selectAmbito.options.length; i++) {
+            if (selectAmbito.options[i].text.trim() === ambitoBuscado) {
+                selectAmbito.selectedIndex = i;
+                break;
+            }
+        }
+    }
+    
+    // Select nivel de riesgo
+    const selectRiesgo = document.getElementById('riesgo');
+    if (selectRiesgo && pregunta.nivel_riesgo) {
+        const nivelNormalizado = pregunta.nivel_riesgo.toLowerCase().trim();
+        for (let option of selectRiesgo.options) {
+            if (option.value.toLowerCase() === nivelNormalizado) {
+                selectRiesgo.value = option.value;
+                break;
+            }
+        }
+    }
+    
+    // Select estado
+    const selectEstado = document.getElementById('estado');
+    if (selectEstado) {
+        selectEstado.value = pregunta.estado || 'Activo';
+    }
+}
+
+function limpiarFormulario() {
+    const pregunta = document.getElementById('pregunta');
+    const ambito = document.getElementById('ambito');
+    const riesgo = document.getElementById('riesgo');
+    const estado = document.getElementById('estado');
+
+    if (pregunta) pregunta.value = '';
+    if (ambito) ambito.selectedIndex = 0;
+    if (riesgo) riesgo.selectedIndex = 0;
+    if (estado) estado.value = 'Activo';
+}
+
+// ============================================
+// FUNCIONES PARA TABS
+// ============================================
+function inicializarTabs() {
+    const tabs = document.querySelectorAll('.browser-tab');
+    const contents = document.querySelectorAll('.tab-content');
+
+    tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            const tabName = tab.getAttribute('data-tab');
+
+            tabs.forEach(t => t.classList.remove('active'));
+            contents.forEach(c => c.classList.remove('active'));
+
+            tab.classList.add('active');
+
+            const targetContent = document.getElementById(tabName);
+            if (targetContent) {
+                targetContent.classList.add('active');
+            }
+
+            // Mapear nombres de tabs a niveles
+            const nivelMap = {
+                'todo': 'todo',
+                'bajo': 'bajo',
+                'moderado': 'moderado',
+                'alto': 'alto',
+                'extremo': 'extremo',
+                'activadora': 'activadora'
+            };
+
+            const nivel = nivelMap[tabName] || 'todo';
+            cargarTablaPorNivel(nivel);
+        });
+    });
+}
+
+// ============================================
+// EVENT LISTENERS PARA BOTONES
+// ============================================
+function agregarEventListenersABotones() {
+    // Botones Editar
+    const botonesEditar = document.querySelectorAll('.action-btn-view');
+    botonesEditar.forEach(boton => {
+        boton.addEventListener('click', function (e) {
+            e.preventDefault();
+            
+            this.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                this.style.transform = 'scale(1)';
+            }, 150);
+            
+            const idPregunta = this.getAttribute('data-id');
+            abrirModalEditar(idPregunta);
+        });
+    });
+
+    // Botones Toggle Estado
+    const botonesToggleEstado = document.querySelectorAll('.action-btn-toggle-estado');
+    botonesToggleEstado.forEach(boton => {
+        boton.addEventListener('click', async function (e) {
+            e.preventDefault();
+            
+            const idPregunta = this.getAttribute('data-id');
+            const estadoActual = this.getAttribute('data-estado');
+            const textoPregunta = this.getAttribute('data-pregunta');
+            
+            this.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                this.style.transform = 'scale(1)';
+            }, 150);
+
+            const esActivo = estadoActual === 'Activo';
+            
+            const result = await Swal.fire({
+                title: esActivo ? '¿Desactivar pregunta?' : '¿Activar pregunta?',
+                html: `¿Estás seguro de que quieres <strong>${esActivo ? 'DESACTIVAR' : 'ACTIVAR'}</strong> la pregunta<br><strong>"${textoPregunta}"</strong>?`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: esActivo ? '#EF4444' : '#3cd455ff',
+                cancelButtonColor: '#6B7280',
+                confirmButtonText: esActivo ? 'Sí, desactivar' : 'Sí, activar',
+                cancelButtonText: 'Cancelar',
+                reverseButtons: true
+            });
+            
+            if (result.isConfirmed) {
+                try {
+                    this.textContent = 'Cambiando...';
+                    this.disabled = true;
+                    
+                    const resultado = await toggleEstadoPregunta(idPregunta);
+                    const nuevoEstado = resultado.data?.estado || (estadoActual === 'Activo' ? 'Inactivo' : 'Activo');
+                    
+                    this.setAttribute('data-estado', nuevoEstado);
+                    
+                    if (nuevoEstado === 'Inactivo') {
+                        this.classList.remove('bg-red-500', 'hover:bg-red-600');
+                        this.classList.add('bg-green-500', 'hover:bg-green-600');
+                        this.textContent = 'Activar';
+                    } else {
+                        this.classList.remove('bg-green-500', 'hover:bg-green-600');
+                        this.classList.add('bg-red-500', 'hover:bg-red-600');
+                        this.textContent = 'Desactivar';
+                    }
+                    
+                    this.disabled = false;
+                    
+                    await Swal.fire({
+                        icon: 'success',
+                        title: '¡Estado actualizado!',
+                        text: resultado.message || `La pregunta ahora está ${nuevoEstado}`,
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                    
+                    const tabActivo = document.querySelector('.browser-tab.active');
+                    if (tabActivo) {
+                        const tabName = tabActivo.getAttribute('data-tab');
+                        if (tabName !== 'todo') {
+                            await cargarTablaPorNivel(tabName);
+                        }
+                    }
+                    
+                } catch (error) {
+                    await Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: error.response?.data?.message || 'No se pudo cambiar el estado de la pregunta',
+                        confirmButtonColor: '#3B82F6'
+                    });
+                    
+                    this.disabled = false;
+                    this.textContent = estadoActual === 'Activo' ? 'Desactivar' : 'Activar';
+                }
+            }
+        });
+    });
+}
+
+// ============================================
+// FUNCIONES PARA GUARDAR/ACTUALIZAR
+// ============================================
+async function guardarOActualizarPregunta() {
+    const botonGuardar = document.getElementById('btnGuardarPregunta');
+    
+    if (botonGuardar.disabled) {
+        return;
+    }
+    
+    // Obtener valores
+    const preguntaTexto = document.getElementById('pregunta').value.trim();
+    const ambitoSelect = document.getElementById('ambito');
+    const ambito = ambitoSelect.options[ambitoSelect.selectedIndex]?.text || '';
+    const riesgo = document.getElementById('riesgo').value;
+    const estado = document.getElementById('estado').value;
+
+    // Validaciones
+    if (!preguntaTexto || !ambito || !riesgo) {
+        await Swal.fire({
+            icon: 'warning',
+            title: 'Campos incompletos',
+            text: 'Por favor complete todos los campos requeridos',
+            confirmButtonColor: '#3B82F6'
+        });
+        return;
+    }
+
+    const preguntaData = {
+        pregunta: preguntaTexto,
+        ambito: ambito,
+        nivel_riesgo: riesgo,
+        estado: estado
+    };
+
+    try {
+        const textoOriginal = botonGuardar.textContent;
+        botonGuardar.textContent = modoEdicion ? 'Actualizando...' : 'Guardando...';
+        botonGuardar.disabled = true;
+
+        let resultado;
+        
+        if (modoEdicion && preguntaEnEdicion) {
+            resultado = await actualizarPregunta(preguntaEnEdicion, preguntaData);
+            await Swal.fire({
+                icon: 'success',
+                title: '¡Actualizado!',
+                text: 'Pregunta actualizada exitosamente',
+                timer: 2000,
+                showConfirmButton: false
+            });
+        } else {
+            resultado = await crearPregunta(preguntaData);
+            await Swal.fire({
+                icon: 'success',
+                title: '¡Creado!',
+                text: 'Pregunta creada exitosamente',
+                timer: 2000,
+                showConfirmButton: false
+            });
+        }
+        
+        cerrarModal();
+        
+        const tabActivo = document.querySelector('.browser-tab.active');
+        if (tabActivo) {
+            const tabName = tabActivo.getAttribute('data-tab');
+            await cargarTablaPorNivel(tabName === 'todo' ? 'todo' : tabName);
+        } else {
+            await cargarTablaPorNivel('todo');
+        }
+        
+    } catch (error) {
+        const errorMessage = error.response?.data?.message || error.message || 'Error desconocido';
+        await Swal.fire({
+            icon: 'error',
+            title: 'Error al guardar',
+            text: errorMessage,
+            confirmButtonColor: '#3B82F6'
+        });
+    } finally {
+        botonGuardar.textContent = modoEdicion ? 'Actualizar Pregunta' : 'Guardar Pregunta';
+        botonGuardar.disabled = false;
+    }
+}
+
 async function crearPregunta(datosPregunta) {
     try {
-        mostrarCargando('Creando pregunta...');
-        
-        // Obtener IDs correctos según el mapeo
         const idAmbito = obtenerIdAmbito(datosPregunta.ambito);
         const idNivelRiesgo = obtenerIdNivelRiesgo(datosPregunta.nivel_riesgo);
         
-        console.log('Mapeando:', {
-            ambito: datosPregunta.ambito,
-            id_ambito: idAmbito,
-            nivel_riesgo: datosPregunta.nivel_riesgo,
-            id_nivel_riesgo: idNivelRiesgo
-        });
-        
-        // Formato exacto que espera el backend
         const datosBackend = {
             pregunta: datosPregunta.pregunta,
             id_ambito: idAmbito,
             id_nivel_riesgo: idNivelRiesgo,
             estado: datosPregunta.estado || 'Activo',
         };
-
-        console.log('Enviando al backend:', datosBackend);
         
         const response = await api.post('/preguntas', datosBackend);
-        
-        cerrarCargando();
-        mostrarExito('Pregunta creada exitosamente');
         
         // Recargar datos
         await cargarPreguntasDesdeAPI();
         
         return response.data;
     } catch (error) {
-        cerrarCargando();
-        console.error('Error al crear pregunta:', error);
-        console.error('Detalles:', error.response?.data);
         throw error;
     }
 }
 
 async function actualizarPregunta(id, datosActualizados) {
     try {
-        mostrarCargando('Actualizando pregunta...');
-        
-        // Preparar datos en formato backend
         const datosBackend = {};
         
         if (datosActualizados.pregunta) {
@@ -418,460 +731,69 @@ async function actualizarPregunta(id, datosActualizados) {
             datosBackend.estado = datosActualizados.estado;
         }
         
-        console.log('Actualizando pregunta ID', id, 'con:', datosBackend);
-        
         const response = await api.put(`/preguntas/${id}`, datosBackend);
-        
-        cerrarCargando();
-        mostrarExito('Pregunta actualizada exitosamente');
         
         // Recargar datos
         await cargarPreguntasDesdeAPI();
         
         return response.data;
     } catch (error) {
-        cerrarCargando();
-        console.error('Error al actualizar pregunta:', error);
-        console.error('Detalles:', error.response?.data);
         throw error;
     }
 }
 
-async function actualizarEstadoPregunta(id, nuevoEstado) {
+async function toggleEstadoPregunta(idPregunta) {
     try {
-        mostrarCargando('Actualizando estado...');
+        // Encontrar pregunta actual
+        const pregunta = preguntas.find(p => p.id == idPregunta);
+        const estadoActual = pregunta?.estado || 'Inactivo';
+        const nuevoEstado = estadoActual === 'Activo' ? 'Inactivo' : 'Activo';
         
-        // Usar el endpoint PUT genérico con solo el estado
-        const response = await api.put(`/preguntas/${id}`, {
+        const response = await api.put(`/preguntas/${idPregunta}`, {
             estado: nuevoEstado
         });
         
         // Actualizar localmente
-        const index = preguntas.findIndex(p => p.id == id);
+        const index = preguntas.findIndex(p => p.id == idPregunta);
         if (index !== -1) {
             preguntas[index].estado = nuevoEstado;
         }
         
-        cerrarCargando();
-        mostrarExito(`Pregunta ${nuevoEstado.toLowerCase()} exitosamente`);
-        
-        // Recargar tabla actual
-        const tabActivo = document.querySelector('.browser-tab.active');
-        if (tabActivo) {
-            const tabName = tabActivo.getAttribute('data-tab');
-            cargarTablaPorNivel(tabName === 'todo' ? 'todo' : tabName);
-        }
-        
         return response.data;
     } catch (error) {
-        cerrarCargando();
-        console.error('Error al actualizar estado:', error);
         throw error;
     }
 }
 
-async function obtenerPreguntaPorId(id) {
-    try {
-        const response = await api.get(`/preguntas/${id}`);
-        const pregunta = response.data.data || response.data;
-        console.log('Pregunta obtenida:', pregunta);
-        return pregunta;
-    } catch (error) {
-        console.error('Error al obtener pregunta:', error);
-        throw error;
-    }
-}
-
-// -------------------------------
+// ============================================
 // FUNCIONES AUXILIARES
-// -------------------------------
+// ============================================
 function obtenerIdNivelRiesgo(nombreNivel) {
     const nivelNormalizado = nombreNivel.toLowerCase().trim();
     const nivel = nivelesRiesgoMap[nivelNormalizado];
     
     if (!nivel) {
         console.warn(`Nivel de riesgo no encontrado: "${nombreNivel}". Usando Bajo por defecto.`);
-        return 1; // Default: Bajo
+        return 1;
     }
     
     return nivel.id;
-}
-
-function obtenerNombreNivelRiesgo(idNivel) {
-    const nivel = Object.values(nivelesRiesgoMap).find(n => n.id === idNivel);
-    return nivel ? nivel.nombre.toLowerCase() : 'bajo';
 }
 
 function obtenerIdAmbito(nombreAmbito) {
     const id = ambitosMap[nombreAmbito];
     
     if (!id) {
-        console.warn(`Ambito no encontrado: "${nombreAmbito}". Usando primer ambito por defecto.`);
-        return 1; // Default: Conducta del agresor
+        console.warn(`Ámbito no encontrado: "${nombreAmbito}". Usando primer ámbito por defecto.`);
+        return 1;
     }
     
     return id;
 }
 
-function obtenerNombreAmbito(idAmbito) {
-    const nombre = Object.keys(ambitosMap).find(key => ambitosMap[key] === idAmbito);
-    return nombre || 'Conducta del agresor';
+function escapeHtml(text) {
+    if (!text) return '';
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
 }
-
-// -------------------------------
-// MANEJO DE FORMULARIOS Y MODALES
-// -------------------------------
-async function cargarPreguntaParaEditar(id) {
-    try {
-        mostrarCargando('Cargando pregunta...');
-        
-        const pregunta = await obtenerPreguntaPorId(id);
-        
-        cerrarCargando();
-        
-        // Mostrar modal de edición
-        mostrarModalEdicion(pregunta);
-        
-        return pregunta;
-    } catch (error) {
-        cerrarCargando();
-        console.error('❌ Error al cargar pregunta para editar:', error);
-        mostrarError('No se pudo cargar la pregunta para editar');
-        throw error;
-    }
-}
-
-function mostrarModalEdicion(pregunta) {
-    const modal = document.getElementById('questionFormModal');
-    if (!modal) {
-        console.error('Modal no encontrado');
-        return;
-    }
-    
-    console.log('Datos de la pregunta a editar:', pregunta);
-    
-    // Cambiar título
-    const titulo = modal.querySelector('h2');
-    if (titulo) titulo.textContent = 'Editar Pregunta';
-    
-    // Llenar campo de pregunta
-    const inputPregunta = document.getElementById('pregunta');
-    if (inputPregunta) {
-        inputPregunta.value = pregunta.pregunta || '';
-        console.log('Campo pregunta llenado:', pregunta.pregunta);
-    }
-    
-    // Seleccionar ámbito - CORREGIDO
-    const selectAmbito = document.getElementById('ambito');
-    if (selectAmbito && pregunta.ambito) {
-        console.log('Buscando ambito:', pregunta.ambito);
-        console.log('Opciones disponibles:', Array.from(selectAmbito.options).map(o => ({value: o.value, text: o.text})));
-        
-        // Buscar comparando en minúsculas (case insensitive)
-        let encontrado = false;
-        const ambitoBuscado = pregunta.ambito.trim().toLowerCase();
-        
-        for (let i = 0; i < selectAmbito.options.length; i++) {
-            const option = selectAmbito.options[i];
-            const optionText = option.text.trim().toLowerCase();
-            const optionValue = option.value.trim().toLowerCase();
-            
-            if (optionText === ambitoBuscado || optionValue === ambitoBuscado) {
-                selectAmbito.selectedIndex = i;
-                encontrado = true;
-                console.log('Ambito encontrado y seleccionado:', option.text, 'en index:', i);
-                break;
-            }
-        }
-        
-        if (!encontrado) {
-            console.warn('No se encontro el ambito:', pregunta.ambito);
-            console.warn('Buscado (lowercase):', ambitoBuscado);
-        }
-    }
-    
-    // Seleccionar nivel de riesgo por nombre
-    const selectRiesgo = document.getElementById('riesgo');
-    if (selectRiesgo && pregunta.nivel_riesgo) {
-        const nivelNormalizado = pregunta.nivel_riesgo.toLowerCase().trim();
-        let encontrado = false;
-        for (let option of selectRiesgo.options) {
-            if (option.value.toLowerCase() === nivelNormalizado) {
-                selectRiesgo.value = option.value;
-                encontrado = true;
-                console.log('Nivel de riesgo seleccionado:', option.value);
-                break;
-            }
-        }
-        if (!encontrado) {
-            console.warn('No se encontro el nivel de riesgo:', pregunta.nivel_riesgo);
-        }
-    }
-    
-    // Estado
-    const selectEstado = document.getElementById('estado');
-    if (selectEstado) {
-        selectEstado.value = pregunta.estado || 'Activo';
-        console.log('Estado seleccionado:', pregunta.estado);
-    }
-    
-    // Guardar ID para la actualización
-    const btnGuardar = document.getElementById('btnGuardarPregunta');
-    if (btnGuardar) {
-        btnGuardar.setAttribute('data-id-edicion', pregunta.id);
-        btnGuardar.textContent = 'Actualizar Pregunta';
-        console.log('ID de pregunta guardado para edicion:', pregunta.id);
-    }
-    
-    // Mostrar modal
-    modal.classList.remove('hidden');
-    modal.classList.add('flex');
-    console.log('Modal de edicion mostrado');
-}
-
-async function guardarPregunta(e) {
-    e.preventDefault();
-    
-    // Obtener valores del formulario
-    const pregunta = document.getElementById('pregunta').value.trim();
-    const ambito = document.getElementById('ambito').value;
-    const riesgo = document.getElementById('riesgo').value;
-    const estado = document.getElementById('estado').value;
-    
-    // Validaciones
-    if (!pregunta) {
-        mostrarError('Por favor, escribe la pregunta');
-        return;
-    }
-    
-    if (!ambito) {
-        mostrarError('Por favor, selecciona un ámbito');
-        return;
-    }
-    
-    if (!riesgo) {
-        mostrarError('Por favor, selecciona un nivel de riesgo');
-        return;
-    }
-    
-    const datosPregunta = {
-        pregunta,
-        ambito,
-        nivel_riesgo: riesgo,
-        estado
-    };
-    
-    // Verificar si es edición o creación
-    const btnGuardar = document.getElementById('btnGuardarPregunta');
-    const idEdicion = btnGuardar.getAttribute('data-id-edicion');
-    
-    try {
-        if (idEdicion) {
-            // Es una edición (PUT)
-            await actualizarPregunta(idEdicion, datosPregunta);
-            
-            // Limpiar atributo de edición
-            btnGuardar.removeAttribute('data-id-edicion');
-            btnGuardar.textContent = 'Guardar Pregunta';
-        } else {
-            // Es una creación (POST)
-            await crearPregunta(datosPregunta);
-        }
-        
-        // Cerrar modal y limpiar formulario
-        closeQuestionModal();
-        limpiarFormulario();
-        
-    } catch (error) {
-        console.error('❌ Error al guardar pregunta:', error);
-        // El error ya se maneja en las funciones individuales
-    }
-}
-
-// -------------------------------
-// MANEJO DE EVENT LISTENERS
-// -------------------------------
-function agregarEventListenersABotones() {
-    // Botones Editar
-    const botonesEditar = document.querySelectorAll('.action-btn-view');
-    botonesEditar.forEach(boton => {
-        boton.addEventListener('click', async function (e) {
-            e.preventDefault();
-            
-            // Animación al hacer clic
-            this.style.transform = 'scale(0.95)';
-            setTimeout(() => {
-                this.style.transform = '';
-            }, 150);
-            
-            const idPregunta = this.getAttribute('data-id');
-            await cargarPreguntaParaEditar(idPregunta);
-        });
-    });
-
-    // Botones Toggle Estado
-    const botonesToggleEstado = document.querySelectorAll('.action-btn-toggle-estado');
-    botonesToggleEstado.forEach(boton => {
-        boton.addEventListener('click', async function (e) {
-            e.preventDefault();
-            
-            // Animación al hacer clic
-            this.style.transform = 'scale(0.95)';
-            setTimeout(() => {
-                this.style.transform = '';
-            }, 150);
-            
-            const idPregunta = this.getAttribute('data-id');
-            const estadoActual = this.getAttribute('data-estado');
-            const nuevoEstado = estadoActual.toLowerCase() === 'activo' ? 'Inactivo' : 'Activo';
-            
-            // Confirmación con SweetAlert2
-            const esActivo = estadoActual.toLowerCase() === 'activo';
-            
-            const result = await Swal.fire({
-                title: esActivo ? '¿Desactivar pregunta?' : '¿Activar pregunta?',
-                text: esActivo 
-                    ? '¿Estás seguro de que quieres desactivar esta pregunta?'
-                    : '¿Estás seguro de que quieres activar esta pregunta?',
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonColor: esActivo ? '#EF4444' : '#10B981',
-                cancelButtonColor: '#6B7280',
-                confirmButtonText: esActivo ? 'Sí, desactivar' : 'Sí, activar',
-                cancelButtonText: 'Cancelar',
-                reverseButtons: true
-            });
-            
-            if (result.isConfirmed) {
-                await actualizarEstadoPregunta(idPregunta, nuevoEstado);
-            }
-        });
-    });
-}
-
-function inicializarEventListeners() {
-    console.log("Inicializando event listeners...");
-
-    // Modal de Preguntas
-    const openQuestionBtn = document.getElementById('openQuestionBtn');
-    const questionFormModal = document.getElementById('questionFormModal');
-    const closeQuestionBtn = document.getElementById('closeQuestionBtn');
-    const cancelQuestionBtn = document.getElementById('cancelQuestionBtn');
-    const questionForm = document.getElementById('questionForm');
-
-    // Abrir modal para crear nueva pregunta
-    if (openQuestionBtn) {
-        openQuestionBtn.addEventListener('click', () => {
-            questionFormModal.classList.remove('hidden');
-            questionFormModal.classList.add('flex');
-            
-            // Restaurar título y botón
-            const titulo = questionFormModal.querySelector('h2');
-            if (titulo) titulo.textContent = 'Nueva Pregunta';
-            
-            const btnGuardar = document.getElementById('btnGuardarPregunta');
-            btnGuardar.removeAttribute('data-id-edicion');
-            btnGuardar.textContent = 'Guardar Pregunta';
-            
-            limpiarFormulario();
-        });
-    }
-
-    // Cerrar modal
-    if (closeQuestionBtn) {
-        closeQuestionBtn.addEventListener('click', closeQuestionModal);
-    }
-
-    if (cancelQuestionBtn) {
-        cancelQuestionBtn.addEventListener('click', closeQuestionModal);
-    }
-
-    // Cerrar modal al hacer clic fuera
-    questionFormModal?.addEventListener('click', (e) => {
-        if (e.target === questionFormModal) {
-            closeQuestionModal();
-        }
-    });
-
-    // Manejar envío del formulario
-    if (questionForm) {
-        questionForm.addEventListener('submit', guardarPregunta);
-    }
-
-    // Tab functionality
-    const browserTabs = document.querySelectorAll('.browser-tab');
-    if (browserTabs.length > 0) {
-        browserTabs.forEach(tab => {
-            tab.addEventListener('click', () => {
-                const tabName = tab.getAttribute('data-tab');
-                
-                // Remove active class from all tabs
-                browserTabs.forEach(t => t.classList.remove('active'));
-                
-                // Add active class to clicked tab
-                tab.classList.add('active');
-                
-                // Remove active class from all contents
-                const tabContents = document.querySelectorAll('.tab-content');
-                tabContents.forEach(content => {
-                    content.classList.remove('active');
-                });
-                
-                // Add active class to selected content
-                const selectedContent = document.getElementById(tabName);
-                if (selectedContent) {
-                    selectedContent.classList.add('active');
-                }
-                
-                // Recargar la tabla específica
-                cargarTablaPorNivel(tabName);
-            });
-        });
-    }
-}
-
-function closeQuestionModal() {
-    const questionFormModal = document.getElementById('questionFormModal');
-    if (questionFormModal) {
-        questionFormModal.classList.remove('flex');
-        questionFormModal.classList.add('hidden');
-        limpiarFormulario();
-    }
-}
-
-function limpiarFormulario() {
-    const pregunta = document.getElementById('pregunta');
-    const ambito = document.getElementById('ambito');
-    const riesgo = document.getElementById('riesgo');
-    const estado = document.getElementById('estado');
-
-    if (pregunta) pregunta.value = '';
-    if (ambito) ambito.selectedIndex = 0;
-    if (riesgo) riesgo.selectedIndex = 0;
-    if (estado) estado.value = 'Activo';
-}
-
-// -------------------------------
-// INICIALIZACIÓN DE LA APLICACIÓN
-// -------------------------------
-document.addEventListener("DOMContentLoaded", async function () {
-    console.log("DOM cargado, inicializando aplicacion...");
-    
-    // Inicializar event listeners
-    inicializarEventListeners();
-    
-    // Cargar datos iniciales
-    await cargarDatosIniciales();
-    
-    console.log("Aplicacion inicializada correctamente");
-});
-
-// Cerrar modal con tecla ESC
-document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
-        const questionFormModal = document.getElementById('questionFormModal');
-        if (questionFormModal && questionFormModal.classList.contains('flex')) {
-            closeQuestionModal();
-        }
-    }
-});

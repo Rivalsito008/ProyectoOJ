@@ -43,12 +43,15 @@ let departamentosData = [];
 let modoEdicion = false;
 let tribunalEnEdicion = null;
 
+// Variable para controlar si ya se mostró el error
+let errorMostrado = false;
+
 // ============================================
 // INICIALIZACIÓN EN DOMContentLoaded
 // ============================================
 document.addEventListener('DOMContentLoaded', async function () {
     // Mostrar SweetAlert de carga
-    Swal.fire({
+    const loadingSwal = Swal.fire({
         title: 'Cargando tribunales...',
         allowOutsideClick: false,
         allowEscapeKey: false,
@@ -67,17 +70,33 @@ document.addEventListener('DOMContentLoaded', async function () {
         
         // Cerrar el SweetAlert cuando todo haya cargado
         Swal.close();
+        errorMostrado = false;
+        
     } catch (error) {
-        // Mostrar error si no se pueden cargar los tribunales
-        Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: 'No se pudieron cargar los tribunales. Revisa la conexión con el servidor.',
-            confirmButtonColor: '#3B82F6'
-        }).then(() => {
-            // Cerrar el loading si estaba abierto
+        console.error('Error crítico en inicialización:', error);
+        
+        // Cerrar el loading
+        if (Swal.isVisible()) {
             Swal.close();
-        });
+        }
+        
+        // Mostrar error solo si no se ha mostrado antes
+        if (!errorMostrado) {
+            errorMostrado = true;
+            
+            // Usar un delay para asegurar que el loading se cierre
+            await new Promise(resolve => setTimeout(resolve, 200));
+            
+            await Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                html: '<p class="text-lg">No se pudieron cargar los tribunales. Revisa la conexión con el servidor.</p>',
+                confirmButtonColor: '#EF4444',
+                confirmButtonText: 'Entendido',
+                allowOutsideClick: false
+            });
+        }
+        
         return; // Salir para no continuar con la inicialización
     }
 
@@ -110,7 +129,7 @@ document.addEventListener('DOMContentLoaded', async function () {
 // FUNCIONES PARA CARGAR TABLAS
 // ============================================
 function cargarTodasLasTablas() {
-    cargarTablaPorEstado('todo');
+    return cargarTablaPorEstado('todo');
 }
 
 async function cargarTablaPorEstado(estado) {
@@ -118,6 +137,7 @@ async function cargarTablaPorEstado(estado) {
     const tbody = document.getElementById(tbodyId);
 
     if (!tbody) {
+        console.error(`No se encontró el tbody con id: ${tbodyId}`);
         return;
     }
 
@@ -243,37 +263,25 @@ async function cargarTablaPorEstado(estado) {
         agregarEventListenersABotones();
 
     } catch (error) {
-        let mensajeError = 'Error desconocido';
-        let mostrarSweetAlert = false;
+        console.error('Error al cargar tribunales:', error);
         
-        if (error.response) {
-            mensajeError = `Error ${error.response.status}: ${error.response.data.message || 'Error del servidor'}`;
-        } else if (error.request) {
-            // Este es el caso de error de conexión (backend no responde)
-            mensajeError = 'No se pudo conectar con el servidor. Verifica que el backend esté corriendo en http://localhost:8000';
-            mostrarSweetAlert = true;
-        } else {
-            mensajeError = error.message;
-        }
-        
-        // Mostrar error en la tabla
+        // Mostrar mensaje de error simple en la tabla
         tbody.innerHTML = `
             <tr>
-                <td colspan="9" class="px-6 py-8 text-center text-red-500">
-                    ${mensajeError}
+                <td colspan="9" class="px-6 py-8 text-center">
+                    <div class="flex flex-col items-center justify-center space-y-3">
+                        <svg class="w-16 h-16 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <p class="text-red-500 text-xl font-bold">Error al cargar tribunales</p>
+                        <p class="text-gray-500 text-sm">Verifica la conexión con el servidor</p>
+                    </div>
                 </td>
             </tr>
         `;
         
-        // Mostrar SweetAlert para errores de conexión
-        if (mostrarSweetAlert) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: 'No se pudieron cargar los tribunales. Revisa la conexión con el servidor.',
-                confirmButtonColor: '#3B82F6'
-            });
-        }
+        // Propagar el error para que sea capturado en DOMContentLoaded
+        throw error;
     }
 }
 
@@ -377,35 +385,71 @@ function cerrarModal() {
 }
 
 async function llenarFormularioEdicion(tribunal) {
+    // Limpiar primero
+    limpiarFormulario();
+    
+    // Llenar campos básicos
     document.getElementById('nombreTribunal').value = tribunal.tribunal || '';
     document.getElementById('direccion').value = tribunal.direccion || '';
     document.getElementById('estado').value = tribunal.estado || 'Activo';
     
+    // Llenar tipo tribunal
     if (tribunal.tipo_tribunal) {
-        document.getElementById('tipoTribunal').value = tribunal.tipo_tribunal.id;
-        
-        const event = new Event('change');
-        document.getElementById('tipoTribunal').dispatchEvent(event);
+        document.getElementById('tipoTribunal').value = tribunal.tipo_tribunal.id_tipo_tribunal || tribunal.tipo_tribunal.id;
     }
     
+    // Llenar numeración
     if (tribunal.numeracion_tribunal) {
-        document.getElementById('numeracion').value = tribunal.numeracion_tribunal.id;
+        document.getElementById('numeracion').value = tribunal.numeracion_tribunal.id_numeracion_tribunal || tribunal.numeracion_tribunal.id;
     }
     
+    // Llenar ubicación
     if (tribunal.distrito && tribunal.distrito.municipio && tribunal.distrito.municipio.departamento) {
-        const departamentoId = tribunal.distrito.municipio.departamento.id;
-        const municipioId = tribunal.distrito.municipio.id;
-        const distritoId = tribunal.distrito.id;
+        const departamentoId = tribunal.distrito.municipio.departamento.id_departamento || tribunal.distrito.municipio.departamento.id;
+        const municipioId = tribunal.distrito.municipio.id_municipio || tribunal.distrito.municipio.id;
+        const distritoId = tribunal.distrito.id_distrito || tribunal.distrito.id;
         
+        // Establecer departamento
         document.getElementById('departamento').value = departamentoId;
         
-        await cargarMunicipiosPorDepartamento(departamentoId);
-        await new Promise(resolve => setTimeout(resolve, 100));
-        document.getElementById('municipio').value = municipioId;
+        // Forzar cambio en departamento para cargar municipios
+        const changeEvent = new Event('change');
+        document.getElementById('departamento').dispatchEvent(changeEvent);
         
-        await cargarDistritosPorMunicipio(municipioId);
-        await new Promise(resolve => setTimeout(resolve, 100));
-        document.getElementById('distrito').value = distritoId;
+        // Esperar a que carguen los municipios
+        await new Promise(resolve => {
+            const checkMunicipios = () => {
+                const municipioSelect = document.getElementById('municipio');
+                if (municipioSelect.options.length > 1) {
+                    // Buscar y seleccionar el municipio
+                    for (let option of municipioSelect.options) {
+                        if (option.value == municipioId) {
+                            municipioSelect.value = municipioId;
+                            break;
+                        }
+                    }
+                    
+                    // Disparar evento change en municipio
+                    const municipioChangeEvent = new Event('change');
+                    municipioSelect.dispatchEvent(municipioChangeEvent);
+                    
+                    // Esperar y seleccionar distrito
+                    setTimeout(() => {
+                        const distritoSelect = document.getElementById('distrito');
+                        for (let option of distritoSelect.options) {
+                            if (option.value == distritoId) {
+                                distritoSelect.value = distritoId;
+                                break;
+                            }
+                        }
+                        resolve();
+                    }, 300);
+                    return;
+                }
+                setTimeout(checkMunicipios, 100);
+            };
+            checkMunicipios();
+        });
     }
 }
 
@@ -673,7 +717,18 @@ async function actualizarTribunal(idTribunal, tribunalData) {
 
 async function toggleEstadoTribunal(idTribunal) {
     try {
-        const response = await api.patch(`/tribunales/${idTribunal}/cambiar-estado`);
+        // Obtener el tribunal para saber el estado actual
+        const responseGet = await api.get(`/tribunales/${idTribunal}`);
+        const tribunal = responseGet.data.data || responseGet.data;
+        
+        const estadoActual = tribunal.estado || 'Activo';
+        const nuevoEstado = estadoActual === 'Activo' ? 'Inactivo' : 'Activo';
+        
+        // Enviar solo el campo estado
+        const response = await api.put(`/tribunales/${idTribunal}`, {
+            estado: nuevoEstado
+        });
+        
         return response.data;
     } catch (error) {
         throw error;
@@ -717,6 +772,7 @@ async function cargarSelectsConDatosReales() {
 
     } catch (error) {
         console.error('Error al cargar datos para selects:', error);
+        throw error;
     }
 }
 
@@ -729,19 +785,15 @@ function configurarSelectsDependientes() {
         departamentoSelect.addEventListener('change', async function() {
             const idDepartamento = this.value;
             
-            municipioSelect.innerHTML = '<option value="">Seleccione municipio...</option>';
-            distritoSelect.innerHTML = '<option value="">Seleccione distrito...</option>';
-            municipioSelect.value = '';
-            distritoSelect.value = '';
+            municipioSelect.innerHTML = '<option value="">Cargando...</option>';
+            municipioSelect.disabled = true;
+            distritoSelect.innerHTML = '<option value="">Seleccione municipio primero...</option>';
+            distritoSelect.disabled = true;
             
             if (idDepartamento) {
-                municipioSelect.innerHTML = '<option value="">Cargando municipios...</option>';
-                municipioSelect.disabled = true;
-                
                 await cargarMunicipiosPorDepartamento(idDepartamento);
-                
-                municipioSelect.disabled = false;
             } else {
+                municipioSelect.innerHTML = '<option value="">Seleccione un departamento...</option>';
                 municipioSelect.disabled = false;
             }
         });
@@ -751,46 +803,44 @@ function configurarSelectsDependientes() {
         municipioSelect.addEventListener('change', async function() {
             const idMunicipio = this.value;
             
-            distritoSelect.innerHTML = '<option value="">Seleccione distrito...</option>';
-            distritoSelect.value = '';
+            distritoSelect.innerHTML = '<option value="">Cargando...</option>';
+            distritoSelect.disabled = true;
             
             if (idMunicipio) {
-                distritoSelect.innerHTML = '<option value="">Cargando distritos...</option>';
-                distritoSelect.disabled = true;
-                
                 await cargarDistritosPorMunicipio(idMunicipio);
-                
-                distritoSelect.disabled = false;
             } else {
+                distritoSelect.innerHTML = '<option value="">Seleccione un municipio...</option>';
                 distritoSelect.disabled = false;
-            }
-        });
-    }
-
-    const tipoTribunalSelect = document.getElementById('tipoTribunal');
-    const materiaSelect = document.getElementById('materia');
-    
-    if (tipoTribunalSelect && materiaSelect) {
-        tipoTribunalSelect.addEventListener('change', function() {
-            const tipoId = this.value;
-            const tipo = tiposTribunal.find(t => t.id_tipo_tribunal == tipoId);
-            
-            materiaSelect.innerHTML = '';
-            if (tipo && tipo.materia) {
-                materiaSelect.innerHTML = `<option value="${tipo.materia.id_materia}">${tipo.materia.materia}</option>`;
-            } else {
-                materiaSelect.innerHTML = '<option value="">No definido</option>';
             }
         });
     }
 }
 
 async function cargarMunicipiosPorDepartamento(idDepartamento) {
+    const municipioSelect = document.getElementById('municipio');
+    
+    if (!idDepartamento) {
+        municipioSelect.innerHTML = '<option value="">Seleccione un departamento primero...</option>';
+        municipioSelect.disabled = true;
+        return;
+    }
+    
     try {
-        const response = await api.get(`/municipios?departamento_id=${idDepartamento}`);
-        const municipios = response.data.data || response.data;
+        municipioSelect.innerHTML = '<option value="">Cargando municipios...</option>';
+        municipioSelect.disabled = true;
         
-        const municipioSelect = document.getElementById('municipio');
+        // Asegúrate de que la URL de la API sea correcta
+        const response = await api.get(`/municipios/departamento/${idDepartamento}`);
+        // O si tu API usa query params:
+        // const response = await api.get(`/municipios?departamento=${idDepartamento}`);
+        
+        let municipios = [];
+        if (response.data && response.data.data) {
+            municipios = response.data.data;
+        } else if (Array.isArray(response.data)) {
+            municipios = response.data;
+        }
+        
         municipioSelect.innerHTML = '<option value="">Seleccione municipio...</option>';
         
         if (municipios && municipios.length > 0) {
@@ -803,19 +853,41 @@ async function cargarMunicipiosPorDepartamento(idDepartamento) {
         } else {
             municipioSelect.innerHTML = '<option value="">No hay municipios disponibles</option>';
         }
-
+        
+        municipioSelect.disabled = false;
+        
     } catch (error) {
-        const municipioSelect = document.getElementById('municipio');
+        console.error('Error cargando municipios:', error);
         municipioSelect.innerHTML = '<option value="">Error al cargar municipios</option>';
+        municipioSelect.disabled = false;
     }
 }
 
 async function cargarDistritosPorMunicipio(idMunicipio) {
+    const distritoSelect = document.getElementById('distrito');
+    
+    if (!idMunicipio) {
+        distritoSelect.innerHTML = '<option value="">Seleccione un municipio primero...</option>';
+        distritoSelect.disabled = true;
+        return;
+    }
+    
     try {
-        const response = await api.get(`/distritos?municipio_id=${idMunicipio}`);
-        const distritos = response.data.data || response.data;
+        distritoSelect.innerHTML = '<option value="">Cargando distritos...</option>';
+        distritoSelect.disabled = true;
         
-        const distritoSelect = document.getElementById('distrito');
+        // Asegúrate de que la URL de la API sea correcta
+        const response = await api.get(`/distritos/municipio/${idMunicipio}`);
+        // O si tu API usa query params:
+        // const response = await api.get(`/distritos?municipio=${idMunicipio}`);
+        
+        let distritos = [];
+        if (response.data && response.data.data) {
+            distritos = response.data.data;
+        } else if (Array.isArray(response.data)) {
+            distritos = response.data;
+        }
+        
         distritoSelect.innerHTML = '<option value="">Seleccione distrito...</option>';
         
         if (distritos && distritos.length > 0) {
@@ -828,10 +900,13 @@ async function cargarDistritosPorMunicipio(idMunicipio) {
         } else {
             distritoSelect.innerHTML = '<option value="">No hay distritos disponibles</option>';
         }
-
+        
+        distritoSelect.disabled = false;
+        
     } catch (error) {
-        const distritoSelect = document.getElementById('distrito');
+        console.error('Error cargando distritos:', error);
         distritoSelect.innerHTML = '<option value="">Error al cargar distritos</option>';
+        distritoSelect.disabled = false;
     }
 }
 
