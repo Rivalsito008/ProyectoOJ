@@ -257,29 +257,29 @@ function cargarTablaPorNivel(nivel) {
 
             const puntajeFormateado = p.puntaje !== null && p.puntaje !== undefined ? `${p.puntaje} pts` : '0 pts';
 
-            tr.innerHTML = `
+tr.innerHTML = `
                 <td class="px-6 py-4 font-medium">${escapeHtml(p.pregunta || '')}</td>
                 <td class="px-6 py-4 text-center">${escapeHtml(p.ambito || 'N/A')}</td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                    <span class="inline-flex items-center justify-center w-20 px-3 py-1 rounded-full text-xs font-semibold text-white ${riesgoClass}">
+                <td class="px-6 py-4 whitespace-nowrap text-center">
+                    <span class="state-badge-shimmer inline-flex items-center justify-center w-20 px-3 py-1 rounded-full text-xs font-semibold relative overflow-hidden ${riesgoClass} text-white border-0 shadow-sm">
                         ${riesgoText}
                     </span>
                 </td>
                 <td class="px-6 py-4 text-center font-semibold">
                     ${puntajeFormateado}
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                    <span class="inline-flex items-center justify-center w-20 px-3 py-1 rounded-full text-xs font-semibold text-white ${colorBoton.split(' ')[0]}">
+                <td class="px-6 py-4 whitespace-nowrap text-center">
+                    <span class="state-badge-shimmer inline-flex items-center justify-center w-20 px-3 py-1 rounded-full text-xs font-semibold relative overflow-hidden ${colorBoton.split(' ')[0]} text-white border-0 shadow-sm">
                         ${p.estado || 'Inactivo'}
                     </span>
                 </td>
                 <td class="px-6 py-4">
                     <div class="flex space-x-2 justify-center">
-                        <button class="action-btn-view px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
+                        <button class="action-btn-view w-20 px-3 py-1 rounded-lg text-sm font-medium transition-all duration-200 shadow-sm relative overflow-hidden"
                                 data-id="${p.id}">
                             Editar
                         </button>
-                        <button class="action-btn-toggle-estado px-3 py-1 rounded transition text-white ${colorBoton}"
+                        <button class="action-btn-toggle-estado w-24 px-3 py-1 rounded-lg text-sm font-medium transition-all duration-200 shadow-sm relative overflow-hidden ${colorBoton} text-white"
                                 data-id="${p.id}"
                                 data-estado="${p.estado || 'Inactivo'}"
                                 data-pregunta="${escapeHtml(p.pregunta || '')}">
@@ -368,10 +368,23 @@ function abrirModalCrear() {
 }
 
 async function abrirModalEditar(idPregunta) {
-    modoEdicion = true;
-    preguntaEnEdicion = idPregunta;
+    // Mostrar SweetAlert de carga inmediatamente (IDÉNTICO al de tribunales)
+    const loadingSwal = Swal.fire({
+        title: 'Cargando datos...',
+        html: 'Por favor espera mientras se cargan los datos de la pregunta',
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+        allowEnterKey: false,
+        showConfirmButton: false,
+        didOpen: () => {
+            Swal.showLoading();
+        }
+    });
     
     try {
+        modoEdicion = true;
+        preguntaEnEdicion = idPregunta;
+        
         const modal = document.getElementById('questionFormModal');
         modal.classList.remove('hidden');
         modal.classList.add('flex');
@@ -389,15 +402,23 @@ async function abrirModalEditar(idPregunta) {
         const response = await api.get(`/preguntas/${idPregunta}`);
         const pregunta = response.data.data || response.data;
         
+        // Llenar formulario con los datos de la pregunta
         await llenarFormularioEdicion(pregunta);
         
+        // Cerrar el SweetAlert de carga
+        Swal.close();
+        
     } catch (error) {
+        // Cerrar el loading si hubo error
+        Swal.close();
+        
         await Swal.fire({
             icon: 'error',
             title: 'Error al cargar',
             text: 'No se pudieron cargar los datos de la pregunta',
             confirmButtonColor: '#3B82F6'
         });
+        
         cerrarModal();
     }
 }
@@ -423,10 +444,25 @@ async function llenarFormularioEdicion(pregunta) {
     const selectAmbito = document.getElementById('ambito');
     if (selectAmbito && pregunta.ambito) {
         const ambitoBuscado = pregunta.ambito.trim();
+        let ambitoEncontrado = false;
+        
         for (let i = 0; i < selectAmbito.options.length; i++) {
             if (selectAmbito.options[i].text.trim() === ambitoBuscado) {
                 selectAmbito.selectedIndex = i;
+                ambitoEncontrado = true;
                 break;
+            }
+        }
+        
+        // Si no se encuentra exacto, buscar con coincidencia parcial
+        if (!ambitoEncontrado) {
+            for (let i = 0; i < selectAmbito.options.length; i++) {
+                const optionText = selectAmbito.options[i].text.trim().toLowerCase();
+                const ambitoLower = ambitoBuscado.toLowerCase();
+                if (optionText.includes(ambitoLower) || ambitoLower.includes(optionText)) {
+                    selectAmbito.selectedIndex = i;
+                    break;
+                }
             }
         }
     }
