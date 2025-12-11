@@ -1,4 +1,4 @@
-// JS/form.js - Código JavaScript completo para el formulario
+// JS/form.js - Código JavaScript completo para el formulario adaptado a 7 pasos
 
 (function () {
     // Aplicar tema
@@ -20,14 +20,15 @@
     document.documentElement.style.setProperty('--contrast', contrast);
 })();
 
-// Formulario por pasos
+// Variables globales
 const steps = document.querySelectorAll('.step');
 const progressBar = document.getElementById('progressBar');
 const nextBtn = document.getElementById('nextBtn');
 const prevBtn = document.getElementById('prevBtn');
 let currentStep = 0;
+const totalSteps = steps.length; // Ahora son 7 pasos
 
-// Preguntas del cuestionario
+// Preguntas del cuestionario (las mismas que antes)
 const preguntas = [
     { texto: 'Pregunta 1: ¿Le ha humillado, criticado, descalificado, burlado, ridiculizado?' },
     { texto: 'Pregunta 2: ¿El agresor le dice cómo vestirse, maquillarse, comportarse o qué publicar en sus redes sociales?' },
@@ -71,79 +72,483 @@ const preguntas = [
 const preguntasPorPagina = 8;
 let paginaActual = 0;
 
-// Función para manejar campos condicionales
+// Función para manejar campos condicionales del nuevo formulario
 function setupConditionalFields() {
-    // Manejar campo de diagnóstico (Víctima)
-    const enfermedadRadios = document.querySelectorAll('input[name="enfermedad"]');
-    const diagnosticoInput = document.getElementById('diagnosticoInput');
+    // Función genérica para manejar campos condicionales basados en selecciones
+    function setupConditionalSelect(selectId, containerId) {
+        const select = document.getElementById(selectId);
+        const container = document.getElementById(containerId);
+        
+        if (select && container) {
+            select.addEventListener('change', function() {
+                if (this.value === 'si') {
+                    container.classList.remove('hidden');
+                } else {
+                    container.classList.add('hidden');
+                }
+            });
+        }
+    }
 
-    enfermedadRadios.forEach(radio => {
-        radio.addEventListener('change', function () {
-            if (this.value === 'si') {
-                diagnosticoInput.style.display = 'block';
-                diagnosticoInput.required = true;
+    // Función genérica para manejar campos condicionales basados en radios
+    function setupConditionalRadio(radioName, containerId) {
+        const radios = document.querySelectorAll(`input[name="${radioName}"]`);
+        const container = document.getElementById(containerId);
+        
+        if (radios.length > 0 && container) {
+            radios.forEach(radio => {
+                radio.addEventListener('change', function() {
+                    if (this.value === 'si') {
+                        container.classList.remove('hidden');
+                    } else {
+                        container.classList.add('hidden');
+                    }
+                });
+            });
+        }
+    }
+
+    // Función para manejar campos "Otro" con input
+    function setupOtherInput(selectId, inputId) {
+        const select = document.getElementById(selectId);
+        const input = document.getElementById(inputId);
+        
+        if (select && input) {
+            select.addEventListener('change', function() {
+                if (this.value === 'other') {
+                    input.style.display = 'block';
+                } else {
+                    input.style.display = 'none';
+                    input.value = '';
+                }
+            });
+        }
+    }
+
+    // Función para manejar checkboxes "Otro" con input
+    function setupOtherCheckbox(checkboxId, inputId) {
+        const checkbox = document.getElementById(checkboxId);
+        const input = document.getElementById(inputId);
+        
+        if (checkbox && input) {
+            checkbox.addEventListener('change', function() {
+                if (this.checked) {
+                    input.style.display = 'block';
+                } else {
+                    input.style.display = 'none';
+                    input.value = '';
+                }
+            });
+        }
+    }
+
+    // ===== DATOS DEL DENUNCIANTE =====
+    
+    // Nacionalidad - otro
+    setupOtherInput('denuncianteNacionalidad', 'denuncianteOtraNacionalidad');
+    
+    // Estado familiar - mostrar nombre cónyuge
+    const denuncianteEstadoFamiliar = document.getElementById('denuncianteEstadoFamiliar');
+    const denuncianteNombreConyugeContainer = document.getElementById('denuncianteNombreConyugeContainer');
+    if (denuncianteEstadoFamiliar && denuncianteNombreConyugeContainer) {
+        denuncianteEstadoFamiliar.addEventListener('change', function() {
+            if (this.value === 'casado' || this.value === 'union_libre') {
+                denuncianteNombreConyugeContainer.style.display = 'block';
             } else {
-                diagnosticoInput.style.display = 'none';
-                diagnosticoInput.required = false;
-                diagnosticoInput.value = '';
-            }
-        });
-    });
-
-    // Manejar campo de discapacidad (Víctima)
-    const discapacidadSelect = document.getElementById('discapacidadSelect');
-    const discapacidadDesc = document.getElementById('discapacidadDesc');
-
-    if (discapacidadSelect) {
-        discapacidadSelect.addEventListener('change', function () {
-            if (this.value === 'Física' || this.value === 'Mental') {
-                discapacidadDesc.style.display = 'block';
-                discapacidadDesc.required = true;
-            } else {
-                discapacidadDesc.style.display = 'none';
-                discapacidadDesc.required = false;
-                discapacidadDesc.value = '';
+                denuncianteNombreConyugeContainer.style.display = 'none';
             }
         });
     }
 
-    // Manejar campo de formación militar (Agresor)
-    const formacionRadios = document.querySelectorAll('input[name="formacionMilitar"]');
-    const tipoFormacionSelect = document.getElementById('tipoFormacionSelect');
-
-    formacionRadios.forEach(radio => {
-        radio.addEventListener('change', function () {
-            if (this.value === 'si') {
-                tipoFormacionSelect.style.display = 'block';
-                tipoFormacionSelect.required = true;
+    // Lógica trabajo
+    const denuncianteNoTrabajo = document.getElementById('denuncianteNoTrabajo');
+    const denuncianteTrabajoEnCasa = document.getElementById('denuncianteTrabajoEnCasa');
+    const denuncianteDireccionTrabajoContainer = document.getElementById('denuncianteDireccionTrabajoContainer');
+    
+    if (denuncianteNoTrabajo && denuncianteTrabajoEnCasa && denuncianteDireccionTrabajoContainer) {
+        function actualizarCamposTrabajoDenunciante() {
+            if (denuncianteNoTrabajo.checked) {
+                denuncianteDireccionTrabajoContainer.style.display = 'none';
+            } else if (denuncianteTrabajoEnCasa.checked) {
+                denuncianteDireccionTrabajoContainer.style.display = 'none';
             } else {
-                tipoFormacionSelect.style.display = 'none';
-                tipoFormacionSelect.required = false;
-                tipoFormacionSelect.value = '';
+                denuncianteDireccionTrabajoContainer.style.display = 'block';
+            }
+        }
+        
+        denuncianteNoTrabajo.addEventListener('change', function() {
+            if (this.checked) {
+                denuncianteTrabajoEnCasa.checked = false;
+            }
+            actualizarCamposTrabajoDenunciante();
+        });
+        
+        denuncianteTrabajoEnCasa.addEventListener('change', function() {
+            if (this.checked) {
+                denuncianteNoTrabajo.checked = false;
+            }
+            actualizarCamposTrabajoDenunciante();
+        });
+    }
+
+    // Cantidad de víctimas
+    const denuncianteCantidadVictimas = document.getElementById('denuncianteCantidadVictimas');
+    const denuncianteMultipleVictimasContainer = document.getElementById('denuncianteMultipleVictimasContainer');
+    if (denuncianteCantidadVictimas && denuncianteMultipleVictimasContainer) {
+        denuncianteCantidadVictimas.addEventListener('change', function() {
+            const cantidad = parseInt(this.value);
+            if (cantidad > 1) {
+                denuncianteMultipleVictimasContainer.classList.remove('hidden');
+            } else {
+                denuncianteMultipleVictimasContainer.classList.add('hidden');
             }
         });
-    });
+    }
 
-    // Manejar campo de detención PNC (Agresor)
-    const detencionRadios = document.querySelectorAll('input[name="detencionPNC"]');
-    const vecesDetencion = document.getElementById('vecesDetencion');
-
-    detencionRadios.forEach(radio => {
-        radio.addEventListener('change', function () {
-            if (this.value === 'si') {
-                vecesDetencion.style.display = 'block';
-                vecesDetencion.required = true;
+    // ===== DATOS DE LA VÍCTIMA =====
+    
+    // Nacionalidad - otro
+    setupOtherInput('victimaNacionalidad', 'victimaOtraNacionalidad');
+    
+    // Estado familiar
+    const victimaEstadoFamiliar = document.getElementById('victimaEstadoFamiliar');
+    const victimaNombreConyugeContainer = document.getElementById('victimaNombreConyugeContainer');
+    if (victimaEstadoFamiliar && victimaNombreConyugeContainer) {
+        victimaEstadoFamiliar.addEventListener('change', function() {
+            if (this.value === 'casado' || this.value === 'union_libre') {
+                victimaNombreConyugeContainer.style.display = 'block';
             } else {
-                vecesDetencion.style.display = 'none';
-                vecesDetencion.required = false;
-                vecesDetencion.value = '';
+                victimaNombreConyugeContainer.style.display = 'none';
             }
         });
+    }
+
+    // Lógica trabajo víctima
+    const victimaNoTrabajo = document.getElementById('victimaNoTrabajo');
+    const victimaTrabajoEnCasa = document.getElementById('victimaTrabajoEnCasa');
+    const victimaDireccionTrabajoContainer = document.getElementById('victimaDireccionTrabajoContainer');
+    
+    if (victimaNoTrabajo && victimaTrabajoEnCasa && victimaDireccionTrabajoContainer) {
+        function actualizarCamposTrabajoVictima() {
+            if (victimaNoTrabajo.checked) {
+                victimaDireccionTrabajoContainer.style.display = 'none';
+            } else if (victimaTrabajoEnCasa.checked) {
+                victimaDireccionTrabajoContainer.style.display = 'none';
+            } else {
+                victimaDireccionTrabajoContainer.style.display = 'block';
+            }
+        }
+        
+        victimaNoTrabajo.addEventListener('change', function() {
+            if (this.checked) {
+                victimaTrabajoEnCasa.checked = false;
+            }
+            actualizarCamposTrabajoVictima();
+        });
+        
+        victimaTrabajoEnCasa.addEventListener('change', function() {
+            if (this.checked) {
+                victimaNoTrabajo.checked = false;
+            }
+            actualizarCamposTrabajoVictima();
+        });
+    }
+
+    // Datos familiares - hijos
+    const victimaCantidadHijos = document.getElementById('victimaCantidadHijos');
+    const victimaDatosHijosContainer = document.getElementById('victimaDatosHijosContainer');
+    if (victimaCantidadHijos && victimaDatosHijosContainer) {
+        victimaCantidadHijos.addEventListener('change', function() {
+            const cantidad = parseInt(this.value);
+            if (cantidad > 0) {
+                victimaDatosHijosContainer.classList.remove('hidden');
+            } else {
+                victimaDatosHijosContainer.classList.add('hidden');
+            }
+        });
+    }
+
+    // Datos económicos
+    setupConditionalRadio('victimaGeneraIngreso', 'victimaSiIngresoContainer');
+    setupConditionalRadio('victimaGeneraIngreso', 'victimaNoIngresoContainer');
+    setupOtherInput('victimaTipoIngresos', 'victimaOtroTipoIngreso');
+    setupOtherInput('victimaDependenciaEconomica', 'victimaOtroDependencia');
+    setupOtherInput('victimaRelacionDependencia', 'victimaOtroRelacion');
+
+    // Otros datos especiales
+    setupConditionalRadio('victimaLesiones', 'victimaLesionesContainer');
+    setupConditionalRadio('victimaHospitalizaciones', 'victimaHospitalizacionesContainer');
+    setupConditionalRadio('victimaAtencionesMedicas', 'victimaAtencionesContainer');
+    
+    // Alerta para lesiones graves
+    const victimaNivelLesion = document.getElementById('victimaNivelLesion');
+    const victimaAlertaLesionGrave = document.getElementById('victimaAlertaLesionGrave');
+    if (victimaNivelLesion && victimaAlertaLesionGrave) {
+        victimaNivelLesion.addEventListener('change', function() {
+            if (this.value === 'Grave') {
+                victimaAlertaLesionGrave.classList.remove('hidden');
+            } else {
+                victimaAlertaLesionGrave.classList.add('hidden');
+            }
+        });
+    }
+
+    // ===== DATOS SOBRE HECHOS =====
+    setupOtherCheckbox('entornoOtraCheck', 'entornoOtraTexto');
+    setupOtherInput('lugarHecho', 'lugarHechoOtro');
+    setupOtherInput('frecuenciaAgresiones', 'otraFrecuencia');
+
+    // ===== DATOS DEL AGRESOR =====
+    
+    // Nacionalidad - otro
+    setupOtherInput('agresorNacionalidad', 'agresorOtraNacionalidad');
+    
+    // Estado familiar
+    const agresorEstadoFamiliar = document.getElementById('agresorEstadoFamiliar');
+    const agresorNombreConyugeContainer = document.getElementById('agresorNombreConyugeContainer');
+    if (agresorEstadoFamiliar && agresorNombreConyugeContainer) {
+        agresorEstadoFamiliar.addEventListener('change', function() {
+            if (this.value === 'casado' || this.value === 'union_libre') {
+                agresorNombreConyugeContainer.style.display = 'block';
+            } else {
+                agresorNombreConyugeContainer.style.display = 'none';
+            }
+        });
+    }
+
+    // Lógica trabajo agresor
+    const agresorNoTrabajo = document.getElementById('agresorNoTrabajo');
+    const agresorTrabajoEnCasa = document.getElementById('agresorTrabajoEnCasa');
+    const agresorDireccionTrabajoContainer = document.getElementById('agresorDireccionTrabajoContainer');
+    
+    if (agresorNoTrabajo && agresorTrabajoEnCasa && agresorDireccionTrabajoContainer) {
+        function actualizarCamposTrabajoAgresor() {
+            if (agresorNoTrabajo.checked) {
+                agresorDireccionTrabajoContainer.style.display = 'none';
+            } else if (agresorTrabajoEnCasa.checked) {
+                agresorDireccionTrabajoContainer.style.display = 'none';
+            } else {
+                agresorDireccionTrabajoContainer.style.display = 'block';
+            }
+        }
+        
+        agresorNoTrabajo.addEventListener('change', function() {
+            if (this.checked) {
+                agresorTrabajoEnCasa.checked = false;
+            }
+            actualizarCamposTrabajoAgresor();
+        });
+        
+        agresorTrabajoEnCasa.addEventListener('change', function() {
+            if (this.checked) {
+                agresorNoTrabajo.checked = false;
+            }
+            actualizarCamposTrabajoAgresor();
+        });
+    }
+
+    // Datos adicionales agresor
+    setupConditionalSelect('agresorConsumoAlcohol', 'agresorFrecuenciaAlcoholContainer');
+    setupConditionalSelect('agresorConsumoDrogas', 'agresorFrecuenciaDrogasContainer');
+    setupConditionalSelect('agresorPoseeArmas', 'agresorTipoArmasContainer');
+    setupConditionalSelect('agresorFormacionEspecial', 'agresorTipoFormacionContainer');
+    setupConditionalSelect('agresorPoseeDiscapacidad', 'agresorTipoDiscapacidadContainer');
+    
+    setupOtherInput('agresorTipoArmas', 'agresorOtroTipoArma');
+    setupOtherInput('agresorTipoFormacion', 'agresorOtroTipoFormacion');
+    setupOtherCheckbox('agresorDiscapacidadOtraCheck', 'agresorDiscapacidadOtraTexto');
+
+    // Cantidad de agresores
+    const cantidadAgresores = document.getElementById('cantidadAgresores');
+    const multipleAgresoresContainer = document.getElementById('multipleAgresoresContainer');
+    if (cantidadAgresores && multipleAgresoresContainer) {
+        cantidadAgresores.addEventListener('change', function() {
+            const cantidad = parseInt(this.value);
+            if (cantidad > 1) {
+                multipleAgresoresContainer.classList.remove('hidden');
+            } else {
+                multipleAgresoresContainer.classList.add('hidden');
+            }
+        });
+    }
+
+    // ===== CÁLCULO DE EDADES =====
+    
+    // Configurar cálculo de edad para denunciante
+    const denuncianteFechaNacimiento = document.getElementById('denuncianteFechaNacimiento');
+    const denuncianteEdad = document.getElementById('denuncianteEdad');
+    const denuncianteCalcularBtn = document.getElementById('denuncianteCalcularEdad');
+    
+    if (denuncianteFechaNacimiento && denuncianteEdad && denuncianteCalcularBtn) {
+        function calcularEdadDenunciante() {
+            if (denuncianteFechaNacimiento.value) {
+                const fechaNac = new Date(denuncianteFechaNacimiento.value);
+                const hoy = new Date();
+                let edad = hoy.getFullYear() - fechaNac.getFullYear();
+                const mes = hoy.getMonth() - fechaNac.getMonth();
+                
+                if (mes < 0 || (mes === 0 && hoy.getDate() < fechaNac.getDate())) {
+                    edad--;
+                }
+                
+                denuncianteEdad.value = edad;
+            }
+        }
+        
+        denuncianteFechaNacimiento.addEventListener('change', calcularEdadDenunciante);
+        denuncianteCalcularBtn.addEventListener('click', calcularEdadDenunciante);
+    }
+
+    // Configurar cálculo de edad para víctima
+    const victimaFechaNacimiento = document.getElementById('victimaFechaNacimiento');
+    const victimaEdad = document.getElementById('victimaEdad');
+    const victimaCalcularBtn = document.getElementById('victimaCalcularEdad');
+    
+    if (victimaFechaNacimiento && victimaEdad && victimaCalcularBtn) {
+        function calcularEdadVictima() {
+            if (victimaFechaNacimiento.value) {
+                const fechaNac = new Date(victimaFechaNacimiento.value);
+                const hoy = new Date();
+                let edad = hoy.getFullYear() - fechaNac.getFullYear();
+                const mes = hoy.getMonth() - fechaNac.getMonth();
+                
+                if (mes < 0 || (mes === 0 && hoy.getDate() < fechaNac.getDate())) {
+                    edad--;
+                }
+                
+                victimaEdad.value = edad;
+            }
+        }
+        
+        victimaFechaNacimiento.addEventListener('change', calcularEdadVictima);
+        victimaCalcularBtn.addEventListener('click', calcularEdadVictima);
+    }
+
+    // Configurar cálculo de edad para agresor
+    const agresorFechaNacimiento = document.getElementById('agresorFechaNacimiento');
+    const agresorEdad = document.getElementById('agresorEdad');
+    const agresorCalcularBtn = document.getElementById('agresorCalcularEdad');
+    
+    if (agresorFechaNacimiento && agresorEdad && agresorCalcularBtn) {
+        function calcularEdadAgresor() {
+            if (agresorFechaNacimiento.value) {
+                const fechaNac = new Date(agresorFechaNacimiento.value);
+                const hoy = new Date();
+                let edad = hoy.getFullYear() - fechaNac.getFullYear();
+                const mes = hoy.getMonth() - fechaNac.getMonth();
+                
+                if (mes < 0 || (mes === 0 && hoy.getDate() < fechaNac.getDate())) {
+                    edad--;
+                }
+                
+                agresorEdad.value = edad;
+            }
+        }
+        
+        agresorFechaNacimiento.addEventListener('change', calcularEdadAgresor);
+        agresorCalcularBtn.addEventListener('click', calcularEdadAgresor);
+    }
+
+    // ===== SISTEMA DE TELÉFONOS =====
+    
+    // Función para agregar teléfonos
+    function setupTelefonoSystem(agregarBtnId, listaId) {
+        const agregarBtn = document.getElementById(agregarBtnId);
+        const lista = document.getElementById(listaId);
+        
+        if (agregarBtn && lista) {
+            agregarBtn.addEventListener('click', function() {
+                const nuevoTelefono = document.createElement('div');
+                nuevoTelefono.className = 'flex gap-2 items-center';
+                nuevoTelefono.innerHTML = `
+                    <input type="tel" placeholder="Número de teléfono" class="border border-gray-300 rounded-lg p-3 flex-grow focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
+                    <select class="border border-gray-300 rounded-lg p-3 focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
+                        <option value="personal">Personal</option>
+                        <option value="trabajo">Trabajo</option>
+                        <option value="casa">Casa</option>
+                        <option value="otro">Otro</option>
+                    </select>
+                    <button type="button" class="text-red-500 hover:text-red-700 eliminar-telefono">✕</button>
+                `;
+                lista.appendChild(nuevoTelefono);
+            });
+        }
+    }
+
+    // Configurar sistemas de teléfonos
+    setupTelefonoSystem('denuncianteAgregarTelefono', 'denuncianteTelefonosLista');
+    setupTelefonoSystem('victimaAgregarTelefono', 'victimaTelefonosLista');
+    setupTelefonoSystem('agresorAgregarTelefono', 'agresorTelefonosLista');
+
+    // Event delegation para eliminar teléfonos
+    document.addEventListener('click', function(e) {
+        if (e.target.classList.contains('eliminar-telefono')) {
+            const telefonoDiv = e.target.parentElement;
+            if (telefonoDiv.parentElement.children.length > 1) {
+                telefonoDiv.remove();
+            }
+        }
     });
+
+    // ===== CKEDITOR PARA RELACIÓN DE HECHOS =====
+    
+    // Inicializar CKEditor si está disponible
+    if (typeof ClassicEditor !== 'undefined') {
+        ClassicEditor
+            .create(document.querySelector('#editor-container'), {
+                toolbar: {
+                    items: [
+                        'heading', '|',
+                        'bold', 'italic', 'underline', '|',
+                        'alignment', '|',
+                        'numberedList', 'bulletedList', '|',
+                        'fontFamily', 'fontSize', 'fontColor', 'fontBackgroundColor', '|',
+                        'link', 'insertTable', '|',
+                        'undo', 'redo', '|',
+                        'sourceEditing'
+                    ]
+                },
+                language: 'es',
+                licenseKey: '',
+            })
+            .then(editor => {
+                window.editor = editor;
+                
+                // Botón para generar texto automático
+                const generarTextoBtn = document.getElementById('generarTextoBtn');
+                if (generarTextoBtn) {
+                    generarTextoBtn.addEventListener('click', function() {
+                        const denuncianteNombre = document.getElementById('denuncianteNombre')?.value || '[Nombre del denunciante]';
+                        const esVictima = document.querySelector('input[name="denuncianteEsVictima"]:checked')?.value;
+                        
+                        let textoBase = '';
+                        
+                        if (esVictima === 'si') {
+                            textoBase = `La señora/or ${denuncianteNombre} en su calidad de víctima en este caso y de generales antes expresada en este documento, habiendo sido informado sobre los derechos y obligaciones que le asisten, de forma libre expresa que...<br><br>`;
+                        } else {
+                            textoBase = `La señora/or ${denuncianteNombre} en su calidad de denunciante y de generales antes expresada en este documento, habiendo sido informado sobre los derechos y obligaciones que le asisten, de forma libre expresa que...<br><br>`;
+                        }
+                        
+                        editor.setData(textoBase);
+                        
+                        // Mostrar en previsualización
+                        const previewRelacion = document.getElementById('previewRelacion');
+                        if (previewRelacion) {
+                            previewRelacion.innerHTML = textoBase;
+                        }
+                    });
+                }
+            })
+            .catch(error => {
+                console.error(error);
+            });
+    }
 }
 
 function mostrarPreguntas() {
     const preguntasForm = document.getElementById('preguntasForm');
+    if (!preguntasForm) return;
+    
     preguntasForm.innerHTML = '';
 
     const inicio = paginaActual * preguntasPorPagina;
@@ -193,25 +598,27 @@ function actualizarDatosComprobante() {
     const numeroCaso = generarNumeroCaso();
     const fechaActual = new Date();
 
-    // Obtener datos por ID
+    // Obtener datos por ID (nuevos IDs del formulario actualizado)
     const nombreDenunciante = document.getElementById('denuncianteNombre')?.value || 'No especificado';
-    const apellidoDenunciante = document.getElementById('denuncianteApellido')?.value || 'No especificado';
-
     const nombreVictima = document.getElementById('victimaNombre')?.value || 'No especificado';
-    const apellidoVictima = document.getElementById('victimaApellido')?.value || 'No especificado';
-
     const nombreAgresor = document.getElementById('agresorNombre')?.value || 'No especificado';
-    const apellidoAgresor = document.getElementById('agresorApellido')?.value || 'No especificado';
 
     const preguntasRespondidas = document.querySelectorAll('input[type="radio"]:checked').length;
 
     // Actualizar comprobante
-    document.getElementById('printCaso').textContent = numeroCaso;
-    document.getElementById('printFecha').textContent = formatearFecha(fechaActual);
-    document.getElementById('printDenunciante').textContent = `${nombreDenunciante} ${apellidoDenunciante}`;
-    document.getElementById('printVictima').textContent = `${nombreVictima} ${apellidoVictima}`;
-    document.getElementById('printAgresor').textContent = `${nombreAgresor} ${apellidoAgresor}`;
-    document.getElementById('printPreguntas').textContent = `${preguntasRespondidas} de ${preguntas.length} preguntas respondidas`;
+    const printCaso = document.getElementById('printCaso');
+    const printFecha = document.getElementById('printFecha');
+    const printDenunciante = document.getElementById('printDenunciante');
+    const printVictima = document.getElementById('printVictima');
+    const printAgresor = document.getElementById('printAgresor');
+    const printPreguntas = document.getElementById('printPreguntas');
+
+    if (printCaso) printCaso.textContent = numeroCaso;
+    if (printFecha) printFecha.textContent = formatearFecha(fechaActual);
+    if (printDenunciante) printDenunciante.textContent = nombreDenunciante;
+    if (printVictima) printVictima.textContent = nombreVictima;
+    if (printAgresor) printAgresor.textContent = nombreAgresor;
+    if (printPreguntas) printPreguntas.textContent = `${preguntasRespondidas} de ${preguntas.length} preguntas respondidas`;
 }
 
 function actualizarResumen() {
@@ -219,12 +626,19 @@ function actualizarResumen() {
     actualizarDatosComprobante();
 
     // Luego copiar los mismos datos al resumen
-    document.getElementById('resumenDenunciante').textContent = document.getElementById('printDenunciante').textContent;
-    document.getElementById('resumenVictima').textContent = document.getElementById('printVictima').textContent;
-    document.getElementById('resumenAgresor').textContent = document.getElementById('printAgresor').textContent;
-    document.getElementById('resumenPreguntas').textContent = document.getElementById('printPreguntas').textContent;
-    document.getElementById('resumenFecha').textContent = document.getElementById('printFecha').textContent;
-    document.getElementById('resumenCaso').textContent = document.getElementById('printCaso').textContent;
+    const resumenDenunciante = document.getElementById('resumenDenunciante');
+    const resumenVictima = document.getElementById('resumenVictima');
+    const resumenAgresor = document.getElementById('resumenAgresor');
+    const resumenPreguntas = document.getElementById('resumenPreguntas');
+    const resumenFecha = document.getElementById('resumenFecha');
+    const resumenCaso = document.getElementById('resumenCaso');
+
+    if (resumenDenunciante) resumenDenunciante.textContent = document.getElementById('printDenunciante')?.textContent || '-';
+    if (resumenVictima) resumenVictima.textContent = document.getElementById('printVictima')?.textContent || '-';
+    if (resumenAgresor) resumenAgresor.textContent = document.getElementById('printAgresor')?.textContent || '-';
+    if (resumenPreguntas) resumenPreguntas.textContent = document.getElementById('printPreguntas')?.textContent || '-';
+    if (resumenFecha) resumenFecha.textContent = document.getElementById('printFecha')?.textContent || '-';
+    if (resumenCaso) resumenCaso.textContent = document.getElementById('printCaso')?.textContent || '-';
 }
 
 // Función para imprimir comprobante
@@ -233,6 +647,8 @@ function imprimirComprobante() {
     actualizarDatosComprobante();
 
     const elementoOriginal = document.getElementById('comprobante');
+    if (!elementoOriginal) return;
+
     const ventanaImpresion = window.open('', '_blank');
 
     ventanaImpresion.document.write(`
@@ -311,25 +727,21 @@ function imprimirComprobante() {
 }
 
 function updateForm() {
+    // Ocultar todos los pasos y mostrar solo el actual
     steps.forEach((step, index) => {
         step.classList.toggle('hidden', index !== currentStep);
     });
 
     // Actualizar barra de progreso (7 pasos totales)
-    progressBar.style.width = `${(currentStep + 1) / 7 * 100}%`;
-
-    // Si estamos en el paso de violencia intrafamiliar, inicializar interactividad
-    if (currentStep === 3) {
-        setTimeout(setupViolenciaInteractiva, 100);
-    }
+    progressBar.style.width = `${((currentStep + 1) / totalSteps) * 100}%`;
 
     // Si estamos en el paso de preguntas, cargarlas
-    if (currentStep === 4) {
+    if (currentStep === 5) { // Ahora es el paso 6 (índice 5) - Cuestionario
         mostrarPreguntas();
     }
 
     // Si estamos en el paso de confirmación, actualizar resumen
-    if (currentStep === 6) {
+    if (currentStep === 6) { // Ahora es el paso 7 (índice 6) - Confirmación
         actualizarResumen();
     }
 
@@ -340,42 +752,50 @@ function updateForm() {
     prevBtn.classList.toggle('hidden', currentStep === 0);
 
     // Actualizar texto del botón siguiente
-    if (currentStep === 6) {
+    if (currentStep === totalSteps - 1) { // Último paso
         nextBtn.textContent = 'Enviar Formulario';
-    } else if (currentStep === 4) {
+        nextBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+        nextBtn.classList.add('bg-green-600', 'hover:bg-green-700');
+    } else if (currentStep === 5) { // Paso de preguntas (índice 5)
         nextBtn.textContent = (paginaActual + 1) * preguntasPorPagina >= preguntas.length
             ? 'Siguiente'
-            : 'Siguiente';
+            : 'Siguiente Preguntas';
+        nextBtn.classList.remove('bg-green-600', 'hover:bg-green-700');
+        nextBtn.classList.add('bg-blue-600', 'hover:bg-blue-700');
     } else {
         nextBtn.textContent = 'Siguiente';
+        nextBtn.classList.remove('bg-green-600', 'hover:bg-green-700');
+        nextBtn.classList.add('bg-blue-600', 'hover:bg-blue-700');
     }
 }
 
 nextBtn.addEventListener('click', () => {
     // Si estamos en el paso de preguntas y hay más páginas
-    if (currentStep === 4 && (paginaActual + 1) * preguntasPorPagina < preguntas.length) {
+    if (currentStep === 5 && (paginaActual + 1) * preguntasPorPagina < preguntas.length) {
         paginaActual++;
         mostrarPreguntas();
         return;
     }
 
     // Avanzar al siguiente paso
-    if (currentStep < 6) {
+    if (currentStep < totalSteps - 1) {
         currentStep++;
         // Resetear paginación si salimos del paso de preguntas
-        if (currentStep !== 4) {
+        if (currentStep !== 5) {
             paginaActual = 0;
         }
         updateForm();
     } else {
         // Aquí iría la lógica para enviar el formulario
         alert('Formulario enviado correctamente. No olvide imprimir su comprobante.');
+        // Podrías agregar aquí el envío real del formulario
+        // document.getElementById('multiStepForm').submit();
     }
 });
 
 prevBtn.addEventListener('click', () => {
     // Si estamos en el paso de preguntas y hay páginas anteriores
-    if (currentStep === 4 && paginaActual > 0) {
+    if (currentStep === 5 && paginaActual > 0) {
         paginaActual--;
         mostrarPreguntas();
         return;
@@ -385,7 +805,7 @@ prevBtn.addEventListener('click', () => {
     if (currentStep > 0) {
         currentStep--;
         // Resetear la página de preguntas cuando retrocedemos al paso anterior
-        if (currentStep === 4) {
+        if (currentStep === 5) {
             paginaActual = 0;
         }
         updateForm();
@@ -399,173 +819,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Agregar event listeners para los botones de impresión y envío
     const imprimirBtn = document.getElementById('imprimirBtn');
-    const enviarBtn = document.getElementById('enviarBtn');
 
     if (imprimirBtn) {
         imprimirBtn.addEventListener('click', imprimirComprobante);
     }
-
-    if (enviarBtn) {
-        enviarBtn.addEventListener('click', function () {
-            alert('Formulario enviado correctamente. No olvide imprimir su comprobante.');
-        });
-    }
 });
-
-// Funcionalidad para tipos de violencia interactivos
-function setupViolenciaInteractiva() {
-    const botonesViolencia = document.querySelectorAll('.violencia-btn');
-    const contenedorOpciones = document.getElementById('opciones-violencia-container');
-    const tiposSeleccionados = new Set();
-
-    // Limpiar selecciones previas y resetear botones al entrar
-    contenedorOpciones.innerHTML = '';
-    botonesViolencia.forEach(boton => {
-        boton.classList.remove('border-blue-500', 'bg-blue-50', 'border-2');
-        boton.classList.add('border-gray-300');
-    });
-
-    // Definir las opciones para cada tipo de violencia
-    const opcionesViolencia = {
-        fisica: [
-            { value: 'golpes', label: 'Golpes' },
-            { value: 'lesiones', label: 'Lesiones' },
-            { value: 'lesiones_arma_fuego', label: 'Lesiones con arma de fuego' },
-            { value: 'lesiones_arma_blanca', label: 'Lesiones con arma blanca' },
-            { value: 'lesiones_arma_contundente', label: 'Lesiones con arma contundente' },
-            { value: 'mordidas', label: 'Mordidas' },
-            { value: 'quemaduras', label: 'Quemaduras' },
-            { value: 'bofetada', label: 'Bofetada' },
-            { value: 'arañazos', label: 'Lo araño únicamente' },
-            { value: 'otras_fisica', label: 'Otras', conInput: true, placeholder: 'Especifique otras formas de violencia física' }
-        ],
-        psicologica: [
-            { value: 'gritos_insultos', label: 'Gritos o insultos' },
-            { value: 'abandono_afectivo', label: 'Abandono afectivo' },
-            { value: 'amenaza_abandono', label: 'Amenaza de abandono' },
-            { value: 'amenaza_quitar_hijos', label: 'Amenaza de quitarle los hijos' },
-            { value: 'humillacion', label: 'Humillación' },
-            { value: 'culpabilizar', label: 'Culpabilizar' },
-            { value: 'marginar_ignorar', label: 'Marginar o ignorar' },
-            { value: 'restriccion_libertad', label: 'Restricción de la libertad' },
-            { value: 'desamparo', label: 'Desamparo' },
-            { value: 'otras_psicologica', label: 'Otras', conInput: true, placeholder: 'Especifique otras formas de violencia psicológica' }
-        ],
-        sexual: [
-            { value: 'presenciar_actos', label: 'Obligada/o a presenciar actos sexuales' },
-            { value: 'tocamientos_contactos', label: 'Obligada a tocamientos y contactos indeseados' },
-            { value: 'contacto_presencia_hijos', label: 'Obligada/o a contacto sexual en presencia de hijos o dependientes' },
-            { value: 'contacto_enferma', label: 'Obligada a contacto sexual estando enferma/o' },
-            { value: 'contacto_otras_personas', label: 'Obliga a contacto sexual con otras personas' },
-            { value: 'violacion', label: 'Violación' },
-            { value: 'resistencia_relaciones', label: 'Resistencia a relaciones sexuales' },
-            { value: 'otras_sexual', label: 'Otras agresiones sexuales', conInput: true, placeholder: 'Especifique otras agresiones sexuales' }
-        ],
-        patrimonial: [
-            { value: 'sustraccion_valores', label: 'Sustracción de valores' },
-            { value: 'destruccion_bienes', label: 'Destrucción de objetos de valor' },
-            { value: 'apropiacion_bienes', label: 'Apropiación de bienes' },
-            { value: 'violencia_economica', label: 'Violencia económica' },
-            { value: 'abandono_alimentario', label: 'Abandono alimentario' },
-            { value: 'no_atencion_medica', label: 'No lleva atención médica' },
-            { value: 'abandono_negligencia', label: 'Abandono o negligencia' },
-            { value: 'abandono_educativo', label: 'Abandono educativo' }
-        ]
-    };
-
-    // Función para mostrar las opciones de un tipo de violencia
-    function mostrarOpciones(tipo) {
-        if (tiposSeleccionados.has(tipo)) return; // Ya está mostrado
-
-        tiposSeleccionados.add(tipo);
-
-        const opciones = opcionesViolencia[tipo];
-        const titulo = tipo === 'fisica' ? 'A. Física' :
-            tipo === 'psicologica' ? 'B. Psicológica' :
-                tipo === 'sexual' ? 'C. Sexual' : 'D. Patrimonial';
-
-        const opcionesHTML = `
-      <div class="p-4 border border-gray-300 rounded-lg bg-white" data-tipo="${tipo}">
-        <div class="flex justify-between items-center mb-3">
-          <h4 class="font-semibold text-gray-800">${titulo}</h4>
-          <button type="button" class="cerrar-opciones text-red-600 hover:text-red-800" data-tipo="${tipo}">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-            </svg>
-          </button>
-        </div>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-          ${opciones.map(opcion => `
-            <label class="flex items-center space-x-2">
-              <input type="checkbox" name="violencia_${tipo}" value="${opcion.value}" class="text-blue-600">
-              <span class="text-sm">${opcion.label}</span>
-              ${opcion.conInput ? `
-                <input type="text" placeholder="${opcion.placeholder}" class="border border-gray-300 rounded-lg p-1 text-sm flex-1" style="display: none;">
-              ` : ''}
-            </label>
-          `).join('')}
-        </div>
-      </div>
-    `;
-
-        contenedorOpciones.insertAdjacentHTML('beforeend', opcionesHTML);
-
-        // Agregar evento para mostrar/ocultar input cuando se selecciona "Otras"
-        const inputsOtras = contenedorOpciones.querySelectorAll(`[data-tipo="${tipo}"] input[type="checkbox"]`);
-        inputsOtras.forEach(input => {
-            input.addEventListener('change', function () {
-                if (this.value.includes('otras_') && this.checked) {
-                    const inputText = this.parentNode.querySelector('input[type="text"]');
-                    if (inputText) inputText.style.display = 'block';
-                } else if (this.value.includes('otras_') && !this.checked) {
-                    const inputText = this.parentNode.querySelector('input[type="text"]');
-                    if (inputText) {
-                        inputText.style.display = 'none';
-                        inputText.value = '';
-                    }
-                }
-            });
-        });
-    }
-
-    // Función para ocultar opciones
-    function ocultarOpciones(tipo) {
-        const elemento = contenedorOpciones.querySelector(`[data-tipo="${tipo}"]`);
-        if (elemento) {
-            elemento.remove();
-            tiposSeleccionados.delete(tipo);
-
-            // Resetear el botón
-            const boton = document.querySelector(`.violencia-btn[data-tipo="${tipo}"]`);
-            if (boton) {
-                boton.classList.remove('border-blue-500', 'bg-blue-50', 'border-2');
-                boton.classList.add('border-gray-300');
-            }
-        }
-    }
-
-    // Event listeners para los botones
-    botonesViolencia.forEach(boton => {
-        boton.addEventListener('click', function () {
-            const tipo = this.getAttribute('data-tipo');
-
-            if (tiposSeleccionados.has(tipo)) {
-                // Si ya está seleccionado, lo quitamos
-                ocultarOpciones(tipo);
-            } else {
-                // Si no está seleccionado, lo agregamos
-                mostrarOpciones(tipo);
-                this.classList.remove('border-gray-300');
-                this.classList.add('border-blue-500', 'bg-blue-50', 'border-2');
-            }
-        });
-    });
-
-    // Event listener para botones de cerrar
-    contenedorOpciones.addEventListener('click', function (e) {
-        if (e.target.closest('.cerrar-opciones')) {
-            const tipo = e.target.closest('.cerrar-opciones').getAttribute('data-tipo');
-            ocultarOpciones(tipo);
-        }
-    });
-}
