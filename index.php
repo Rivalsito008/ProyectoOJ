@@ -60,6 +60,7 @@
     </form>
   </div>
 
+  <script src="services/auth.js"></script>
   <script src="JS/index.js"></script>
 </body>
 
