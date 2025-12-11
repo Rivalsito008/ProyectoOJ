@@ -87,7 +87,7 @@ async function login(email, pwd, remember = false) {
 
         return {
             success: true,
-            message: response.data.message
+            message: response.data.message || 'Error al iniciar sesión'
         };
     } catch (error) {
         throw error;
@@ -99,13 +99,16 @@ async function logout() {
     try {
         await axios.post('/auth/logout');
     } catch (error) {
-        console.error('Error al cerrar la sesion del usuario desde el servidor', error);
+        console.error('Error al cerrar la sesión del usuario desde el servidor', error);
     } finally {
+        // limpiamos la cache
         userDataCache = null;
         isAuthenticated = false;
 
+        // limpiamos el localStorage
         localStorage.removeItem('sigen-email');
 
+        // redirigimos al login
         window.location.href = 'index.php';
     }
 }
@@ -114,9 +117,9 @@ async function logout() {
 // Funcion para proteger las paginas con auth
 async function requireAuth() {
     try {
-        const authenticated = await isAuthenticated;
+        const authenticated = await isAuthenticated();
         if (!authenticated) {
-            console.error('No has iniciado sesion, redirigiendo al login');
+            console.warn('No autenticado, redirigiendo al login....');
             window.location.href = 'index.php';
         }
     } catch (error) {
@@ -126,11 +129,22 @@ async function requireAuth() {
 }
 
 
-
+// =============================
 // FUNCIONES DE UTILIDAD
+// =============================
+
+// obtenemos el email del usuario
+async function getUserEmail() {
+    try {
+        const user = await getUserData(true);
+        return user?.email_institucional || null;
+    } catch (error) {
+        return null;
+    }
+}
 
 
-// obtenemos el roles del usuario
+// obtenemos los roles del usuario
 async function getUserRoles() {
     try {
         const user = await getUserData(true);
@@ -152,6 +166,9 @@ async function isAdmin() {
     return await hasRole('admin');
 }
 
+function getSavedEmail() {
+    return localStorage.getItem('sigen-email') || null;
+}
 
 
 // =============================
@@ -179,7 +196,7 @@ axios.interceptors.response.use(
 // =============================
 
 window.addEventListener('DOMContentLoaded', async function () {
-    const isLoginPage = window.location.pathname.includes('index.php') || window.location.pathname.endsWith('/');
+    const isLoginPage = window.location.pathname.includes('index.php') || window.location.pathname.endsWith('/') || window.location.pathname === '/';
 
     if (isLoginPage) {
         // verificamos que existe sesion
@@ -205,13 +222,22 @@ window.addEventListener('DOMContentLoaded', async function () {
 // EXPORTAR FUNCIONES
 // ======================================
 window.auth = {
-    getUserData,
-    isAuthenticated,
+    // Autenticación
     login,
     logout,
+    isAuthenticated,
     requireAuth,
+
+    // Usuario
+    getUserData,
     // getUserFullName,
+    getUserEmail,
     getUserRoles,
+
+    // Roles
     hasRole,
-    isAdmin
+    isAdmin,
+
+    // Utilidades
+    getSavedEmail
 };

@@ -1,5 +1,6 @@
-// Configuración de la API
-const API_URL = 'http://localhost:8000/api';
+// ======================================
+// LÓGICA DE UI DEL LOGIN
+// ======================================
 
 // Elementos del DOM
 const form = document.getElementById('loginForm');
@@ -12,12 +13,14 @@ const submitBtn = document.getElementById('submit-btn');
 const errorMessage = document.getElementById('error-message');
 const successMessage = document.getElementById('success-message');
 
-// Configurar axios
-axios.defaults.baseURL = API_URL;
-axios.defaults.headers.common['Content-Type'] = 'application/json';
-axios.defaults.headers.common['Accept'] = 'application/json';
+// ======================================
+// FUNCIONES DE UI
+// ======================================
 
-// Funciones de utilidad
+/**
+ * Mostrar mensaje de error
+ * @param {string} message - Mensaje a mostrar
+ */
 function showError(message) {
     errorMessage.textContent = message;
     errorMessage.classList.add('show');
@@ -28,12 +31,21 @@ function showError(message) {
     }, 5000);
 }
 
+/**
+ * Mostrar mensaje de éxito
+ * @param {string} message - Mensaje a mostrar
+ */
 function showSuccess(message) {
     successMessage.textContent = message;
     successMessage.classList.add('show');
     errorMessage.classList.remove('show');
 }
 
+/**
+ * Mostrar/ocultar pantalla de carga
+ * @param {boolean} show - Si se debe mostrar
+ * @param {string} text - Texto a mostrar
+ */
 function showLoading(show = true, text = 'Iniciando sesión...') {
     if (show) {
         loadingText.textContent = text;
@@ -45,28 +57,63 @@ function showLoading(show = true, text = 'Iniciando sesión...') {
     }
 }
 
-function saveSession(token, userData) {
-    // Guardar token
-    localStorage.setItem('sigen-token', token);
-
-    // Guardar datos del usuario
-    localStorage.setItem('sigen-user', JSON.stringify(userData));
-
-    // Si "recordarme" está marcado, guardar email
-    if (rememberCheckbox.checked) {
-        localStorage.setItem('sigen-email', emailInput.value);
-    } else {
-        localStorage.removeItem('sigen-email');
-    }
+/**
+ * Validar formato de email
+ * @param {string} email - Email a validar
+ * @returns {boolean}
+ */
+function isValidEmail(email) {
+    return email.includes('@') && email.endsWith('@csj.gob.sv');
 }
 
-// Manejar envío del formulario
+/**
+ * Manejar errores de la API
+ * @param {Error} error - Error de axios
+ */
+function handleLoginError(error) {
+    if (error.response) {
+        const status = error.response.status;
+        const data = error.response.data;
+
+        switch (status) {
+            case 401:
+                showError('Credenciales incorrectas. Verifica tu correo y contraseña.');
+                break;
+            case 422:
+                // Errores de validación
+                const errors = data.errors;
+                const firstError = Object.values(errors)[0][0];
+                showError(firstError);
+                break;
+            case 500:
+                showError('Error en el servidor. Intenta nuevamente más tarde.');
+                break;
+            default:
+                showError(data.message || 'Error al iniciar sesión. Intenta nuevamente.');
+        }
+    } else if (error.request) {
+        showError('No se pudo conectar con el servidor. Verifica tu conexión a internet.');
+    } else {
+        showError('Ocurrió un error inesperado. Intenta nuevamente.');
+    }
+
+    console.error('Error de login:', error);
+}
+
+// ======================================
+// MANEJO DEL FORMULARIO
+// ======================================
+
+/**
+ * Manejar envío del formulario de login
+ */
 form.addEventListener('submit', async function (e) {
     e.preventDefault();
 
     // Obtener valores
     const email = emailInput.value.trim();
     const password = passwordInput.value.trim();
+    const remember = rememberCheckbox.checked;
 
     // Validación básica
     if (!email || !password) {
@@ -74,8 +121,8 @@ form.addEventListener('submit', async function (e) {
         return;
     }
 
-    if (!email.endsWith('@csj.gob.sv')) {
-        showError('Por favor, ingresa un correo electrónico válido');
+    if (!isValidEmail(email)) {
+        showError('Por favor, ingresa un correo electrónico válido (@csj.gob.sv)');
         return;
     }
 
@@ -83,19 +130,10 @@ form.addEventListener('submit', async function (e) {
     showLoading(true);
 
     try {
-        // Hacer petición al API
-        const response = await axios.post('/auth/login', {
-            email_institucional: email,
-            contrasena: password
-        });
+        // Llamar a la función de login del servicio auth
+        const result = await auth.login(email, password, remember);
 
-        // Verificar respuesta exitosa
-        if (response.data.success) {
-            const { access_token, usuario } = response.data.data;
-
-            // Guardar sesión
-            saveSession(access_token, usuario);
-
+        if (result.success) {
             // Mostrar mensaje de éxito
             showSuccess('¡Inicio de sesión exitoso! Redirigiendo...');
 
@@ -105,67 +143,50 @@ form.addEventListener('submit', async function (e) {
             }, 1000);
         } else {
             showLoading(false);
-            showError(response.data.message || 'Error al iniciar sesión');
+            showError(result.message);
         }
-
     } catch (error) {
         showLoading(false);
-
-        // Manejar diferentes tipos de errores
-        if (error.response) {
-            // Error de respuesta del servidor
-            const status = error.response.status;
-            const data = error.response.data;
-
-            if (status === 401) {
-                showError('Credenciales incorrectas. Verifica tu correo y contraseña.');
-            } else if (status === 422) {
-                // Errores de validación
-                const errors = data.errors;
-                const firstError = Object.values(errors)[0][0];
-                showError(firstError);
-            } else if (status === 500) {
-                showError('Error en el servidor. Intenta nuevamente más tarde.');
-            } else {
-                showError(data.message || 'Error al iniciar sesión. Intenta nuevamente.');
-            }
-        } else if (error.request) {
-            // Error de red
-            showError('No se pudo conectar con el servidor. Verifica tu conexión a internet.');
-        } else {
-            // Error desconocido
-            showError('Ocurrió un error inesperado. Intenta nuevamente.');
-        }
-
-        console.error('Error de login:', error);
+        handleLoginError(error);
     }
 });
 
-// Cargar email recordado si existe
-window.addEventListener('DOMContentLoaded', () => {
-    const savedEmail = localStorage.getItem('sigen-email');
+// ======================================
+// CARGAR EMAIL GUARDADO
+// ======================================
+
+/**
+ * Cargar email guardado al iniciar
+ */
+function loadSavedEmail() {
+    const savedEmail = auth.getSavedEmail();
+
     if (savedEmail) {
         emailInput.value = savedEmail;
         rememberCheckbox.checked = true;
     }
+}
 
-    // Verificar si ya hay una sesión activa
-    const token = localStorage.getItem('sigen-token');
-    if (token) {
-        // Opcional: verificar si el token es válido
-        // Si quieres, puedes hacer una petición a /auth/me para verificar
-        showLoading(true, 'Verificando sesión...');
-        setTimeout(() => {
-            window.location.href = 'inicio.php';
-        }, 500);
-    }
-});
+// ======================================
+// LIMPIAR MENSAJES AL ESCRIBIR
+// ======================================
 
-// Limpiar mensajes al escribir
 emailInput.addEventListener('input', () => {
     errorMessage.classList.remove('show');
 });
 
 passwordInput.addEventListener('input', () => {
     errorMessage.classList.remove('show');
+});
+
+// ======================================
+// INICIALIZACIÓN
+// ======================================
+
+window.addEventListener('DOMContentLoaded', () => {
+    // Cargar email guardado si existe
+    loadSavedEmail();
+
+    // El auth.js ya maneja la verificación de sesión automáticamente
+    // Si hay sesión activa, redirigirá a inicio.php
 });
