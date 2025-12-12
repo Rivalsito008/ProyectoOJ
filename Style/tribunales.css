@@ -1,3 +1,5 @@
+@import "tailwindcss";
+
 :root {
     --bg-color: #e8eaed;
     --text-color: #111827;
@@ -347,6 +349,12 @@ tbody tr {
     background-color: var(--card-bg);
     border-bottom: 1px solid var(--border-color);
     animation: slideInRow 0.6s ease backwards;
+    transition: all 0.3s ease;
+}
+
+/* MODO OSCURO - Bordes grises claros */
+[data-theme="dark"] tbody tr {
+    border-bottom: 1px solid #cdcbcb; /* Gris claro en vez de negro */
 }
 
 /* Animación de entrada escalonada para filas */
@@ -1051,5 +1059,91 @@ DROPDOWN DE PERFIL
             opacity: 1;
             transform: translateY(0);
         }
+    }
+}
+
+/* ============================================
+   MEJORAS ADICIONALES
+   ============================================ */
+
+
+/* Botón flotante con animación suave */
+#openFormBtn {
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    animation: buttonAppearFloat 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), 
+               float 3s ease-in-out 0.6s infinite !important;
+}
+
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0px);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+@keyframes buttonAppearFloat {
+    from {
+        opacity: 0;
+        transform: scale(0.5) translateY(100px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+#openFormBtn:hover {
+    transform: translateY(-5px) scale(1.05) !important;
+    box-shadow: 0 20px 40px rgba(16, 185, 129, 0.4) !important;
+}
+
+#openFormBtn:active {
+    transform: scale(0.95) translateY(0px) !important;
+    transition: all 0.2s ease !important;
+}
+
+/* Fondo modal transparente gris */
+#userFormModal {
+    background-color: rgba(0, 0, 0, 0.4) !important;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+[data-theme="dark"] #userFormModal {
+    background-color: rgba(0, 0, 0, 0.6) !important;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+#userFormModal.flex {
+    animation: fadeInBackdrop 0.3s ease;
+}
+
+@keyframes fadeInBackdrop {
+    from {
+        background-color: rgba(0, 0, 0, 0);
+        backdrop-filter: blur(0px);
+    }
+    to {
+        background-color: rgba(0, 0, 0, 0.4);
+        backdrop-filter: blur(8px);
+    }
+}
+
+[data-theme="dark"] #userFormModal.flex {
+    animation: fadeInBackdropDark 0.3s ease;
+}
+
+@keyframes fadeInBackdropDark {
+    from {
+        background-color: rgba(0, 0, 0, 0);
+        backdrop-filter: blur(0px);
+    }
+    to {
+        background-color: rgba(0, 0, 0, 0.6);
+        backdrop-filter: blur(10px);
     }
 }

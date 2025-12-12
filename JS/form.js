@@ -78,9 +78,9 @@ function setupConditionalFields() {
     function setupConditionalSelect(selectId, containerId) {
         const select = document.getElementById(selectId);
         const container = document.getElementById(containerId);
-        
+
         if (select && container) {
-            select.addEventListener('change', function() {
+            select.addEventListener('change', function () {
                 if (this.value === 'si') {
                     container.classList.remove('hidden');
                 } else {
@@ -94,10 +94,10 @@ function setupConditionalFields() {
     function setupConditionalRadio(radioName, containerId) {
         const radios = document.querySelectorAll(`input[name="${radioName}"]`);
         const container = document.getElementById(containerId);
-        
+
         if (radios.length > 0 && container) {
             radios.forEach(radio => {
-                radio.addEventListener('change', function() {
+                radio.addEventListener('change', function () {
                     if (this.value === 'si') {
                         container.classList.remove('hidden');
                     } else {
@@ -112,9 +112,9 @@ function setupConditionalFields() {
     function setupOtherInput(selectId, inputId) {
         const select = document.getElementById(selectId);
         const input = document.getElementById(inputId);
-        
+
         if (select && input) {
-            select.addEventListener('change', function() {
+            select.addEventListener('change', function () {
                 if (this.value === 'other') {
                     input.style.display = 'block';
                 } else {
@@ -129,9 +129,9 @@ function setupConditionalFields() {
     function setupOtherCheckbox(checkboxId, inputId) {
         const checkbox = document.getElementById(checkboxId);
         const input = document.getElementById(inputId);
-        
+
         if (checkbox && input) {
-            checkbox.addEventListener('change', function() {
+            checkbox.addEventListener('change', function () {
                 if (this.checked) {
                     input.style.display = 'block';
                 } else {
@@ -143,15 +143,15 @@ function setupConditionalFields() {
     }
 
     // ===== DATOS DEL DENUNCIANTE =====
-    
+
     // Nacionalidad - otro
     setupOtherInput('denuncianteNacionalidad', 'denuncianteOtraNacionalidad');
-    
+
     // Estado familiar - mostrar nombre cónyuge
     const denuncianteEstadoFamiliar = document.getElementById('denuncianteEstadoFamiliar');
     const denuncianteNombreConyugeContainer = document.getElementById('denuncianteNombreConyugeContainer');
     if (denuncianteEstadoFamiliar && denuncianteNombreConyugeContainer) {
-        denuncianteEstadoFamiliar.addEventListener('change', function() {
+        denuncianteEstadoFamiliar.addEventListener('change', function () {
             if (this.value === 'casado' || this.value === 'union_libre') {
                 denuncianteNombreConyugeContainer.style.display = 'block';
             } else {
@@ -164,7 +164,7 @@ function setupConditionalFields() {
     const denuncianteNoTrabajo = document.getElementById('denuncianteNoTrabajo');
     const denuncianteTrabajoEnCasa = document.getElementById('denuncianteTrabajoEnCasa');
     const denuncianteDireccionTrabajoContainer = document.getElementById('denuncianteDireccionTrabajoContainer');
-    
+
     if (denuncianteNoTrabajo && denuncianteTrabajoEnCasa && denuncianteDireccionTrabajoContainer) {
         function actualizarCamposTrabajoDenunciante() {
             if (denuncianteNoTrabajo.checked) {
@@ -175,15 +175,15 @@ function setupConditionalFields() {
                 denuncianteDireccionTrabajoContainer.style.display = 'block';
             }
         }
-        
-        denuncianteNoTrabajo.addEventListener('change', function() {
+
+        denuncianteNoTrabajo.addEventListener('change', function () {
             if (this.checked) {
                 denuncianteTrabajoEnCasa.checked = false;
             }
             actualizarCamposTrabajoDenunciante();
         });
-        
-        denuncianteTrabajoEnCasa.addEventListener('change', function() {
+
+        denuncianteTrabajoEnCasa.addEventListener('change', function () {
             if (this.checked) {
                 denuncianteNoTrabajo.checked = false;
             }
@@ -195,7 +195,7 @@ function setupConditionalFields() {
     const denuncianteCantidadVictimas = document.getElementById('denuncianteCantidadVictimas');
     const denuncianteMultipleVictimasContainer = document.getElementById('denuncianteMultipleVictimasContainer');
     if (denuncianteCantidadVictimas && denuncianteMultipleVictimasContainer) {
-        denuncianteCantidadVictimas.addEventListener('change', function() {
+        denuncianteCantidadVictimas.addEventListener('change', function () {
             const cantidad = parseInt(this.value);
             if (cantidad > 1) {
                 denuncianteMultipleVictimasContainer.classList.remove('hidden');
@@ -206,15 +206,15 @@ function setupConditionalFields() {
     }
 
     // ===== DATOS DE LA VÍCTIMA =====
-    
+
     // Nacionalidad - otro
     setupOtherInput('victimaNacionalidad', 'victimaOtraNacionalidad');
-    
+
     // Estado familiar
     const victimaEstadoFamiliar = document.getElementById('victimaEstadoFamiliar');
     const victimaNombreConyugeContainer = document.getElementById('victimaNombreConyugeContainer');
     if (victimaEstadoFamiliar && victimaNombreConyugeContainer) {
-        victimaEstadoFamiliar.addEventListener('change', function() {
+        victimaEstadoFamiliar.addEventListener('change', function () {
             if (this.value === 'casado' || this.value === 'union_libre') {
                 victimaNombreConyugeContainer.style.display = 'block';
             } else {
@@ -227,7 +227,7 @@ function setupConditionalFields() {
     const victimaNoTrabajo = document.getElementById('victimaNoTrabajo');
     const victimaTrabajoEnCasa = document.getElementById('victimaTrabajoEnCasa');
     const victimaDireccionTrabajoContainer = document.getElementById('victimaDireccionTrabajoContainer');
-    
+
     if (victimaNoTrabajo && victimaTrabajoEnCasa && victimaDireccionTrabajoContainer) {
         function actualizarCamposTrabajoVictima() {
             if (victimaNoTrabajo.checked) {
@@ -238,15 +238,15 @@ function setupConditionalFields() {
                 victimaDireccionTrabajoContainer.style.display = 'block';
             }
         }
-        
-        victimaNoTrabajo.addEventListener('change', function() {
+
+        victimaNoTrabajo.addEventListener('change', function () {
             if (this.checked) {
                 victimaTrabajoEnCasa.checked = false;
             }
             actualizarCamposTrabajoVictima();
         });
-        
-        victimaTrabajoEnCasa.addEventListener('change', function() {
+
+        victimaTrabajoEnCasa.addEventListener('change', function () {
             if (this.checked) {
                 victimaNoTrabajo.checked = false;
             }
@@ -258,7 +258,7 @@ function setupConditionalFields() {
     const victimaCantidadHijos = document.getElementById('victimaCantidadHijos');
     const victimaDatosHijosContainer = document.getElementById('victimaDatosHijosContainer');
     if (victimaCantidadHijos && victimaDatosHijosContainer) {
-        victimaCantidadHijos.addEventListener('change', function() {
+        victimaCantidadHijos.addEventListener('change', function () {
             const cantidad = parseInt(this.value);
             if (cantidad > 0) {
                 victimaDatosHijosContainer.classList.remove('hidden');
@@ -279,12 +279,12 @@ function setupConditionalFields() {
     setupConditionalRadio('victimaLesiones', 'victimaLesionesContainer');
     setupConditionalRadio('victimaHospitalizaciones', 'victimaHospitalizacionesContainer');
     setupConditionalRadio('victimaAtencionesMedicas', 'victimaAtencionesContainer');
-    
+
     // Alerta para lesiones graves
     const victimaNivelLesion = document.getElementById('victimaNivelLesion');
     const victimaAlertaLesionGrave = document.getElementById('victimaAlertaLesionGrave');
     if (victimaNivelLesion && victimaAlertaLesionGrave) {
-        victimaNivelLesion.addEventListener('change', function() {
+        victimaNivelLesion.addEventListener('change', function () {
             if (this.value === 'Grave') {
                 victimaAlertaLesionGrave.classList.remove('hidden');
             } else {
@@ -299,15 +299,15 @@ function setupConditionalFields() {
     setupOtherInput('frecuenciaAgresiones', 'otraFrecuencia');
 
     // ===== DATOS DEL AGRESOR =====
-    
+
     // Nacionalidad - otro
     setupOtherInput('agresorNacionalidad', 'agresorOtraNacionalidad');
-    
+
     // Estado familiar
     const agresorEstadoFamiliar = document.getElementById('agresorEstadoFamiliar');
     const agresorNombreConyugeContainer = document.getElementById('agresorNombreConyugeContainer');
     if (agresorEstadoFamiliar && agresorNombreConyugeContainer) {
-        agresorEstadoFamiliar.addEventListener('change', function() {
+        agresorEstadoFamiliar.addEventListener('change', function () {
             if (this.value === 'casado' || this.value === 'union_libre') {
                 agresorNombreConyugeContainer.style.display = 'block';
             } else {
@@ -320,7 +320,7 @@ function setupConditionalFields() {
     const agresorNoTrabajo = document.getElementById('agresorNoTrabajo');
     const agresorTrabajoEnCasa = document.getElementById('agresorTrabajoEnCasa');
     const agresorDireccionTrabajoContainer = document.getElementById('agresorDireccionTrabajoContainer');
-    
+
     if (agresorNoTrabajo && agresorTrabajoEnCasa && agresorDireccionTrabajoContainer) {
         function actualizarCamposTrabajoAgresor() {
             if (agresorNoTrabajo.checked) {
@@ -331,15 +331,15 @@ function setupConditionalFields() {
                 agresorDireccionTrabajoContainer.style.display = 'block';
             }
         }
-        
-        agresorNoTrabajo.addEventListener('change', function() {
+
+        agresorNoTrabajo.addEventListener('change', function () {
             if (this.checked) {
                 agresorTrabajoEnCasa.checked = false;
             }
             actualizarCamposTrabajoAgresor();
         });
-        
-        agresorTrabajoEnCasa.addEventListener('change', function() {
+
+        agresorTrabajoEnCasa.addEventListener('change', function () {
             if (this.checked) {
                 agresorNoTrabajo.checked = false;
             }
@@ -353,7 +353,7 @@ function setupConditionalFields() {
     setupConditionalSelect('agresorPoseeArmas', 'agresorTipoArmasContainer');
     setupConditionalSelect('agresorFormacionEspecial', 'agresorTipoFormacionContainer');
     setupConditionalSelect('agresorPoseeDiscapacidad', 'agresorTipoDiscapacidadContainer');
-    
+
     setupOtherInput('agresorTipoArmas', 'agresorOtroTipoArma');
     setupOtherInput('agresorTipoFormacion', 'agresorOtroTipoFormacion');
     setupOtherCheckbox('agresorDiscapacidadOtraCheck', 'agresorDiscapacidadOtraTexto');
@@ -362,7 +362,7 @@ function setupConditionalFields() {
     const cantidadAgresores = document.getElementById('cantidadAgresores');
     const multipleAgresoresContainer = document.getElementById('multipleAgresoresContainer');
     if (cantidadAgresores && multipleAgresoresContainer) {
-        cantidadAgresores.addEventListener('change', function() {
+        cantidadAgresores.addEventListener('change', function () {
             const cantidad = parseInt(this.value);
             if (cantidad > 1) {
                 multipleAgresoresContainer.classList.remove('hidden');
@@ -373,12 +373,12 @@ function setupConditionalFields() {
     }
 
     // ===== CÁLCULO DE EDADES =====
-    
+
     // Configurar cálculo de edad para denunciante
     const denuncianteFechaNacimiento = document.getElementById('denuncianteFechaNacimiento');
     const denuncianteEdad = document.getElementById('denuncianteEdad');
     const denuncianteCalcularBtn = document.getElementById('denuncianteCalcularEdad');
-    
+
     if (denuncianteFechaNacimiento && denuncianteEdad && denuncianteCalcularBtn) {
         function calcularEdadDenunciante() {
             if (denuncianteFechaNacimiento.value) {
@@ -386,15 +386,15 @@ function setupConditionalFields() {
                 const hoy = new Date();
                 let edad = hoy.getFullYear() - fechaNac.getFullYear();
                 const mes = hoy.getMonth() - fechaNac.getMonth();
-                
+
                 if (mes < 0 || (mes === 0 && hoy.getDate() < fechaNac.getDate())) {
                     edad--;
                 }
-                
+
                 denuncianteEdad.value = edad;
             }
         }
-        
+
         denuncianteFechaNacimiento.addEventListener('change', calcularEdadDenunciante);
         denuncianteCalcularBtn.addEventListener('click', calcularEdadDenunciante);
     }
@@ -403,7 +403,7 @@ function setupConditionalFields() {
     const victimaFechaNacimiento = document.getElementById('victimaFechaNacimiento');
     const victimaEdad = document.getElementById('victimaEdad');
     const victimaCalcularBtn = document.getElementById('victimaCalcularEdad');
-    
+
     if (victimaFechaNacimiento && victimaEdad && victimaCalcularBtn) {
         function calcularEdadVictima() {
             if (victimaFechaNacimiento.value) {
@@ -411,15 +411,15 @@ function setupConditionalFields() {
                 const hoy = new Date();
                 let edad = hoy.getFullYear() - fechaNac.getFullYear();
                 const mes = hoy.getMonth() - fechaNac.getMonth();
-                
+
                 if (mes < 0 || (mes === 0 && hoy.getDate() < fechaNac.getDate())) {
                     edad--;
                 }
-                
+
                 victimaEdad.value = edad;
             }
         }
-        
+
         victimaFechaNacimiento.addEventListener('change', calcularEdadVictima);
         victimaCalcularBtn.addEventListener('click', calcularEdadVictima);
     }
@@ -428,7 +428,7 @@ function setupConditionalFields() {
     const agresorFechaNacimiento = document.getElementById('agresorFechaNacimiento');
     const agresorEdad = document.getElementById('agresorEdad');
     const agresorCalcularBtn = document.getElementById('agresorCalcularEdad');
-    
+
     if (agresorFechaNacimiento && agresorEdad && agresorCalcularBtn) {
         function calcularEdadAgresor() {
             if (agresorFechaNacimiento.value) {
@@ -436,40 +436,45 @@ function setupConditionalFields() {
                 const hoy = new Date();
                 let edad = hoy.getFullYear() - fechaNac.getFullYear();
                 const mes = hoy.getMonth() - fechaNac.getMonth();
-                
+
                 if (mes < 0 || (mes === 0 && hoy.getDate() < fechaNac.getDate())) {
                     edad--;
                 }
-                
+
                 agresorEdad.value = edad;
             }
         }
-        
+
         agresorFechaNacimiento.addEventListener('change', calcularEdadAgresor);
         agresorCalcularBtn.addEventListener('click', calcularEdadAgresor);
     }
 
     // ===== SISTEMA DE TELÉFONOS =====
-    
+
     // Función para agregar teléfonos
     function setupTelefonoSystem(agregarBtnId, listaId) {
         const agregarBtn = document.getElementById(agregarBtnId);
         const lista = document.getElementById(listaId);
-        
+
         if (agregarBtn && lista) {
-            agregarBtn.addEventListener('click', function() {
+            // Clonar el botón para remover todos los event listeners
+            const nuevoBtn = agregarBtn.cloneNode(true);
+            agregarBtn.parentNode.replaceChild(nuevoBtn, agregarBtn);
+
+            // Agregar el event listener una sola vez
+            nuevoBtn.addEventListener('click', function () {
                 const nuevoTelefono = document.createElement('div');
                 nuevoTelefono.className = 'flex gap-2 items-center';
                 nuevoTelefono.innerHTML = `
-                    <input type="tel" placeholder="Número de teléfono" class="border border-gray-300 rounded-lg p-3 flex-grow focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
-                    <select class="border border-gray-300 rounded-lg p-3 focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
-                        <option value="personal">Personal</option>
-                        <option value="trabajo">Trabajo</option>
-                        <option value="casa">Casa</option>
-                        <option value="otro">Otro</option>
-                    </select>
-                    <button type="button" class="text-red-500 hover:text-red-700 eliminar-telefono">✕</button>
-                `;
+                <input type="tel" placeholder="Número de teléfono" class="border border-gray-300 rounded-lg p-3 flex-grow focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
+                <select class="border border-gray-300 rounded-lg p-3 focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
+                    <option value="personal">Personal</option>
+                    <option value="trabajo">Trabajo</option>
+                    <option value="casa">Casa</option>
+                    <option value="otro">Otro</option>
+                </select>
+                <button type="button" class="text-red-500 hover:text-red-700 eliminar-telefono">✕</button>
+            `;
                 lista.appendChild(nuevoTelefono);
             });
         }
@@ -481,7 +486,7 @@ function setupConditionalFields() {
     setupTelefonoSystem('agresorAgregarTelefono', 'agresorTelefonosLista');
 
     // Event delegation para eliminar teléfonos
-    document.addEventListener('click', function(e) {
+    document.addEventListener('click', function (e) {
         if (e.target.classList.contains('eliminar-telefono')) {
             const telefonoDiv = e.target.parentElement;
             if (telefonoDiv.parentElement.children.length > 1) {
@@ -491,7 +496,7 @@ function setupConditionalFields() {
     });
 
     // ===== CKEDITOR PARA RELACIÓN DE HECHOS =====
-    
+
     // Inicializar CKEditor si está disponible
     if (typeof ClassicEditor !== 'undefined') {
         ClassicEditor
@@ -513,24 +518,24 @@ function setupConditionalFields() {
             })
             .then(editor => {
                 window.editor = editor;
-                
+
                 // Botón para generar texto automático
                 const generarTextoBtn = document.getElementById('generarTextoBtn');
                 if (generarTextoBtn) {
-                    generarTextoBtn.addEventListener('click', function() {
+                    generarTextoBtn.addEventListener('click', function () {
                         const denuncianteNombre = document.getElementById('denuncianteNombre')?.value || '[Nombre del denunciante]';
                         const esVictima = document.querySelector('input[name="denuncianteEsVictima"]:checked')?.value;
-                        
+
                         let textoBase = '';
-                        
+
                         if (esVictima === 'si') {
                             textoBase = `La señora/or ${denuncianteNombre} en su calidad de víctima en este caso y de generales antes expresada en este documento, habiendo sido informado sobre los derechos y obligaciones que le asisten, de forma libre expresa que...<br><br>`;
                         } else {
                             textoBase = `La señora/or ${denuncianteNombre} en su calidad de denunciante y de generales antes expresada en este documento, habiendo sido informado sobre los derechos y obligaciones que le asisten, de forma libre expresa que...<br><br>`;
                         }
-                        
+
                         editor.setData(textoBase);
-                        
+
                         // Mostrar en previsualización
                         const previewRelacion = document.getElementById('previewRelacion');
                         if (previewRelacion) {
@@ -548,7 +553,7 @@ function setupConditionalFields() {
 function mostrarPreguntas() {
     const preguntasForm = document.getElementById('preguntasForm');
     if (!preguntasForm) return;
-    
+
     preguntasForm.innerHTML = '';
 
     const inicio = paginaActual * preguntasPorPagina;

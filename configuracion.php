@@ -5,7 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SIGEN - Sistema de Gestión Notarial</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="src/global.css">
+    <link rel="stylesheet" href="src/output.css">
     <link rel="stylesheet" href="Style/configuracion.css">
 </head>
 
@@ -58,8 +59,10 @@
                 <!-- Contraste -->
                 <div class="card rounded-xl p-6 shadow md:col-span-2">
                     <h2 class="text-xl font-semibold mb-4">Contraste</h2>
-                    <input id="contrastRange" type="range" min="0.8" max="1.6" step="0.1" value="1" class="w-full cursor-pointer">
-                    <p class="mt-2 text-sm">Nivel de contraste: <span id="contrastValue" class="font-semibold">1.0</span></p>
+                    <input id="contrastRange" type="range" min="0.8" max="1.6" step="0.1" value="1"
+                        class="w-full cursor-pointer">
+                    <p class="mt-2 text-sm">Nivel de contraste: <span id="contrastValue"
+                            class="font-semibold">1.0</span></p>
                 </div>
 
                 <!-- Cuenta -->

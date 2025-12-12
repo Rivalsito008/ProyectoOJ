@@ -1,3 +1,5 @@
+@import "tailwindcss";
+
 :root {
     --bg-color: #e8eaed;
     --text-color: #111827;
@@ -333,6 +335,7 @@ body {
         opacity: 0;
         transform: translateY(10px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -353,6 +356,7 @@ body {
         opacity: 0;
         transform: translateY(20px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -371,6 +375,7 @@ table {
         opacity: 0;
         transform: translateY(20px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -387,6 +392,13 @@ tbody tr {
     background-color: var(--card-bg);
     border-bottom: 1px solid var(--border-color);
     animation: slideInRow 0.6s ease backwards;
+    transition: all 0.3s ease;
+}
+
+/* MODO OSCURO - Bordes grises claros */
+[data-theme="dark"] tbody tr {
+    border-bottom: 1px solid #cdcbcb;
+    /* Gris claro en vez de negro */
 }
 
 @keyframes slideInRow {
@@ -394,6 +406,7 @@ tbody tr {
         opacity: 0;
         transform: translateX(-30px);
     }
+
     to {
         opacity: 1;
         transform: translateX(0);
@@ -401,18 +414,53 @@ tbody tr {
 }
 
 /* Retrasos escalonados para cada fila (¡EFECTO INCREÍBLE!) */
-tbody tr:nth-child(1) { animation-delay: 0.1s; }
-tbody tr:nth-child(2) { animation-delay: 0.2s; }
-tbody tr:nth-child(3) { animation-delay: 0.3s; }
-tbody tr:nth-child(4) { animation-delay: 0.4s; }
-tbody tr:nth-child(5) { animation-delay: 0.5s; }
-tbody tr:nth-child(6) { animation-delay: 0.6s; }
-tbody tr:nth-child(7) { animation-delay: 0.7s; }
-tbody tr:nth-child(8) { animation-delay: 0.8s; }
-tbody tr:nth-child(9) { animation-delay: 0.9s; }
-tbody tr:nth-child(10) { animation-delay: 1.0s; }
-tbody tr:nth-child(11) { animation-delay: 1.1s; }
-tbody tr:nth-child(12) { animation-delay: 1.2s; }
+tbody tr:nth-child(1) {
+    animation-delay: 0.1s;
+}
+
+tbody tr:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+tbody tr:nth-child(3) {
+    animation-delay: 0.3s;
+}
+
+tbody tr:nth-child(4) {
+    animation-delay: 0.4s;
+}
+
+tbody tr:nth-child(5) {
+    animation-delay: 0.5s;
+}
+
+tbody tr:nth-child(6) {
+    animation-delay: 0.6s;
+}
+
+tbody tr:nth-child(7) {
+    animation-delay: 0.7s;
+}
+
+tbody tr:nth-child(8) {
+    animation-delay: 0.8s;
+}
+
+tbody tr:nth-child(9) {
+    animation-delay: 0.9s;
+}
+
+tbody tr:nth-child(10) {
+    animation-delay: 1.0s;
+}
+
+tbody tr:nth-child(11) {
+    animation-delay: 1.1s;
+}
+
+tbody tr:nth-child(12) {
+    animation-delay: 1.2s;
+}
 
 /* Efecto hover mejorado para filas */
 tbody tr:hover {
@@ -444,6 +492,7 @@ select {
         opacity: 0;
         transform: translateY(-30px) scale(0.95);
     }
+
     to {
         opacity: 1;
         transform: translateY(0) scale(1);
@@ -486,9 +535,17 @@ select {
 }
 
 @keyframes inputFocus {
-    0% { transform: translateY(0); }
-    50% { transform: translateY(-2px); }
-    100% { transform: translateY(-1px); }
+    0% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-2px);
+    }
+
+    100% {
+        transform: translateY(-1px);
+    }
 }
 
 /* Modo oscuro: focus morado */
@@ -509,6 +566,7 @@ select {
         opacity: 0;
         transform: translateY(-20px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -630,6 +688,7 @@ select {
         opacity: 0;
         transform: scale(0.8);
     }
+
     to {
         opacity: 1;
         transform: scale(1);
@@ -710,6 +769,7 @@ select {
         opacity: 0;
         transform: translateY(15px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -745,9 +805,12 @@ select {
 }
 
 @keyframes pulseRed {
-    0%, 100% {
+
+    0%,
+    100% {
         box-shadow: 0 3px 8px rgba(239, 68, 68, 0.3);
     }
+
     50% {
         box-shadow: 0 3px 15px rgba(239, 68, 68, 0.5);
     }
@@ -764,9 +827,12 @@ select {
 }
 
 @keyframes pulseGreen {
-    0%, 100% {
+
+    0%,
+    100% {
         box-shadow: 0 3px 8px rgba(16, 185, 129, 0.3);
     }
+
     50% {
         box-shadow: 0 3px 15px rgba(16, 185, 129, 0.5);
     }
@@ -804,9 +870,11 @@ select {
         opacity: 0;
         transform: scale(0.5);
     }
+
     50% {
         opacity: 0.3;
     }
+
     100% {
         opacity: 0;
         transform: scale(1.5);
@@ -851,10 +919,12 @@ select {
         transform: scale(1);
         opacity: 1;
     }
+
     50% {
         transform: scale(0.9);
         opacity: 0.7;
     }
+
     100% {
         transform: scale(1);
         opacity: 1;
@@ -897,6 +967,7 @@ select {
     0% {
         left: -100%;
     }
+
     100% {
         left: 400%;
     }
@@ -906,9 +977,11 @@ select {
     0% {
         transform: scale(1);
     }
+
     50% {
         transform: scale(0.9);
     }
+
     100% {
         transform: scale(1);
     }
@@ -946,6 +1019,7 @@ select {
         opacity: 0;
         transform: translateY(20px) scale(0.9);
     }
+
     to {
         opacity: 1;
         transform: translateY(0) scale(1);
@@ -1111,28 +1185,30 @@ select {
 
 /* ===== RESPONSIVE ===== */
 @media (max-width: 768px) {
+
     .action-btn-view,
     .action-btn-toggle-estado {
         padding: 6px 10px !important;
         font-size: 11px !important;
         width: 70px !important;
     }
-    
+
     .state-badge-shimmer {
         font-size: 11px;
         padding: 2px 8px !important;
     }
-    
+
     /* Ajustar animaciones para mobile */
     tbody tr {
         animation: slideInRowMobile 0.5s ease backwards;
     }
-    
+
     @keyframes slideInRowMobile {
         from {
             opacity: 0;
             transform: translateY(10px);
         }
+
         to {
             opacity: 1;
             transform: translateY(0);
@@ -1155,4 +1231,91 @@ select {
 .py-1 {
     padding-top: 0.25rem !important;
     padding-bottom: 0.25rem !important;
+}
+/* ============================================
+   MEJORAS ADICIONALES
+   ============================================ */
+
+/* Botón flotante con animación suave */
+/* CAMBIAR: #openFormBtn → #openQuestionBtn */
+#openQuestionBtn {
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    animation: buttonAppearFloat 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), 
+               float 3s ease-in-out 0.6s infinite !important;
+}
+
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0px);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+@keyframes buttonAppearFloat {
+    from {
+        opacity: 0;
+        transform: scale(0.5) translateY(100px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+#openQuestionBtn:hover {
+    transform: translateY(-5px) scale(1.05) !important;
+    box-shadow: 0 20px 40px rgba(59, 130, 246, 0.4) !important;
+}
+
+#openQuestionBtn:active {
+    transform: scale(0.95) translateY(0px) !important;
+    transition: all 0.2s ease !important;
+}
+
+/* Fondo modal transparente gris */
+/* CAMBIAR: #userFormModal → #questionFormModal */
+#questionFormModal {
+    background-color: rgba(0, 0, 0, 0.4) !important;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+[data-theme="dark"] #questionFormModal {
+    background-color: rgba(0, 0, 0, 0.6) !important;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+/* CAMBIAR: #userFormModal.flex → #questionFormModal:not(.hidden) */
+#questionFormModal:not(.hidden) {
+    animation: fadeInBackdrop 0.3s ease;
+}
+
+@keyframes fadeInBackdrop {
+    from {
+        background-color: rgba(0, 0, 0, 0);
+        backdrop-filter: blur(0px);
+    }
+    to {
+        background-color: rgba(0, 0, 0, 0.4);
+        backdrop-filter: blur(8px);
+    }
+}
+
+[data-theme="dark"] #questionFormModal:not(.hidden) {
+    animation: fadeInBackdropDark 0.3s ease;
+}
+
+@keyframes fadeInBackdropDark {
+    from {
+        background-color: rgba(0, 0, 0, 0);
+        backdrop-filter: blur(0px);
+    }
+    to {
+        background-color: rgba(0, 0, 0, 0.6);
+        backdrop-filter: blur(10px);
+    }
 }

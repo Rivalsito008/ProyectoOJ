@@ -5,7 +5,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Login | SIGEN</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="src/global.css">
+  <link rel="stylesheet" href="src/output.css">
   <link rel="stylesheet" href="Style/index.css">
 </head>
 
@@ -18,7 +19,8 @@
   </div>
 
   <!-- Contenedor del Login -->
-  <div class="login-container bg-white/10 backdrop-blur-md shadow-2xl rounded-2xl p-8 w-[90%] max-w-md border border-white/20">
+  <div
+    class="login-container bg-white/10 backdrop-blur-md shadow-2xl rounded-2xl p-8 w-[90%] max-w-md border border-white/20">
 
     <!-- Encabezado -->
     <div class="text-center mb-6">

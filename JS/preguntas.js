@@ -19,7 +19,29 @@ api.interceptors.response.use(
         return Promise.reject(error);
     }
 );
+// ===================================================================
+// INICIALIZACIÓN Y CONFIGURACIÓN DE TEMA
+// ===================================================================
+(function () {
+    const t = localStorage.getItem('theme-preference') || 'auto';
+    let f = t;
+    if (t === 'auto') {
+        f = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+    document.documentElement.setAttribute('data-theme', f);
 
+    const fontSize = localStorage.getItem('font-size') || '16';
+    document.documentElement.style.setProperty('--font-size', fontSize + 'px');
+})();
+
+    // Detectar cambios en preferencia de sistema (para modo auto)
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+        const temaActual = localStorage.getItem('theme-preference') || 'auto';
+        if (temaActual === 'auto') {
+            const nuevoTema = e.matches ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', nuevoTema);
+        }
+    });
 // ============================================
 // VARIABLES GLOBALES
 // ============================================

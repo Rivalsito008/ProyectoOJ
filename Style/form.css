@@ -1,3 +1,5 @@
+@import "tailwindcss";
+
 :root {
     --bg-color: #f9fafb;
     --text-color: #111827;
@@ -717,4 +719,19 @@ textarea::placeholder {
 
 .print-only {
     display: none;
+}
+
+/* ===== LÍNEAS DE ENCABEZADOS DE SECCIÓN ===== */
+.border-b {
+    border-bottom-color: #bec0c2 !important; /* Gris muy claro */
+}
+
+/* Si quieres que sea AÚN más claro */
+.border-b-subtle {
+    border-bottom: 1px solid #bec0c2 !important;
+}
+
+/* O si prefieres un gris intermedio */
+.border-b-light {
+    border-bottom: 1px solid #bec0c2 !important;
 }

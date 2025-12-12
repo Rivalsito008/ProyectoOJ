@@ -1,3 +1,5 @@
+@import "tailwindcss";
+
 :root {
     --bg-color: #e8eaed;
     --text-color: #111827;
@@ -42,19 +44,20 @@ body {
 
 /* ===== SIDEBAR ===== */
 .sidebar {
-    width: 80px; /* Estado inicial SIEMPRE colapsado */
+    width: 80px;
+    /* Estado inicial SIEMPRE colapsado */
     transition: width 0.3s ease;
     background-color: var(--sidebar-bg);
     color: var(--text-colorsdb);
     border-right: 1px solid var(--border-color);
 }
 
-.sidebar-collapsed { 
-    width: 80px !important; 
+.sidebar-collapsed {
+    width: 80px !important;
 }
 
-.sidebar-expanded { 
-    width: 256px !important; 
+.sidebar-expanded {
+    width: 256px !important;
 }
 
 .content {
@@ -137,7 +140,10 @@ body {
     box-shadow: inset 0 0 25px rgba(151, 120, 255, 0.35);
 }
 
-.nav-item svg { min-width: 20px; }
+.nav-item svg {
+    min-width: 20px;
+}
+
 .flecha {
     stroke: var(--flecha-color);
     transition: stroke 0.3s ease;
@@ -163,13 +169,29 @@ body {
     border-bottom: 1px solid var(--border-color);
 }
 
-.dropdown-avatar { border-color: var(--border-color); }
-.dropdown-username { color: var(--text-colorcrd); }
-.dropdown-role { color: #6b7280; }
-.dropdown-body { background-color: var(--card-bg); }
+.dropdown-avatar {
+    border-color: var(--border-color);
+}
 
-.dropdown-logout { color: #dc2626; }
-.dropdown-logout:hover { background-color: #fef2f2; }
+.dropdown-username {
+    color: var(--text-colorcrd);
+}
+
+.dropdown-role {
+    color: #6b7280;
+}
+
+.dropdown-body {
+    background-color: var(--card-bg);
+}
+
+.dropdown-logout {
+    color: #dc2626;
+}
+
+.dropdown-logout:hover {
+    background-color: #fef2f2;
+}
 
 /* Dropdown - Modo Oscuro */
 [data-theme="dark"] .dropdown {
@@ -182,12 +204,29 @@ body {
     border-bottom: 1px solid #3d3454;
 }
 
-[data-theme="dark"] .dropdown-avatar { border-color: #4b4563; }
-[data-theme="dark"] .dropdown-username { color: #f3f4f6; }
-[data-theme="dark"] .dropdown-role { color: #9ca3af; }
-[data-theme="dark"] .dropdown-body { background-color: #241c37; }
-[data-theme="dark"] .dropdown-logout { color: #fca5a5; }
-[data-theme="dark"] .dropdown-logout:hover { background-color: rgba(127, 29, 29, 0.3); }
+[data-theme="dark"] .dropdown-avatar {
+    border-color: #4b4563;
+}
+
+[data-theme="dark"] .dropdown-username {
+    color: #f3f4f6;
+}
+
+[data-theme="dark"] .dropdown-role {
+    color: #9ca3af;
+}
+
+[data-theme="dark"] .dropdown-body {
+    background-color: #241c37;
+}
+
+[data-theme="dark"] .dropdown-logout {
+    color: #fca5a5;
+}
+
+[data-theme="dark"] .dropdown-logout:hover {
+    background-color: rgba(127, 29, 29, 0.3);
+}
 
 /* ===== HEADER ===== */
 .header-bg {
@@ -208,7 +247,9 @@ body {
     transition: color 0.3s ease;
 }
 
-#profileButton:hover { background-color: var(--hover-hd); }
+#profileButton:hover {
+    background-color: var(--hover-hd);
+}
 
 /* ===== TABS ===== */
 .tabs-container {
@@ -247,7 +288,9 @@ body {
     padding: 12px 20px;
 }
 
-.browser-tab:hover:not(.active) { background: var(--hover-item); }
+.browser-tab:hover:not(.active) {
+    background: var(--hover-item);
+}
 
 .browser-tab.active {
     background: var(--card-bg);
@@ -292,15 +335,23 @@ body {
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-.tab-content { display: none; }
+.tab-content {
+    display: none;
+}
+
 .tab-content.active {
     display: block;
     animation: fadeIn 0.3s ease;
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
 }
 
 /* ===== TABLES ===== */
@@ -328,7 +379,8 @@ tbody tr {
     background-color: #f7f7f7;
 }
 
-input, select {
+input,
+select {
     background-color: var(--card-bg);
     color: var(--text-colorcrd);
     border-color: var(--border-color);
@@ -344,6 +396,7 @@ input, select {
         opacity: 0;
         transform: scale(0.9) translateY(-20px);
     }
+
     to {
         opacity: 1;
         transform: scale(1) translateY(0);
@@ -435,8 +488,13 @@ input, select {
 
 /* ===== ANIMACIÓN SHIMMER UNIVERSAL ===== */
 @keyframes shimmerUniversal {
-    0% { left: -100%; }
-    100% { left: 400%; }
+    0% {
+        left: -100%;
+    }
+
+    100% {
+        left: 400%;
+    }
 }
 
 /* ===== BARRAS DE RIESGO ===== */
@@ -712,16 +770,38 @@ tr:hover .risk-bar-table {
 }
 
 /* ===== COLORES MEJORADOS ===== */
-.text-green-600 { color: #059669; }
-.text-red-600 { color: #dc2626; }
-.dark .text-green-400 { color: #059669; }
-.dark .text-red-400 { color: #dc2626; }
+.text-green-600 {
+    color: #059669;
+}
+
+.text-red-600 {
+    color: #dc2626;
+}
+
+.dark .text-green-400 {
+    color: #059669;
+}
+
+.dark .text-red-400 {
+    color: #dc2626;
+}
 
 /* Gradientes para cards de niveles */
-.bg-green-50 { background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); }
-.bg-yellow-50 { background: linear-gradient(135deg, #fefce8 0%, #fef9c3 100%); }
-.bg-orange-50 { background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%); }
-.bg-red-50 { background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%); }
+.bg-green-50 {
+    background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+}
+
+.bg-yellow-50 {
+    background: linear-gradient(135deg, #fefce8 0%, #fef9c3 100%);
+}
+
+.bg-orange-50 {
+    background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%);
+}
+
+.bg-red-50 {
+    background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+}
 
 /* Hover en cards */
 #riskLevelsModal .bg-green-50:hover,
@@ -753,13 +833,19 @@ tr:hover .risk-bar-table {
 }
 
 /* ===== UTILIDADES ===== */
-.h-3 { height: 0.75rem; }
+.h-3 {
+    height: 0.75rem;
+}
+
 .w-20 {
     width: 5rem !important;
     min-width: 5rem !important;
     max-width: 5rem !important;
 }
-td:nth-child(2) { min-width: 180px; }
+
+td:nth-child(2) {
+    min-width: 180px;
+}
 
 /* Botón DETALLES - Nuevo botón verde */
 .action-btn-details {
@@ -833,13 +919,14 @@ td:nth-child(2) { min-width: 180px; }
         opacity: 0;
         transform: translateY(-10px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
     }
 }
 
-.accordion-content:not(.hidden) > * {
+.accordion-content:not(.hidden)>* {
     animation: slideDown 0.3s ease-out;
 }
 
@@ -917,11 +1004,12 @@ td:nth-child(2) { min-width: 180px; }
     display: flex;
     flex-direction: column;
     max-height: 90vh;
-    padding: 0 !important; /* Eliminar todo padding del contenedor */
+    padding: 0 !important;
+    /* Eliminar todo padding del contenedor */
     overflow: hidden;
 }
 
-#modalDetalles .modal-dialog > div {
+#modalDetalles .modal-dialog>div {
     display: flex;
     flex-direction: column;
     max-height: 90vh;
@@ -933,7 +1021,8 @@ td:nth-child(2) { min-width: 180px; }
     left: 0;
     right: 0;
     width: 100%;
-    border-radius: 12px 12px 0 0; /* Solo redondear esquinas superiores */
+    border-radius: 12px 12px 0 0;
+    /* Solo redondear esquinas superiores */
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
@@ -943,7 +1032,8 @@ td:nth-child(2) { min-width: 180px; }
     left: 0;
     right: 0;
     width: 100%;
-    border-radius: 0 0 12px 12px; /* Solo redondear esquinas inferiores */
+    border-radius: 0 0 12px 12px;
+    /* Solo redondear esquinas inferiores */
     box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.05);
 }
 
@@ -989,13 +1079,14 @@ td:nth-child(2) { min-width: 180px; }
         opacity: 0;
         transform: translateY(-10px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
     }
 }
 
-.accordion-content:not(.hidden) > * {
+.accordion-content:not(.hidden)>* {
     animation: slideDown 0.3s ease-out;
 }
 
@@ -1034,4 +1125,327 @@ td:nth-child(2) { min-width: 180px; }
 .accordion-content table .px-2 {
     display: inline-block;
     white-space: nowrap;
+}
+
+/* ===== MEJORAS PARA MODALES - FONDO SEMITRANSPARENTE ===== */
+
+/* Modal de Respuestas */
+#modalRespuestas {
+    background-color: rgba(0, 0, 0, 0.4) !important;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+[data-theme="dark"] #modalRespuestas {
+    background-color: rgba(0, 0, 0, 0.6) !important;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+/* Modal de Niveles de Riesgo */
+#riskLevelsModal {
+    background-color: rgba(0, 0, 0, 0.4) !important;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+[data-theme="dark"] #riskLevelsModal {
+    background-color: rgba(0, 0, 0, 0.6) !important;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+/* Modal de Acciones */
+#modalAcciones {
+    background-color: rgba(0, 0, 0, 0.4) !important;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+[data-theme="dark"] #modalAcciones {
+    background-color: rgba(0, 0, 0, 0.6) !important;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+/* Modal de Detalles */
+#modalDetalles {
+    background-color: rgba(0, 0, 0, 0.4) !important;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+[data-theme="dark"] #modalDetalles {
+    background-color: rgba(0, 0, 0, 0.6) !important;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+/* Animación de aparición para todos los modales */
+#modalRespuestas.flex,
+#riskLevelsModal.flex,
+#modalAcciones.flex,
+#modalDetalles.flex {
+    animation: fadeInBackdrop 0.3s ease;
+}
+
+@keyframes fadeInBackdrop {
+    from {
+        background-color: rgba(0, 0, 0, 0);
+        backdrop-filter: blur(0px);
+    }
+
+    to {
+        background-color: rgba(0, 0, 0, 0.4);
+        backdrop-filter: blur(8px);
+    }
+}
+
+[data-theme="dark"] #modalRespuestas.flex,
+[data-theme="dark"] #riskLevelsModal.flex,
+[data-theme="dark"] #modalAcciones.flex,
+[data-theme="dark"] #modalDetalles.flex {
+    animation: fadeInBackdropDark 0.3s ease;
+}
+
+@keyframes fadeInBackdropDark {
+    from {
+        background-color: rgba(0, 0, 0, 0);
+        backdrop-filter: blur(0px);
+    }
+
+    to {
+        background-color: rgba(0, 0, 0, 0.6);
+        backdrop-filter: blur(10px);
+    }
+}
+
+/* ===== MEJORAS PARA TABLAS DENTRO DEL MODAL DETALLES ===== */
+
+/* Filas de tablas más claras en el modal de detalles */
+#modalDetalles .accordion-content table tbody tr {
+    background-color: #f9fafb !important;
+    border-bottom: 1px solid #e5e7eb !important;
+    transition: background-color 0.2s ease;
+}
+
+#modalDetalles .accordion-content table tbody tr:hover {
+    background-color: #f3f4f6 !important;
+}
+
+/* Modo oscuro - mantener el contraste adecuado */
+[data-theme="dark"] #modalDetalles .accordion-content table tbody tr {
+    background-color: #374151 !important;
+    border-bottom: 1px solid #4b5563 !important;
+}
+
+[data-theme="dark"] #modalDetalles .accordion-content table tbody tr:hover {
+    background-color: #4b5563 !important;
+}
+
+/* Celdas de la tabla con mejor espaciado */
+#modalDetalles .accordion-content table td {
+    padding: 0.75rem 1rem !important;
+}
+
+/* Primera columna (etiquetas) con fondo ligeramente diferente */
+#modalDetalles .accordion-content table td:first-child {
+    background-color: #f3f4f6 !important;
+    font-weight: 500 !important;
+}
+
+[data-theme="dark"] #modalDetalles .accordion-content table td:first-child {
+    background-color: #2d3748 !important;
+}
+
+/* Hover en filas completas */
+#modalDetalles .accordion-content table tbody tr:hover td:first-child {
+    background-color: #e5e7eb !important;
+}
+
+[data-theme="dark"] #modalDetalles .accordion-content table tbody tr:hover td:first-child {
+    background-color: #3d4654 !important;
+}
+
+/* Bordes redondeados en primera y última fila visible */
+#modalDetalles .accordion-content table tbody tr:first-child td:first-child {
+    border-top-left-radius: 0.5rem;
+}
+
+#modalDetalles .accordion-content table tbody tr:first-child td:last-child {
+    border-top-right-radius: 0.5rem;
+}
+
+#modalDetalles .accordion-content table tbody tr:last-child td:first-child {
+    border-bottom-left-radius: 0.5rem;
+}
+
+#modalDetalles .accordion-content table tbody tr:last-child td:last-child {
+    border-bottom-right-radius: 0.5rem;
+}
+
+/* Mejorar el contraste del texto en las tablas */
+#modalDetalles .accordion-content table td {
+    color: #374151 !important;
+}
+
+[data-theme="dark"] #modalDetalles .accordion-content table td {
+    color: #d1d5db !important;
+}
+
+/* Texto de las etiquetas (primera columna) */
+#modalDetalles .accordion-content table td:first-child {
+    color: #1f2937 !important;
+}
+
+[data-theme="dark"] #modalDetalles .accordion-content table td:first-child {
+    color: #f3f4f6 !important;
+}
+
+/* ===== TRANSICIONES SUAVES ===== */
+
+/* Contenedores de acordeones */
+.accordion-content {
+    transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+        opacity 0.3s ease;
+}
+
+.accordion-content.hidden {
+    opacity: 0;
+}
+
+.accordion-content:not(.hidden) {
+    opacity: 1;
+}
+
+/* Modales con transición suave */
+#modalRespuestas,
+#riskLevelsModal,
+#modalAcciones,
+#modalDetalles {
+    transition: opacity 0.3s ease,
+        backdrop-filter 0.3s ease;
+}
+
+#modalRespuestas.hidden,
+#riskLevelsModal.hidden,
+#modalAcciones.hidden,
+#modalDetalles.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* ===== MEJORAS ADICIONALES PARA LOS CONTENEDORES DE MODAL ===== */
+
+/* Sombra más pronunciada para los diálogos de modal */
+.modal-dialog {
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
+}
+
+[data-theme="dark"] .modal-dialog {
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5) !important;
+}
+
+/* Scroll suave en modales */
+#modalRespuestas .overflow-y-auto,
+#modalDetalles .overflow-y-auto {
+    scroll-behavior: smooth;
+}
+
+/* Mejorar el scrollbar en las tablas del modal */
+#modalDetalles .accordion-content::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+#modalDetalles .accordion-content::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+}
+
+#modalDetalles .accordion-content::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 3px;
+}
+
+#modalDetalles .accordion-content::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
+
+[data-theme="dark"] #modalDetalles .accordion-content::-webkit-scrollbar-track {
+    background: #374151;
+}
+
+[data-theme="dark"] #modalDetalles .accordion-content::-webkit-scrollbar-thumb {
+    background: #6b7280;
+}
+
+[data-theme="dark"] #modalDetalles .accordion-content::-webkit-scrollbar-thumb:hover {
+    background: #9ca3af;
+}
+
+/* Mejorar el estilo del modal de acciones para que use los estilos generales */
+#modalAcciones {
+    /* Asegurarse de usar la misma transparencia que los demás modales */
+    background-color: rgba(0, 0, 0, 0.4) !important;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+[data-theme="dark"] #modalAcciones {
+    background-color: rgba(0, 0, 0, 0.6) !important;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+/* Asegurar que la animación de aparición funcione igual que en otros modales */
+#modalAcciones.flex {
+    animation: fadeInBackdrop 0.3s ease;
+}
+
+[data-theme="dark"] #modalAcciones.flex {
+    animation: fadeInBackdropDark 0.3s ease;
+}
+
+/* Estilos para el contenedor interno del modal de acciones */
+#modalAcciones .fixed.inset-0 {
+    /* Asegurarse de que el overlay interno también sea transparente */
+    background-color: transparent !important;
+}
+
+/* Asegurar que los elementos dentro del modal tengan la animación correcta */
+#modalAcciones .modal-dialog {
+    animation: modalAppear 0.3s ease-out;
+}
+
+/* Opcional: Si quieres que el contenido del modal también tenga transparencia */
+#modalAcciones .modal-content {
+    background-color: var(--card-bg);
+    border-radius: 12px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+/* Estilos para botones dentro del modal de acciones */
+#modalAcciones .action-btn {
+    position: relative;
+    overflow: hidden;
+    font-weight: 600;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+}
+
+#modalAcciones .action-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 25%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    animation: shimmerUniversal 3s infinite linear;
 }
