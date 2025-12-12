@@ -79,9 +79,7 @@
   </div>
 
   <!-- Scripts -->
-  <!-- IMPORTANTE: auth.js DEBE ir primero -->
-  <script src="services/auth.js"></script>
-  <script src="JS/index.js"></script>
+  <script src="JS/login.js"></script>
 
 </body>
 
