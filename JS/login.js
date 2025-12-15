@@ -1,7 +1,5 @@
-// ======================================
-// CONFIGURACIÓN
-// ======================================
-const API_URL = 'http://localhost:8000/api'; // Cambia esto a tu URL de API
+// LOGIN.JS - Lógica del formulario de login
+
 
 // ======================================
 // ELEMENTOS DEL DOM
@@ -17,14 +15,7 @@ const errorMessage = document.getElementById('error-message');
 const successMessage = document.getElementById('success-message');
 
 // ======================================
-// CONFIGURAR AXIOS
-// ======================================
-axios.defaults.baseURL = API_URL;
-axios.defaults.headers.common['Content-Type'] = 'application/json';
-axios.defaults.headers.common['Accept'] = 'application/json';
-
-// ======================================
-// FUNCIONES DE UTILIDAD
+// FUNCIONES DE UI
 // ======================================
 
 function showError(message) {
@@ -54,23 +45,31 @@ function showLoading(show = true, text = 'Iniciando sesión...') {
     }
 }
 
-function saveSession(token, userData) {
-    // Guardar token
-    localStorage.setItem('sigen-token', token);
+// ======================================
+// VALIDACIÓN
+// ======================================
 
-    // Guardar datos del usuario
-    localStorage.setItem('sigen-user', JSON.stringify(userData));
-
-    // Si "recordarme" está marcado, guardar email
-    if (rememberCheckbox.checked) {
-        localStorage.setItem('sigen-email', emailInput.value);
-    } else {
-        localStorage.removeItem('sigen-email');
+function validateForm(email, password) {
+    if (!email || !password) {
+        showError('Por favor, completa todos los campos');
+        return false;
     }
+
+    if (!email.includes('@') || !email.includes('@csj.gob.sv')) {
+        showError('Por favor, ingresa un correo electrónico válido');
+        return false;
+    }
+
+    if (password.length < 4) {
+        showError('La contraseña debe tener al menos 4 caracteres');
+        return false;
+    }
+
+    return true;
 }
 
 // ======================================
-// MANEJAR ENVÍO DEL FORMULARIO
+// MANEJO DEL FORMULARIO
 // ======================================
 
 form.addEventListener('submit', async function (e) {
@@ -79,15 +78,10 @@ form.addEventListener('submit', async function (e) {
     // Obtener valores
     const email = emailInput.value.trim();
     const password = passwordInput.value.trim();
+    const remember = rememberCheckbox.checked;
 
-    // Validación básica
-    if (!email || !password) {
-        showError('Por favor, completa todos los campos');
-        return;
-    }
-
-    if (!email.includes('@')) {
-        showError('Por favor, ingresa un correo electrónico válido');
+    // Validar
+    if (!validateForm(email, password)) {
         return;
     }
 
@@ -95,20 +89,11 @@ form.addEventListener('submit', async function (e) {
     showLoading(true);
 
     try {
-        // Hacer petición al API
-        const response = await axios.post('/auth/login', {
-            email_institucional: email,
-            contrasena: password
-        });
+        // Usar el servicio de autenticación
+        const result = await auth.login(email, password, remember);
 
-        // Verificar respuesta exitosa
-        if (response.data.success) {
-            const { access_token, usuario } = response.data.data;
-
-            // Guardar sesión
-            saveSession(access_token, usuario);
-
-            // Mostrar mensaje de éxito
+        if (result.success) {
+            // Login exitoso
             showSuccess('¡Inicio de sesión exitoso! Redirigiendo...');
 
             // Redirigir después de 1 segundo
@@ -116,8 +101,9 @@ form.addEventListener('submit', async function (e) {
                 window.location.href = 'inicio.php';
             }, 1000);
         } else {
+            // Error en la respuesta
             showLoading(false);
-            showError(response.data.message || 'Error al iniciar sesión');
+            showError(result.message || 'Error al iniciar sesión');
         }
 
     } catch (error) {
@@ -125,21 +111,30 @@ form.addEventListener('submit', async function (e) {
 
         // Manejar diferentes tipos de errores
         if (error.response) {
-            // Error de respuesta del servidor
             const status = error.response.status;
             const data = error.response.data;
 
-            if (status === 401) {
-                showError('Credenciales incorrectas. Verifica tu correo y contraseña.');
-            } else if (status === 422) {
-                // Errores de validación
-                const errors = data.errors;
-                const firstError = Object.values(errors)[0][0];
-                showError(firstError);
-            } else if (status === 500) {
-                showError('Error en el servidor. Intenta nuevamente más tarde.');
-            } else {
-                showError(data.message || 'Error al iniciar sesión. Intenta nuevamente.');
+            switch (status) {
+                case 401:
+                    showError('Credenciales incorrectas. Verifica tu correo y contraseña.');
+                    break;
+                case 422:
+                    // Errores de validación
+                    if (data.errors) {
+                        const firstError = Object.values(data.errors)[0][0];
+                        showError(firstError);
+                    } else {
+                        showError(data.message || 'Datos inválidos');
+                    }
+                    break;
+                case 429:
+                    showError('Demasiados intentos. Intenta nuevamente más tarde.');
+                    break;
+                case 500:
+                    showError('Error en el servidor. Intenta nuevamente más tarde.');
+                    break;
+                default:
+                    showError(data.message || 'Error al iniciar sesión. Intenta nuevamente.');
             }
         } else if (error.request) {
             // Error de red
@@ -158,19 +153,11 @@ form.addEventListener('submit', async function (e) {
 // ======================================
 
 window.addEventListener('DOMContentLoaded', () => {
-    const savedEmail = localStorage.getItem('sigen-email');
+    // Cargar email guardado
+    const savedEmail = auth.getSavedEmail();
     if (savedEmail) {
         emailInput.value = savedEmail;
         rememberCheckbox.checked = true;
-    }
-
-    // Verificar si ya hay una sesión activa
-    const token = localStorage.getItem('sigen-token');
-    if (token) {
-        showLoading(true, 'Sesión activa detectada. Redirigiendo...');
-        setTimeout(() => {
-            window.location.href = 'inicio.php';
-        }, 500);
     }
 });
 
@@ -184,4 +171,18 @@ emailInput.addEventListener('input', () => {
 
 passwordInput.addEventListener('input', () => {
     errorMessage.classList.remove('show');
+});
+
+// ======================================
+// PREVENIR DOBLE SUBMIT
+// ======================================
+
+let isSubmitting = false;
+form.addEventListener('submit', (e) => {
+    if (isSubmitting) {
+        e.preventDefault();
+        return false;
+    }
+    isSubmitting = true;
+    setTimeout(() => { isSubmitting = false; }, 3000);
 });

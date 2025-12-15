@@ -1,3 +1,6 @@
+
+<!-- HEADER.PHP -->
+
 <?php
 
 $page_title = $page_title ?? 'Dashboard';

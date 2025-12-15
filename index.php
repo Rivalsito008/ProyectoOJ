@@ -79,6 +79,7 @@
   </div>
 
   <!-- Scripts -->
+  <script src="services/auth.js"></script>
   <script src="JS/login.js"></script>
 
 </body>

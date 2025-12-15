@@ -1,78 +1,44 @@
+// AUTH.JS - Servicio de Autenticación
+// ======================================
 
 const API_URL = 'http://localhost:8000/api';
 
-
-// Datos de cache en memoria
+// Cache en memoria
 let userDataCache = null;
 let isAuthenticatedCache = false;
 
 // =============================
-// CONFIGURACION DE AXIOS
+// CONFIGURACIÓN DE AXIOS
 // =============================
 axios.defaults.baseURL = API_URL;
 axios.defaults.headers.common['Content-Type'] = 'application/json';
 axios.defaults.headers.common['Accept'] = 'application/json';
-axios.defaults.withCredentials = true; // nos permite enviar cookies
-
+axios.defaults.withCredentials = true; // IMPORTANTE: permite enviar cookies
 
 // =============================
-// FUNCIONES DE AUTH
+// FUNCIONES DE AUTENTICACIÓN
 // =============================
 
-
-// Obtenemos los datos del usuario desde el servidor - auth/me
-async function getUserData(useCache = false) {
-
-    // si se encuentra cache existente se permite usar y retonar esos datos
-    if (useCache && userDataCache) {
-        return userDataCache;
-    }
-
-    try {
-        const response = await axios.get('/auth/me');
-
-        if (response.data.success) {
-            userDataCache = response.data.data;
-            isAuthenticatedCache = true;
-            return userDataCache;
-        }
-
-        // retornamos por defecto null, en caso de no encontrarse datos
-        return null;
-    } catch (error) {
-        if (error.response?.status === 401) {
-            userDataCache = null;
-            isAuthenticatedCache = false;
-        }
-
-        throw error;
-    }
-}
-
-// Verificamos que el usuario esta autenticado
-async function isAuthenticated() {
-    try {
-        await getUserData();
-        return true;
-    } catch (error) {
-        return false;
-    }
-}
-
-// Login
-async function login(email, pwd, remember = false) {
+/**
+ * Login - Autentica al usuario
+ * @param {string} email - Email institucional
+ * @param {string} password - Contraseña
+ * @param {boolean} remember - Recordar email
+ * @returns {Promise<Object>} Resultado del login
+ */
+async function login(email, password, remember = false) {
     try {
         const response = await axios.post('/auth/login', {
             email_institucional: email,
-            contrasena: pwd
+            contrasena: password
         });
 
         if (response.data.success) {
-            // guardamos los datos en la cache de memoria
-            userDataCache = response.data.data.usuario;
-            isAuthenticated = true;
+            // Guardar datos en cache
+            userDataCache = response.data.data.usuario || response.data.data;
+            isAuthenticatedCache = true;
 
-            // opcion recordarme
+            // Opción "Recordarme" - solo guarda el email
             if (remember) {
                 localStorage.setItem('sigen-email', email);
             } else {
@@ -86,7 +52,7 @@ async function login(email, pwd, remember = false) {
         }
 
         return {
-            success: true,
+            success: false,
             message: response.data.message || 'Error al iniciar sesión'
         };
     } catch (error) {
@@ -94,46 +60,94 @@ async function login(email, pwd, remember = false) {
     }
 }
 
-// logout
+/**
+ * Logout - Cierra la sesión del usuario
+ */
 async function logout() {
     try {
         await axios.post('/auth/logout');
     } catch (error) {
-        console.error('Error al cerrar la sesión del usuario desde el servidor', error);
+        console.error('Error al cerrar sesión en el servidor:', error);
     } finally {
-        // limpiamos la cache
+        // Limpiar cache
         userDataCache = null;
-        isAuthenticated = false;
+        isAuthenticatedCache = false;
 
-        // limpiamos el localStorage
-        localStorage.removeItem('sigen-email');
+        // NO limpiar el email si está guardado (para "Recordarme")
+        // localStorage.removeItem('sigen-email'); // COMENTADO
 
-        // redirigimos al login
+        // Redirigir al login
         window.location.href = 'index.php';
     }
 }
 
+/**
+ * Obtiene los datos del usuario desde el servidor
+ * @param {boolean} useCache - Usar cache si existe
+ * @returns {Promise<Object|null>} Datos del usuario
+ */
+async function getUserData(useCache = false) {
+    // Si hay cache y se permite usarlo, retornar
+    if (useCache && userDataCache) {
+        return userDataCache;
+    }
 
-// Funcion para proteger las paginas con auth
+    try {
+        const response = await axios.get('/auth/me');
+
+        if (response.data.success) {
+            userDataCache = response.data.data;
+            isAuthenticatedCache = true;
+            return userDataCache;
+        }
+
+        return null;
+    } catch (error) {
+        if (error.response?.status === 401) {
+            userDataCache = null;
+            isAuthenticatedCache = false;
+        }
+        throw error;
+    }
+}
+
+/**
+ * Verifica si el usuario está autenticado
+ * @returns {Promise<boolean>}
+ */
+async function isAuthenticated() {
+    try {
+        await getUserData();
+        return true;
+    } catch (error) {
+        return false;
+    }
+}
+
+/**
+ * Protege páginas que requieren autenticación
+ * Redirige al login si no está autenticado
+ */
 async function requireAuth() {
     try {
         const authenticated = await isAuthenticated();
         if (!authenticated) {
-            console.warn('No autenticado, redirigiendo al login....');
+            console.warn('No autenticado, redirigiendo al login...');
             window.location.href = 'index.php';
         }
     } catch (error) {
-        console.error('Error al verificar autenticación', error);
+        console.error('Error al verificar autenticación:', error);
         window.location.href = 'index.php';
     }
 }
-
 
 // =============================
 // FUNCIONES DE UTILIDAD
 // =============================
 
-// obtenemos el email del usuario
+/**
+ * Obtiene el email del usuario autenticado
+ */
 async function getUserEmail() {
     try {
         const user = await getUserData(true);
@@ -143,8 +157,24 @@ async function getUserEmail() {
     }
 }
 
+/**
+ * Obtiene el nombre completo del usuario
+ */
+async function getUserFullName() {
+    try {
+        const user = await getUserData(true);
+        if (user) {
+            return `${user.nombres || ''} ${user.apellidos || ''}`.trim();
+        }
+        return null;
+    } catch (error) {
+        return null;
+    }
+}
 
-// obtenemos los roles del usuario
+/**
+ * Obtiene los roles del usuario
+ */
 async function getUserRoles() {
     try {
         const user = await getUserData(true);
@@ -154,69 +184,80 @@ async function getUserRoles() {
     }
 }
 
-// verificamos que el usuario tiene un rol en especifico
-async function hasRole(rol) {
+/**
+ * Verifica si el usuario tiene un rol específico
+ */
+async function hasRole(role) {
     const roles = await getUserRoles();
-    return roles.includes(rol);
+    return roles.includes(role);
 }
 
-
-// verificamos que el usuario tenga rol de administrador
+/**
+ * Verifica si el usuario es administrador
+ */
 async function isAdmin() {
     return await hasRole('admin');
 }
 
+/**
+ * Obtiene el email guardado (función "Recordarme")
+ */
 function getSavedEmail() {
-    return localStorage.getItem('sigen-email') || null;
+    return localStorage.getItem('sigen-email') || '';
 }
-
 
 // =============================
 // INTERCEPTOR DE AXIOS
 // =============================
 
-// para 401 (no autenticado)
+// Maneja respuestas 401 (No autenticado)
 axios.interceptors.response.use(
     response => response,
     error => {
         if (error.response?.status === 401) {
-            console.warn('Sesión expirada. Rediriendo al login.... ');
+            console.warn('Sesión expirada. Redirigiendo al login...');
             userDataCache = null;
-            isAuthenticated = false;
-            window.location.href = 'index.php';
-        }
+            isAuthenticatedCache = false;
 
+            // Solo redirigir si no estamos ya en el login
+            const isLoginPage = window.location.pathname.includes('index.php') ||
+                window.location.pathname.endsWith('/') ||
+                window.location.pathname === '/';
+
+            if (!isLoginPage) {
+                window.location.href = 'index.php';
+            }
+        }
         return Promise.reject(error);
     }
 );
-
 
 // =============================
 // INICIALIZACIÓN
 // =============================
 
 window.addEventListener('DOMContentLoaded', async function () {
-    const isLoginPage = window.location.pathname.includes('index.php') || window.location.pathname.endsWith('/') || window.location.pathname === '/';
+    const isLoginPage = window.location.pathname.includes('index.php') ||
+        window.location.pathname.endsWith('/') ||
+        window.location.pathname === '/';
 
     if (isLoginPage) {
-        // verificamos que existe sesion
+        // Si estamos en login, verificar si ya hay sesión activa
         try {
             const authenticated = await isAuthenticated();
             if (authenticated) {
-                console.log('sesion activa');
+                console.log('Sesión activa detectada, redirigiendo...');
                 window.location.href = 'inicio.php';
             }
         } catch (error) {
-
+            // No hay sesión, el usuario puede hacer login
         }
-
         return;
     }
 
-    // para el resto de paginas requerimos de autenticación
+    // Para todas las demás páginas, requerir autenticación
     await requireAuth();
 });
-
 
 // ======================================
 // EXPORTAR FUNCIONES
@@ -230,7 +271,7 @@ window.auth = {
 
     // Usuario
     getUserData,
-    // getUserFullName,
+    getUserFullName,
     getUserEmail,
     getUserRoles,
 
