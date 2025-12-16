@@ -254,18 +254,138 @@ function setupConditionalFields() {
         });
     }
 
+    // Busca la sección donde está el código de "Datos familiares - hijos" 
+    // (aproximadamente en la línea 209-219) y reemplázala con esto:
+
     // Datos familiares - hijos
     const victimaCantidadHijos = document.getElementById('victimaCantidadHijos');
     const victimaDatosHijosContainer = document.getElementById('victimaDatosHijosContainer');
-    if (victimaCantidadHijos && victimaDatosHijosContainer) {
+    const victimaListaHijos = document.getElementById('victimaListaHijos');
+
+    if (victimaCantidadHijos && victimaDatosHijosContainer && victimaListaHijos) {
         victimaCantidadHijos.addEventListener('change', function () {
             const cantidad = parseInt(this.value);
-            if (cantidad > 0) {
+
+            if (cantidad > 0 && cantidad <= 6) {
                 victimaDatosHijosContainer.classList.remove('hidden');
-            } else {
+                victimaListaHijos.innerHTML = ''; // Limpiar contenido anterior
+
+                // Crear formulario para cada hijo
+                for (let i = 1; i <= cantidad; i++) {
+                    const hijoForm = document.createElement('div');
+                    hijoForm.className = 'mb-6 p-4 border border-gray-200 rounded-lg bg-white';
+                    hijoForm.innerHTML = `
+                    <h5 class="font-medium text-gray-700 mb-3 pb-2 border-b">Hijo ${i}</h5>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Nombre del hijo -->
+                        <div class="md:col-span-2">
+                            <label class="block text-gray-700 text-sm font-medium mb-2">Nombre completo</label>
+                            <input type="text" 
+                                   placeholder="Nombre completo del hijo" 
+                                   id="hijo${i}Nombre"
+                                   class="border border-gray-300 rounded-lg p-3 w-full focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
+                        </div>
+                        
+                        <!-- Fecha de nacimiento y edad -->
+                        <div>
+                            <label class="block text-gray-700 text-sm font-medium mb-2">Fecha de Nacimiento</label>
+                            <input type="date" 
+                                   id="hijo${i}FechaNacimiento"
+                                   class="border border-gray-300 rounded-lg p-3 w-full focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 text-sm font-medium mb-2">Edad</label>
+                            <div class="flex gap-2">
+                                <input type="number" 
+                                       id="hijo${i}Edad" 
+                                       placeholder="Se calculará automáticamente"
+                                       class="border border-gray-300 rounded-lg p-3 w-full focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                                       readonly>
+                                <button type="button" 
+                                        class="px-4 bg-gray-200 rounded-lg hover:bg-gray-300 calcular-edad-hijo"
+                                        data-hijo="${i}">
+                                    Calcular
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Escolaridad -->
+                        <div>
+                            <label class="block text-gray-700 text-sm font-medium mb-2">Escolaridad</label>
+                            <select id="hijo${i}Escolaridad"
+                                    class="border border-gray-300 rounded-lg p-3 w-full focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
+                                <option value="">Seleccione</option>
+                                <option>Preescolar</option>
+                                <option>1 a 3 grado</option>
+                                <option>4 a 6 grado</option>
+                                <option>7 a 9 grado</option>
+                                <option>Bachillerato</option>
+                                <option>Técnico</option>
+                                <option>Universitario</option>
+                                <option>Ninguno</option>
+                            </select>
+                        </div>
+                        
+                        <!-- Nombre del padre -->
+                        <div>
+                            <label class="block text-gray-700 text-sm font-medium mb-2">Nombre del padre</label>
+                            <input type="text" 
+                                   placeholder="Nombre completo del padre" 
+                                   id="hijo${i}NombrePadre"
+                                   class="border border-gray-300 rounded-lg p-3 w-full focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
+                        </div>
+                    </div>
+                `;
+                    victimaListaHijos.appendChild(hijoForm);
+                }
+
+                // Agregar event listeners para calcular edad de cada hijo
+                setTimeout(() => {
+                    document.querySelectorAll('.calcular-edad-hijo').forEach(btn => {
+                        btn.addEventListener('click', function () {
+                            const hijoNum = this.getAttribute('data-hijo');
+                            const fechaNacimiento = document.getElementById(`hijo${hijoNum}FechaNacimiento`).value;
+
+                            if (fechaNacimiento) {
+                                const edad = calcularEdadGenerica(fechaNacimiento);
+                                document.getElementById(`hijo${hijoNum}Edad`).value = edad;
+                            } else {
+                                alert('Por favor ingrese la fecha de nacimiento primero');
+                            }
+                        });
+                    });
+
+                    // También calcular automáticamente al cambiar la fecha
+                    document.querySelectorAll('[id^="hijo"][id$="FechaNacimiento"]').forEach(input => {
+                        input.addEventListener('change', function () {
+                            const hijoNum = this.id.match(/hijo(\d+)FechaNacimiento/)[1];
+                            if (this.value) {
+                                const edad = calcularEdadGenerica(this.value);
+                                document.getElementById(`hijo${hijoNum}Edad`).value = edad;
+                            }
+                        });
+                    });
+                }, 100);
+
+            } else if (cantidad === 0) {
                 victimaDatosHijosContainer.classList.add('hidden');
+                victimaListaHijos.innerHTML = '';
             }
         });
+    }
+
+    // Agregar esta función auxiliar para calcular edad (colócala antes de setupConditionalFields)
+    function calcularEdadGenerica(fechaNacimiento) {
+        const hoy = new Date();
+        const nacimiento = new Date(fechaNacimiento);
+        let edad = hoy.getFullYear() - nacimiento.getFullYear();
+        const mes = hoy.getMonth() - nacimiento.getMonth();
+
+        if (mes < 0 || (mes === 0 && hoy.getDate() < nacimiento.getDate())) {
+            edad--;
+        }
+
+        return edad;
     }
 
     // Datos económicos
