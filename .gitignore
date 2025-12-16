@@ -1,7 +1,7 @@
 # Tailwind CLI
 
-tailwindcss-linux-x64
-tailwindcss-macos-x64
+tailwindcss-windows-x64.exe
+
 
 # Node modules
 node_modules/
@@ -17,4 +17,4 @@ build/
 .env.local
 
 node_modules/
-package-lock.json? 
+package-lock.json? tailwindcss-windows-x64.exe
