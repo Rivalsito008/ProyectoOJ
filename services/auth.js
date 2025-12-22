@@ -141,6 +141,60 @@ async function requireAuth() {
     }
 }
 
+/**
+ * RequireRole: Protege páginas que requieren un rol específico
+ * @param {string|array} allowedRoles - Rol o array de roles permitidos
+ * @param {string} redirectTo - Página de redirección si no tiene permiso
+ */
+async function requireRole(allowedRoles, redirectTo = 'inicio.php') {
+    try {
+        // verificamos la autenticación 
+        const autheticated = await isAuthenticated();
+        if (!autheticated) {
+            return false;
+        }
+
+        // obtenemos los roles del usuario
+        const roles = await getUserRoles();
+
+        // convertir a array en caso de que los roles vengan como string
+        const rolesArray = Array.isArray(allowedRoles) ? allowedRoles : [allowedRoles];
+
+        // verificamos si tiene el rol permitido
+        const hasPermission = rolesArray.some(role =>
+            roles.includes(role.toLowerCase())
+        );
+
+        if (!hasPermission) {
+            console.warn(`Acceso denegado. No tienes permiso. Rol requerido: ${rolesArray.join(' o ')}`);
+            window.location.href = redirectTo;
+            return false;
+        }
+
+        return true;
+    } catch (error) {
+        console.error('Error al verificar roles:', error);
+        window.location.href = redirectTo;
+        return false;
+    }
+}
+
+/**
+ * CheckPermission: Verifica permisos sin redirigir (útil para mostrar/ocultar elementos)
+ */
+async function checkPermission(requireRoles) {
+    try {
+        const userRoles = await getUserRoles();
+        const rolesArray = Array.isArray(requireRoles) ? requireRoles : [requireRoles];
+
+        return rolesArray.some(role =>
+            userRoles.includes(role.toLowerCase())
+        );
+    } catch (error) {
+        return false;
+    }
+}
+
 // =============================
 // FUNCIONES DE UTILIDAD
 // =============================
@@ -178,8 +232,23 @@ async function getUserFullName() {
 async function getUserRoles() {
     try {
         const user = await getUserData(true);
-        return user?.roles || [];
+
+        // si los valores de rol vienen como array de strings
+        if (user?.roles && Array.isArray(user.roles)) {
+            return user.roles.map(role => role.toLowerCase());
+        }
+
+        // si los valores vienen como objetos desde el bkend
+        if (user?.usuario_roles && Array.isArray(user.usuario_roles)) {
+            return user.usuario_roles
+                .filter(ur => ur.estado === 'Activo')
+                .map(ur => ur.rol?.rol?.toLowerCase() || '')
+                .filter(Boolean);
+        }
+
+        return [];
     } catch (error) {
+        console.error('Error al obtener roles:', error);
         return [];
     }
 }
@@ -189,7 +258,7 @@ async function getUserRoles() {
  */
 async function hasRole(role) {
     const roles = await getUserRoles();
-    return roles.includes(role);
+    return roles.includes(role.toLowerCase());
 }
 
 /**
@@ -228,6 +297,13 @@ axios.interceptors.response.use(
                 window.location.href = 'index.php';
             }
         }
+
+        // Manejar 403 (Forbidden)
+        if (error.response?.status === 403) {
+            console.warn('Acceso denegado');
+            alert('No tienes permisos para realizar esta acción');
+        }
+
         return Promise.reject(error);
     }
 );
@@ -268,6 +344,9 @@ window.auth = {
     logout,
     isAuthenticated,
     requireAuth,
+
+    requireRole,
+    checkPermission,
 
     // Usuario
     getUserData,
