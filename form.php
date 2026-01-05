@@ -78,20 +78,7 @@
                   <select id="denuncianteDeptoNac"
                     class="border border-gray-300 rounded-lg p-3 focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
                     <option value="">Departamento</option>
-                    <option>Ahuachapán</option>
-                    <option>Cabañas</option>
-                    <option>Chalatenango</option>
-                    <option>Cuscatlán</option>
-                    <option>La Libertad</option>
-                    <option>La Paz</option>
-                    <option>La Unión</option>
-                    <option>Morazán</option>
-                    <option>San Miguel</option>
-                    <option>San Salvador</option>
-                    <option>San Vicente</option>
-                    <option>Santa Ana</option>
-                    <option>Sonsonate</option>
-                    <option>Usulután</option>
+                    <!-- Se poblará dinámicamente desde la API -->
                   </select>
                   <select id="denuncianteMuniNac"
                     class="border border-gray-300 rounded-lg p-3 focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
@@ -109,19 +96,9 @@
                 <label class="block text-gray-700 text-sm font-medium mb-2">Nacionalidad</label>
                 <select id="denuncianteNacionalidad"
                   class="border border-gray-300 rounded-lg p-3 w-full focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
-                  <option value="SV">Salvadoreña</option>
-                  <option value="GT">Guatemalteca</option>
-                  <option value="HN">Hondureña</option>
-                  <option value="NI">Nicaragüense</option>
-                  <option value="CR">Costarricense</option>
-                  <option value="PA">Panameña</option>
-                  <option value="MX">Mexicana</option>
-                  <option value="US">Estadounidense</option>
-                  <option value="other">Otra</option>
+                  <option value="">Seleccione nacionalidad</option>
+                  <!-- Se poblará dinámicamente desde la API -->
                 </select>
-                <input type="text" placeholder="Especifique otra nacionalidad" id="denuncianteOtraNacionalidad"
-                  class="border border-gray-300 rounded-lg p-3 w-full mt-2 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-                  style="display: none;">
               </div>
 
               <!-- Nivel educativo -->
@@ -130,13 +107,7 @@
                 <select id="denuncianteNivelEducativo"
                   class="border border-gray-300 rounded-lg p-3 w-full focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
                   <option value="">Seleccione</option>
-                  <option>1 a 3 grado</option>
-                  <option>4 a 6 grado</option>
-                  <option>7 a 9 grado</option>
-                  <option>Bachillerato</option>
-                  <option>Técnico</option>
-                  <option>Universitario</option>
-                  <option>Ninguno</option>
+                  <!-- Se poblará dinámicamente desde la API -->
                 </select>
               </div>
 
@@ -146,10 +117,7 @@
                 <select id="denuncianteEstadoFamiliar"
                   class="border border-gray-300 rounded-lg p-3 w-full focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
                   <option value="">Seleccione</option>
-                  <option value="soltero">Soltero/a</option>
-                  <option value="casado">Casado/a</option>
-                  <option value="separado">Separado/a</option>
-                  <option value="union_libre">Unión Libre</option>
+                  <!-- Se poblará dinámicamente desde la API -->
                 </select>
               </div>
 
@@ -165,9 +133,8 @@
                 <label class="block text-gray-700 text-sm font-medium mb-2">Sexo</label>
                 <select id="denuncianteSexo"
                   class="border border-gray-300 rounded-lg p-3 w-full focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
-                  <option value="">Seleccione</option>
-                  <option>Masculino</option>
-                  <option>Femenino</option>
+                  <option value="">Seleccione sexo</option>
+                  <!-- Se poblará dinámicamente desde la API -->
                 </select>
               </div>
 
@@ -197,10 +164,7 @@
                 <select id="denuncianteTipoDocumento"
                   class="border border-gray-300 rounded-lg p-3 w-full focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
                   <option value="">Seleccione</option>
-                  <option>DUI</option>
-                  <option>Pasaporte</option>
-                  <option>Partida de nacimiento</option>
-                  <option>Otro</option>
+                  <!-- Se poblará dinámicamente desde la API -->
                 </select>
               </div>
 
@@ -218,20 +182,7 @@
                   <select id="denuncianteDeptoRes"
                     class="border border-gray-300 rounded-lg p-3 focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
                     <option value="">Departamento</option>
-                    <option>Ahuachapán</option>
-                    <option>Cabañas</option>
-                    <option>Chalatenango</option>
-                    <option>Cuscatlán</option>
-                    <option>La Libertad</option>
-                    <option>La Paz</option>
-                    <option>La Unión</option>
-                    <option>Morazán</option>
-                    <option>San Miguel</option>
-                    <option>San Salvador</option>
-                    <option>San Vicente</option>
-                    <option>Santa Ana</option>
-                    <option>Sonsonate</option>
-                    <option>Usulután</option>
+                    <!-- Se poblará dinámicamente desde la API -->
                   </select>
                   <select id="denuncianteMuniRes"
                     class="border border-gray-300 rounded-lg p-3 focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
@@ -272,14 +223,7 @@
                 <select id="denuncianteProfesion"
                   class="border border-gray-300 rounded-lg p-3 w-full focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
                   <option value="">Seleccione profesión</option>
-                  <option>Abogado</option>
-                  <option>Médico</option>
-                  <option>Ingeniero</option>
-                  <option>Docente</option>
-                  <option>Contador</option>
-                  <option>Enfermero</option>
-                  <option>Arquitecto</option>
-                  <option>Ninguna</option>
+                  <!-- Se poblará dinámicamente desde la API -->
                 </select>
               </div>
 
@@ -289,12 +233,7 @@
                 <select id="denuncianteOcupacion"
                   class="border border-gray-300 rounded-lg p-3 w-full focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
                   <option value="">Seleccione ocupación</option>
-                  <option>Empleado</option>
-                  <option>Oficios domésticos</option>
-                  <option>Desempleado</option>
-                  <option>Estudiante</option>
-                  <option>Jubilado</option>
-                  <option>Independiente</option>
+                  <!-- Se poblará dinámicamente desde la API -->
                 </select>
               </div>
 
@@ -323,20 +262,7 @@
                   <select id="denuncianteDeptoTrabajo"
                     class="border border-gray-300 rounded-lg p-3 focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
                     <option value="">Departamento</option>
-                    <option>Ahuachapán</option>
-                    <option>Cabañas</option>
-                    <option>Chalatenango</option>
-                    <option>Cuscatlán</option>
-                    <option>La Libertad</option>
-                    <option>La Paz</option>
-                    <option>La Unión</option>
-                    <option>Morazán</option>
-                    <option>San Miguel</option>
-                    <option>San Salvador</option>
-                    <option>San Vicente</option>
-                    <option>Santa Ana</option>
-                    <option>Sonsonate</option>
-                    <option>Usulután</option>
+                    <!-- Se poblará dinámicamente desde la API -->
                   </select>
                   <select id="denuncianteMunicipioTrabajo"
                     class="border border-gray-300 rounded-lg p-3 focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
@@ -381,10 +307,8 @@
                       class="border border-gray-300 rounded-lg p-3 flex-grow focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
                     <select
                       class="border border-gray-300 rounded-lg p-3 focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
-                      <option value="personal">Personal</option>
-                      <option value="trabajo">Trabajo</option>
-                      <option value="casa">Casa</option>
-                      <option value="otro">Otro</option>
+                      <option value="">Tipo</option>
+                      <!-- Se poblará dinámicamente desde la API -->
                     </select>
                     <button type="button" class="text-red-500 hover:text-red-700 eliminar-telefono">✕</button>
                   </div>
@@ -489,20 +413,7 @@
                   <select id="victimaDeptoNac"
                     class="border border-gray-300 rounded-lg p-3 focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
                     <option value="">Departamento</option>
-                    <option>Ahuachapán</option>
-                    <option>Cabañas</option>
-                    <option>Chalatenango</option>
-                    <option>Cuscatlán</option>
-                    <option>La Libertad</option>
-                    <option>La Paz</option>
-                    <option>La Unión</option>
-                    <option>Morazán</option>
-                    <option>San Miguel</option>
-                    <option>San Salvador</option>
-                    <option>San Vicente</option>
-                    <option>Santa Ana</option>
-                    <option>Sonsonate</option>
-                    <option>Usulután</option>
+                    <!-- Se poblará dinámicamente desde la API -->
                   </select>
                   <select id="victimaMuniNac"
                     class="border border-gray-300 rounded-lg p-3 focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
@@ -520,19 +431,9 @@
                 <label class="block text-gray-700 text-sm font-medium mb-2">Nacionalidad</label>
                 <select id="victimaNacionalidad"
                   class="border border-gray-300 rounded-lg p-3 w-full focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
-                  <option value="SV">Salvadoreña</option>
-                  <option value="GT">Guatemalteca</option>
-                  <option value="HN">Hondureña</option>
-                  <option value="NI">Nicaragüense</option>
-                  <option value="CR">Costarricense</option>
-                  <option value="PA">Panameña</option>
-                  <option value="MX">Mexicana</option>
-                  <option value="US">Estadounidense</option>
-                  <option value="other">Otra</option>
+                  <option value="">Seleccione nacionalidad</option>
+                  <!-- Se poblará dinámicamente desde la API -->
                 </select>
-                <input type="text" placeholder="Especifique otra nacionalidad" id="victimaOtraNacionalidad"
-                  class="border border-gray-300 rounded-lg p-3 w-full mt-2 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-                  style="display: none;">
               </div>
 
               <!-- Nivel educativo -->
@@ -541,13 +442,7 @@
                 <select id="victimaNivelEducativo"
                   class="border border-gray-300 rounded-lg p-3 w-full focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
                   <option value="">Seleccione</option>
-                  <option>1 a 3 grado</option>
-                  <option>4 a 6 grado</option>
-                  <option>7 a 9 grado</option>
-                  <option>Bachillerato</option>
-                  <option>Técnico</option>
-                  <option>Universitario</option>
-                  <option>Ninguno</option>
+                  <!-- Se poblará dinámicamente desde la API -->
                 </select>
               </div>
 
@@ -557,10 +452,7 @@
                 <select id="victimaEstadoFamiliar"
                   class="border border-gray-300 rounded-lg p-3 w-full focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
                   <option value="">Seleccione</option>
-                  <option value="soltero">Soltero/a</option>
-                  <option value="casado">Casado/a</option>
-                  <option value="separado">Separado/a</option>
-                  <option value="union_libre">Unión Libre</option>
+                  <!-- Se poblará dinámicamente desde la API -->
                 </select>
               </div>
 
@@ -576,9 +468,8 @@
                 <label class="block text-gray-700 text-sm font-medium mb-2">Sexo</label>
                 <select id="victimaSexo"
                   class="border border-gray-300 rounded-lg p-3 w-full focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
-                  <option value="">Seleccione</option>
-                  <option>Masculino</option>
-                  <option>Femenino</option>
+                  <option value="">Seleccione sexo</option>
+                  <!-- Se poblará dinámicamente desde la API -->
                 </select>
               </div>
 
@@ -608,10 +499,7 @@
                 <select id="victimaTipoDocumento"
                   class="border border-gray-300 rounded-lg p-3 w-full focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
                   <option value="">Seleccione</option>
-                  <option>DUI</option>
-                  <option>Pasaporte</option>
-                  <option>Partida de nacimiento</option>
-                  <option>Otro</option>
+                  <!-- Se poblará dinámicamente desde la API -->
                 </select>
               </div>
 
@@ -629,20 +517,7 @@
                   <select id="victimaDeptoRes"
                     class="border border-gray-300 rounded-lg p-3 focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
                     <option value="">Departamento</option>
-                    <option>Ahuachapán</option>
-                    <option>Cabañas</option>
-                    <option>Chalatenango</option>
-                    <option>Cuscatlán</option>
-                    <option>La Libertad</option>
-                    <option>La Paz</option>
-                    <option>La Unión</option>
-                    <option>Morazán</option>
-                    <option>San Miguel</option>
-                    <option>San Salvador</option>
-                    <option>San Vicente</option>
-                    <option>Santa Ana</option>
-                    <option>Sonsonate</option>
-                    <option>Usulután</option>
+                    <!-- Se poblará dinámicamente desde la API -->
                   </select>
                   <select id="victimaMuniRes"
                     class="border border-gray-300 rounded-lg p-3 focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
@@ -683,14 +558,7 @@
                 <select id="victimaProfesion"
                   class="border border-gray-300 rounded-lg p-3 w-full focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
                   <option value="">Seleccione profesión</option>
-                  <option>Abogado</option>
-                  <option>Médico</option>
-                  <option>Ingeniero</option>
-                  <option>Docente</option>
-                  <option>Contador</option>
-                  <option>Enfermero</option>
-                  <option>Arquitecto</option>
-                  <option>Ninguna</option>
+                  <!-- Se poblará dinámicamente desde la API -->
                 </select>
               </div>
 
@@ -700,12 +568,7 @@
                 <select id="victimaOcupacion"
                   class="border border-gray-300 rounded-lg p-3 w-full focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
                   <option value="">Seleccione ocupación</option>
-                  <option>Empleado</option>
-                  <option>Oficios domésticos</option>
-                  <option>Desempleado</option>
-                  <option>Estudiante</option>
-                  <option>Jubilado</option>
-                  <option>Independiente</option>
+                  <!-- Se poblará dinámicamente desde la API -->
                 </select>
               </div>
 
@@ -734,20 +597,7 @@
                   <select id="victimaDeptoTrabajo"
                     class="border border-gray-300 rounded-lg p-3 focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
                     <option value="">Departamento</option>
-                    <option>Ahuachapán</option>
-                    <option>Cabañas</option>
-                    <option>Chalatenango</option>
-                    <option>Cuscatlán</option>
-                    <option>La Libertad</option>
-                    <option>La Paz</option>
-                    <option>La Unión</option>
-                    <option>Morazán</option>
-                    <option>San Miguel</option>
-                    <option>San Salvador</option>
-                    <option>San Vicente</option>
-                    <option>Santa Ana</option>
-                    <option>Sonsonate</option>
-                    <option>Usulután</option>
+                    <!-- Se poblará dinámicamente desde la API -->
                   </select>
                   <select id="victimaMunicipioTrabajo"
                     class="border border-gray-300 rounded-lg p-3 focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
@@ -819,14 +669,7 @@
                 <select id="victimaDependenciaEconomica"
                   class="border border-gray-300 rounded-lg p-3 w-full focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
                   <option value="">Seleccione</option>
-                  <option value="esposo">Esposo</option>
-                  <option value="compañero">Compañero de vida</option>
-                  <option value="si_misma">De sí misma</option>
-                  <option value="padre">Padre</option>
-                  <option value="madre">Madre</option>
-                  <option value="ambos_padres">Ambos padres</option>
-                  <option value="abuelos">Abuelos</option>
-                  <option value="other">Otro</option>
+                  <!-- Se poblará dinámicamente desde la API -->
                 </select>
                 <input type="text" placeholder="Especifique" id="victimaOtroDependencia"
                   class="border border-gray-300 rounded-lg p-3 w-full mt-2 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
@@ -855,11 +698,7 @@
                     <select id="victimaTipoIngresos"
                       class="border border-gray-300 rounded-lg p-3 w-full focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
                       <option value="">Seleccione</option>
-                      <option>Negocio propio</option>
-                      <option>Emprendimiento</option>
-                      <option>Ventas</option>
-                      <option>Remesas</option>
-                      <option value="other">Otros</option>
+                      <!-- Se poblará dinámicamente desde la API -->
                     </select>
                     <input type="text" placeholder="Especifique" id="victimaOtroTipoIngreso"
                       class="border border-gray-300 rounded-lg p-3 w-full mt-2 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
@@ -871,12 +710,7 @@
                     <select id="victimaRangoIngresos"
                       class="border border-gray-300 rounded-lg p-3 w-full focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
                       <option value="">Seleccione rango</option>
-                      <option>$100 a $300</option>
-                      <option>$301 a $600</option>
-                      <option>$601 a $900</option>
-                      <option>$901 a $1,200</option>
-                      <option>$1,201 a $1,500</option>
-                      <option>Más de $1,500</option>
+                      <!-- Se poblará dinámicamente desde la API -->
                     </select>
                   </div>
                 </div>
@@ -894,17 +728,9 @@
                       persona?</label>
                     <select id="victimaRelacionDependencia"
                       class="border border-gray-300 rounded-lg p-3 w-full focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
-                      <option value="">Seleccione</option>
-                      <option>Esposo</option>
-                      <option>Compañero de vida</option>
-                      <option>Novio</option>
-                      <option>Amigo</option>
-                      <option>Familiar</option>
-                      <option value="other">Otro</option>
+                      <option value="">Seleccione tipo de relación</option>
+                      <!-- Se poblará dinámicamente desde la API -->
                     </select>
-                    <input type="text" placeholder="Especifique" id="victimaOtroRelacion"
-                      class="border border-gray-300 rounded-lg p-3 w-full mt-2 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-                      style="display: none;">
                   </div>
                   <div>
                     <label class="block text-gray-700 text-sm font-medium mb-2">Frecuencia con que recibe este
@@ -912,12 +738,7 @@
                     <select id="victimaFrecuenciaIngreso"
                       class="border border-gray-300 rounded-lg p-3 w-full focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
                       <option value="">Seleccione</option>
-                      <option>Semanal</option>
-                      <option>Quincenal</option>
-                      <option>Mensual</option>
-                      <option>Bimestral</option>
-                      <option>Trimestral</option>
-                      <option>Ocasional</option>
+                      <!-- Se poblará dinámicamente desde la API -->
                     </select>
                   </div>
                 </div>
@@ -939,10 +760,8 @@
                       class="border border-gray-300 rounded-lg p-3 flex-grow focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
                     <select
                       class="border border-gray-300 rounded-lg p-3 focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
-                      <option value="personal">Personal</option>
-                      <option value="trabajo">Trabajo</option>
-                      <option value="casa">Casa</option>
-                      <option value="otro">Otro</option>
+                      <option value="">Tipo</option>
+                      <!-- Se poblará dinámicamente desde la API -->
                     </select>
                     <button type="button" class="text-red-500 hover:text-red-700 eliminar-telefono">✕</button>
                   </div>
@@ -982,10 +801,7 @@
                       <select id="victimaTipoLesion"
                         class="border border-gray-300 rounded-lg p-3 w-full focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
                         <option value="">Seleccione</option>
-                        <option>Herida</option>
-                        <option>Golpe</option>
-                        <option>Raspo</option>
-                        <option>Hematoma</option>
+                        <!-- Se poblará dinámicamente desde la API -->
                       </select>
                     </div>
                     <div>
@@ -993,9 +809,7 @@
                       <select id="victimaNivelLesion"
                         class="border border-gray-300 rounded-lg p-3 w-full focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
                         <option value="">Seleccione</option>
-                        <option>Leve</option>
-                        <option>Intermedia</option>
-                        <option>Grave</option>
+                        <!-- Se poblará dinámicamente desde la API -->
                       </select>
                     </div>
                   </div>
@@ -1082,13 +896,32 @@
             </p>
           </div>
 
+          <!-- Botón para generar texto - ARRIBA del editor -->
+          <div class="mb-4">
+            <button type="button" id="generarTextoBtn"
+              class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 flex items-center gap-2">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              Generar Texto Automático
+            </button>
+            <p class="text-sm text-gray-500 mt-1">Haga clic para generar el encabezado según los datos del denunciante
+            </p>
+          </div>
+
           <!-- Editor de texto enriquecido -->
           <div class="mb-6">
-            <label class="block text-gray-700 text-sm font-medium mb-2">Narración de los hechos:</label>
-            <div id="editor-container" class="border border-gray-300 rounded-lg overflow-hidden">
-              <!-- CKEditor se inicializará aquí -->
-              <textarea id="relacionHechos" name="relacionHechos" style="display:none;"></textarea>
+            <label class="block text-gray-700 text-sm font-medium mb-2">Narración de los hechos *</label>
+
+            <!-- CONTENEDOR PARA CKEDITOR -->
+            <div id="editor-container" class="min-h-[300px]">
+              <!-- CKEditor se cargará aquí dinámicamente -->
+              <textarea id="relacionHechos" name="relacionHechos" rows="10"
+                class="border border-gray-300 rounded-lg p-4 w-full focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                placeholder="Describa detalladamente los hechos ocurridos..."></textarea>
             </div>
+
             <p class="text-sm text-gray-500 mt-2">
               Puede formatear el texto utilizando las herramientas de la barra superior.
             </p>
@@ -1097,15 +930,11 @@
           <!-- Previsualización del texto generado -->
           <div class="border border-gray-300 rounded-lg p-4 bg-gray-50">
             <h3 class="font-semibold mb-3">Previsualización del texto generado:</h3>
-            <div id="previewRelacion" class="p-4 bg-white border border-gray-200 rounded-lg min-h-[200px]">
-              <!-- Aquí se mostrará el texto generado automáticamente -->
-              <p class="text-gray-600">El texto se generará automáticamente cuando complete los datos del denunciante.
-              </p>
+            <div id="previewRelacion"
+              class="p-4 bg-white border border-gray-200 rounded-lg min-h-[150px] max-h-[300px] overflow-y-auto">
+              <p class="text-gray-600 italic">El texto se generará automáticamente cuando presione el botón "Generar
+                Texto Automático".</p>
             </div>
-            <button type="button" id="generarTextoBtn"
-              class="mt-3 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm">
-              Generar texto automático
-            </button>
           </div>
 
           <!-- Instrucciones -->
@@ -1117,6 +946,7 @@
               <li>Mencione cualquier evidencia o testigo de los hechos</li>
               <li>Utilice el botón "Generar texto automático" para crear un encabezado basado en los datos del
                 denunciante</li>
+              <li><strong>NOTA:</strong> El texto generado incluirá el encabezado legal correspondiente</li>
             </ul>
           </div>
         </div>
@@ -1129,26 +959,8 @@
           <div class="mb-6">
             <label class="block text-gray-700 text-sm font-medium mb-2">Entorno en que se da la violencia (puede
               seleccionar varias opciones)</label>
-            <div class="space-y-2">
-              <label class="flex items-center space-x-2">
-                <input type="checkbox" name="entornoViolencia" value="personal" class="text-blue-600">
-                <span>Personal</span>
-              </label>
-              <label class="flex items-center space-x-2">
-                <input type="checkbox" name="entornoViolencia" value="redes" class="text-blue-600">
-                <span>Redes Sociales</span>
-              </label>
-              <label class="flex items-center space-x-2">
-                <input type="checkbox" name="entornoViolencia" value="mensajeria" class="text-blue-600">
-                <span>Mensajería Texto</span>
-              </label>
-              <label class="flex items-center space-x-2">
-                <input type="checkbox" name="entornoViolencia" value="otra" class="text-blue-600" id="entornoOtraCheck">
-                <span>Otra:</span>
-                <input type="text" placeholder="Especifique" id="entornoOtraTexto"
-                  class="border border-gray-300 rounded-lg p-2 flex-grow focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-                  style="display: none;">
-              </label>
+            <div class="space-y-2" id="entornoViolenciaContainer">
+              <!-- Se poblará dinámicamente desde la API -->
             </div>
           </div>
 
@@ -1187,11 +999,7 @@
             <select id="lugarHecho"
               class="border border-gray-300 rounded-lg p-3 w-full mb-2 focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
               <option value="">Seleccione</option>
-              <option>Casa</option>
-              <option>Trabajo</option>
-              <option>Vía pública</option>
-              <option>Vehículo</option>
-              <option value="other">Otro</option>
+              <!-- Se poblará dinámicamente desde la API -->
             </select>
             <input type="text" placeholder="Especifique otro lugar" id="lugarHechoOtro"
               class="border border-gray-300 rounded-lg p-3 w-full focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
@@ -1212,20 +1020,7 @@
               <select id="deptoHecho"
                 class="border border-gray-300 rounded-lg p-3 focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
                 <option value="">Departamento</option>
-                <option>Ahuachapán</option>
-                <option>Cabañas</option>
-                <option>Chalatenango</option>
-                <option>Cuscatlán</option>
-                <option>La Libertad</option>
-                <option>La Paz</option>
-                <option>La Unión</option>
-                <option>Morazán</option>
-                <option>San Miguel</option>
-                <option>San Salvador</option>
-                <option>San Vicente</option>
-                <option>Santa Ana</option>
-                <option>Sonsonate</option>
-                <option>Usulután</option>
+                <!-- Se poblará dinámicamente desde la API -->
               </select>
               <select id="municipioHecho"
                 class="border border-gray-300 rounded-lg p-3 focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
@@ -1287,13 +1082,7 @@
                 <select id="frecuenciaAgresiones"
                   class="border border-gray-300 rounded-lg p-3 w-full focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
                   <option value="">Seleccione</option>
-                  <option>Diaria</option>
-                  <option>Semanal</option>
-                  <option>Quincenal</option>
-                  <option>Mensual</option>
-                  <option>Semestral</option>
-                  <option>Anual</option>
-                  <option value="other">Otra</option>
+                  <!-- Se poblará dinámicamente desde la API -->
                 </select>
                 <input type="text" placeholder="Especifique otra frecuencia" id="otraFrecuencia"
                   class="border border-gray-300 rounded-lg p-3 w-full mt-2 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
@@ -1405,20 +1194,7 @@
                   <select id="agresorDeptoNac"
                     class="border border-gray-300 rounded-lg p-3 focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
                     <option value="">Departamento</option>
-                    <option>Ahuachapán</option>
-                    <option>Cabañas</option>
-                    <option>Chalatenango</option>
-                    <option>Cuscatlán</option>
-                    <option>La Libertad</option>
-                    <option>La Paz</option>
-                    <option>La Unión</option>
-                    <option>Morazán</option>
-                    <option>San Miguel</option>
-                    <option>San Salvador</option>
-                    <option>San Vicente</option>
-                    <option>Santa Ana</option>
-                    <option>Sonsonate</option>
-                    <option>Usulután</option>
+                    <!-- Se poblará dinámicamente desde la API -->
                   </select>
                   <select id="agresorMuniNac"
                     class="border border-gray-300 rounded-lg p-3 focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
@@ -1436,19 +1212,9 @@
                 <label class="block text-gray-700 text-sm font-medium mb-2">Nacionalidad</label>
                 <select id="agresorNacionalidad"
                   class="border border-gray-300 rounded-lg p-3 w-full focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
-                  <option value="SV">Salvadoreña</option>
-                  <option value="GT">Guatemalteca</option>
-                  <option value="HN">Hondureña</option>
-                  <option value="NI">Nicaragüense</option>
-                  <option value="CR">Costarricense</option>
-                  <option value="PA">Panameña</option>
-                  <option value="MX">Mexicana</option>
-                  <option value="US">Estadounidense</option>
-                  <option value="other">Otra</option>
+                  <option value="">Seleccione nacionalidad</option>
+                  <!-- Se poblará dinámicamente desde la API -->
                 </select>
-                <input type="text" placeholder="Especifique otra nacionalidad" id="agresorOtraNacionalidad"
-                  class="border border-gray-300 rounded-lg p-3 w-full mt-2 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-                  style="display: none;">
               </div>
 
               <!-- Nivel educativo -->
@@ -1457,13 +1223,7 @@
                 <select id="agresorNivelEducativo"
                   class="border border-gray-300 rounded-lg p-3 w-full focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
                   <option value="">Seleccione</option>
-                  <option>1 a 3 grado</option>
-                  <option>4 a 6 grado</option>
-                  <option>7 a 9 grado</option>
-                  <option>Bachillerato</option>
-                  <option>Técnico</option>
-                  <option>Universitario</option>
-                  <option>Ninguno</option>
+                  <!-- Se poblará dinámicamente desde la API -->
                 </select>
               </div>
 
@@ -1473,10 +1233,7 @@
                 <select id="agresorEstadoFamiliar"
                   class="border border-gray-300 rounded-lg p-3 w-full focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
                   <option value="">Seleccione</option>
-                  <option value="soltero">Soltero/a</option>
-                  <option value="casado">Casado/a</option>
-                  <option value="separado">Separado/a</option>
-                  <option value="union_libre">Unión Libre</option>
+                  <!-- Se poblará dinámicamente desde la API -->
                 </select>
               </div>
 
@@ -1492,9 +1249,8 @@
                 <label class="block text-gray-700 text-sm font-medium mb-2">Sexo</label>
                 <select id="agresorSexo"
                   class="border border-gray-300 rounded-lg p-3 w-full focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
-                  <option value="">Seleccione</option>
-                  <option>Masculino</option>
-                  <option>Femenino</option>
+                  <option value="">Seleccione sexo</option>
+                  <!-- Se poblará dinámicamente desde la API -->
                 </select>
               </div>
 
@@ -1524,10 +1280,7 @@
                 <select id="agresorTipoDocumento"
                   class="border border-gray-300 rounded-lg p-3 w-full focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
                   <option value="">Seleccione</option>
-                  <option>DUI</option>
-                  <option>Pasaporte</option>
-                  <option>Partida de nacimiento</option>
-                  <option>Otro</option>
+                  <!-- Se poblará dinámicamente desde la API -->
                 </select>
               </div>
 
@@ -1545,20 +1298,7 @@
                   <select id="agresorDeptoRes"
                     class="border border-gray-300 rounded-lg p-3 focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
                     <option value="">Departamento</option>
-                    <option>Ahuachapán</option>
-                    <option>Cabañas</option>
-                    <option>Chalatenango</option>
-                    <option>Cuscatlán</option>
-                    <option>La Libertad</option>
-                    <option>La Paz</option>
-                    <option>La Unión</option>
-                    <option>Morazán</option>
-                    <option>San Miguel</option>
-                    <option>San Salvador</option>
-                    <option>San Vicente</option>
-                    <option>Santa Ana</option>
-                    <option>Sonsonate</option>
-                    <option>Usulután</option>
+                    <!-- Se poblará dinámicamente desde la API -->
                   </select>
                   <select id="agresorMuniRes"
                     class="border border-gray-300 rounded-lg p-3 focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
@@ -1598,18 +1338,8 @@
                 <label class="block text-gray-700 text-sm font-medium mb-2">Profesión</label>
                 <select id="agresorProfesion"
                   class="border border-gray-300 rounded-lg p-3 w-full focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
-                  <option value="">Seleccione profesión</option>
-                  <option>Abogado</option>
-                  <option>Médico</option>
-                  <option>Ingeniero</option>
-                  <option>Docente</option>
-                  <option>Contador</option>
-                  <option>Enfermero</option>
-                  <option>Arquitecto</option>
-                  <option>Policía</option>
-                  <option>Militar</option>
-                  <option>Guardia de seguridad</option>
-                  <option>Ninguna</option>
+                  <option value="">Seleccione una profesión</option>
+                  <!-- Se poblará dinámicamente desde la API -->
                 </select>
               </div>
 
@@ -1618,14 +1348,8 @@
                 <label class="block text-gray-700 text-sm font-medium mb-2">Ocupación</label>
                 <select id="agresorOcupacion"
                   class="border border-gray-300 rounded-lg p-3 w-full focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
-                  <option value="">Seleccione ocupación</option>
-                  <option>Empleado</option>
-                  <option>Oficios domésticos</option>
-                  <option>Desempleado</option>
-                  <option>Estudiante</option>
-                  <option>Jubilado</option>
-                  <option>Independiente</option>
-                  <option>Trabajador informal</option>
+                  <option value="">Seleccione una ocupación</option>
+                  <!-- Se poblará dinámicamente desde la API -->
                 </select>
               </div>
 
@@ -1654,20 +1378,7 @@
                   <select id="agresorDeptoTrabajo"
                     class="border border-gray-300 rounded-lg p-3 focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
                     <option value="">Departamento</option>
-                    <option>Ahuachapán</option>
-                    <option>Cabañas</option>
-                    <option>Chalatenango</option>
-                    <option>Cuscatlán</option>
-                    <option>La Libertad</option>
-                    <option>La Paz</option>
-                    <option>La Unión</option>
-                    <option>Morazán</option>
-                    <option>San Miguel</option>
-                    <option>San Salvador</option>
-                    <option>San Vicente</option>
-                    <option>Santa Ana</option>
-                    <option>Sonsonate</option>
-                    <option>Usulután</option>
+                    <!-- Se poblará dinámicamente desde la API -->
                   </select>
                   <select id="agresorMunicipioTrabajo"
                     class="border border-gray-300 rounded-lg p-3 focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
@@ -1718,11 +1429,7 @@
                   <select id="agresorFrecuenciaAlcohol"
                     class="border border-gray-300 rounded-lg p-3 w-full focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
                     <option value="">Seleccione</option>
-                    <option>Diario</option>
-                    <option>Semanal</option>
-                    <option>Cada fin de semana</option>
-                    <option>Cada 15 días</option>
-                    <option>Ocasionalmente</option>
+                    <!-- Se poblará dinámicamente desde la API -->
                   </select>
                 </div>
               </div>
@@ -1743,11 +1450,7 @@
                   <select id="agresorFrecuenciaDrogas"
                     class="border border-gray-300 rounded-lg p-3 w-full focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
                     <option value="">Seleccione</option>
-                    <option>Diario</option>
-                    <option>Semanal</option>
-                    <option>Cada fin de semana</option>
-                    <option>Cada 15 días</option>
-                    <option>Ocasionalmente</option>
+                    <!-- Se poblará dinámicamente desde la API -->
                   </select>
                 </div>
               </div>
@@ -1768,12 +1471,7 @@
                   <select id="agresorTipoArmas"
                     class="border border-gray-300 rounded-lg p-3 w-full mb-2 focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
                     <option value="">Seleccione</option>
-                    <option>Pistola</option>
-                    <option>Corvo</option>
-                    <option>Machete</option>
-                    <option>Fusil</option>
-                    <option>Escopeta</option>
-                    <option value="other">Otro</option>
+                    <!-- Se poblará dinámicamente desde la API -->
                   </select>
                   <input type="text" placeholder="Especifique otro tipo de arma" id="agresorOtroTipoArma"
                     class="border border-gray-300 rounded-lg p-3 w-full focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
@@ -1798,14 +1496,7 @@
                   <select id="agresorTipoFormacion"
                     class="border border-gray-300 rounded-lg p-3 w-full mb-2 focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
                     <option value="">Seleccione</option>
-                    <option>Militar</option>
-                    <option>Policial</option>
-                    <option>Artes marciales</option>
-                    <option>Médica</option>
-                    <option>De salud</option>
-                    <option>Esotérica</option>
-                    <option>Armaría</option>
-                    <option value="other">Otra</option>
+                    <!-- Se poblará dinámicamente desde la API -->
                   </select>
                   <input type="text" placeholder="Especifique otra formación" id="agresorOtroTipoFormacion"
                     class="border border-gray-300 rounded-lg p-3 w-full focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
@@ -1868,13 +1559,11 @@
                   <!-- Primer teléfono -->
                   <div class="flex gap-2 items-center">
                     <input type="tel" placeholder="Número de teléfono"
-                      class="border border-gray-300 rounded-lg p-3 flex-grow focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
+                      class="border border-gray-300 rounded-lg p-3 flex-grow focus:border-blue-500">
                     <select
                       class="border border-gray-300 rounded-lg p-3 focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
-                      <option value="personal">Personal</option>
-                      <option value="trabajo">Trabajo</option>
-                      <option value="casa">Casa</option>
-                      <option value="otro">Otro</option>
+                      <option value="">Tipo</option>
+                      <!-- Se poblará dinámicamente desde la API -->
                     </select>
                     <button type="button" class="text-red-500 hover:text-red-700 eliminar-telefono">✕</button>
                   </div>
@@ -1995,6 +1684,7 @@
   </div>
 
   <!-- Scripts externos -->
+  <script src="node_modules/axios/dist/axios.min.js"></script>
   <script src="JS/form.js"></script>
 
 </body>
