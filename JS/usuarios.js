@@ -1,341 +1,670 @@
-(function () {
-    // Aplicar tema
-    const t = localStorage.getItem('theme-preference') || 'auto';
-    let f = t;
-    if (t === 'auto') {
-        f = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+// USUARIOS.JS - Gestión de Usuarios (Solo Administradores)
+// ======================================
+// VERSION OPTIMIZADA CON SISTEMA DE MODALS MEJORADO
+// ======================================
+
+// ======================================
+// PROTECCIÓN DE RUTA - SOLO ADMINISTRADORES
+// ======================================
+(async function () {
+    console.log('Verificando permisos de administrador...');
+    const hasPermission = await auth.requireRole('admin', 'inicio.php');
+    if (!hasPermission) {
+        console.error('Acceso denegado: No tienes permisos de administrador');
+        return;
     }
-    document.documentElement.setAttribute('data-theme', f);
-
-    // Aplicar tamaño de fuente
-    const fontSize = localStorage.getItem('font-size') || '16';
-    document.documentElement.style.setProperty('--font-size', fontSize + 'px');
-
-    // Aplicar contraste
-    const contrast = localStorage.getItem('contrast') || '1';
-    document.documentElement.style.setProperty('--contrast', contrast);
+    console.log('✓ Acceso autorizado: Usuario Administrador');
 })();
 
-// CORREGIDO: Cambiar "preguntas" por "usuarios" y agregar propiedades faltantes
-const usuarios = [
-    { id: 1, nombre: "Iván Alejandro", apellido: "Barrera Escalante", email: "ivanbarrera@email.com", rol: "Administrador", estado: "Activo", nivel: "activo" },
-    { id: 2, nombre: "Carlos Manuel", apellido: "Gonzales Pineda", email: "carlosgonzales@email.com", rol: "Notario", estado: "Inactivo", nivel: "inactivo" },
-    { id: 3, nombre: "Mario Alberto", apellido: "Mejia Cruz", email: "marioalberto@email.com", rol: "Administrador", estado: "Activo", nivel: "activo" },
-    { id: 4, nombre: "Yahir Alejandro", apellido: "Palma Gutierres", email: "yahirpalma@email.com", rol: "Juez", estado: "Inactivo", nivel: "inactivo" },
-    { id: 5, nombre: "Hector Jose", apellido: "Moreno Argueta", email: "hectorjose@email.com", rol: "Notario", estado: "Activo", nivel: "activo" },
-    { id: 6, nombre: "Esteban Miguel", apellido: "Landaverde Argueta", email: "estebanmiguel@email.com", rol: "Administrador", estado: "Activo", nivel: "activo" },
-    { id: 7, nombre: "Rodrigo Andres", apellido: "Barrera Escalante", email: "rodrigoandres@email.com", rol: "Administrador", estado: "Inactivo", nivel: "inactivo" },
-    { id: 8, nombre: "Juan Pablo", apellido: "Barrera Escalante", email: "jpbarrera@email.com", rol: "Juez", estado: "Activo", nivel: "activo" },
-];
+// ======================================
+// ELEMENTOS DEL DOM
+// ======================================
+const elementos = {
+    // Botones principales
+    openFormBtn: document.getElementById('openFormBtn'),
 
-// CORREGIDO: Llamar a la función cuando se carga la página
-document.addEventListener('DOMContentLoaded', function () {
-    cargarTodasLasTablas();
-    inicializarModal();
-    inicializarTabs();
+    // Modal Agregar
+    addModal: document.getElementById('userFormModal'),
+    closeAddBtn: document.getElementById('closeFormBtn'),
+    saveAddBtn: document.getElementById('saveAddBtn'),
+    addForm: document.getElementById('addUserForm'),
+
+    // Modal Editar
+    editModal: document.getElementById('editUserModal'),
+    closeEditBtn: document.getElementById('closeEditBtn'),
+    cancelEditBtn: document.getElementById('cancelEditBtn'),
+    saveEditBtn: document.getElementById('saveEditBtn'),
+    editForm: document.getElementById('editUserForm'),
+
+    // Modal Detalles
+    detailsModal: document.getElementById('viewDetailsModal'),
+
+    // Tabs
+    tabs: document.querySelectorAll('.browser-tab'),
+
+    // Tablas
+    tablaTodo: document.getElementById('tablaTodo'),
+    tablaActivo: document.getElementById('tablaActivo'),
+    tablaInactivo: document.getElementById('tablaInactivo')
+};
+
+// ======================================
+// ESTADO DE LA APLICACIÓN
+// ======================================
+let usuarios = [];
+let currentTab = 'Todo';
+let usuarioEnEdicion = null; // Usuario que se está editando
+
+// ======================================
+// CLASE MODAL MANAGER - Gestión centralizada de modals
+// ======================================
+class ModalManager {
+    /**
+     * Abre un modal específico
+     * @param {HTMLElement} modal - Elemento del modal a abrir
+     */
+    static abrir(modal) {
+        if (!modal) {
+            console.error('Modal no encontrado');
+            return;
+        }
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+        document.body.style.overflow = 'hidden';
+
+        // Agregar listener para cerrar al hacer clic fuera
+        setTimeout(() => {
+            modal.addEventListener('click', this.clickFueraHandler);
+        }, 100);
+    }
+
+    /**
+     * Cierra un modal específico
+     * @param {HTMLElement} modal - Elemento del modal a cerrar
+     */
+    static cerrar(modal) {
+        if (!modal) return;
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+        document.body.style.overflow = 'auto';
+        modal.removeEventListener('click', this.clickFueraHandler);
+    }
+
+    /**
+     * Handler para cerrar modal al hacer clic fuera
+     */
+    static clickFueraHandler(e) {
+        if (e.target === e.currentTarget) {
+            ModalManager.cerrar(e.currentTarget);
+        }
+    }
+
+    /**
+     * Limpia un formulario
+     * @param {HTMLFormElement} form - Formulario a limpiar
+     */
+    static limpiarFormulario(form) {
+        if (form) {
+            form.reset();
+            // Limpiar también campos hidden
+            const hiddenInputs = form.querySelectorAll('input[type="hidden"]');
+            hiddenInputs.forEach(input => input.value = '');
+        }
+    }
+}
+
+// ======================================
+// EVENT LISTENERS - MODAL AGREGAR
+// ======================================
+if (elementos.openFormBtn) {
+    elementos.openFormBtn.addEventListener('click', () => {
+        ModalManager.limpiarFormulario(elementos.addForm);
+        ModalManager.abrir(elementos.addModal);
+    });
+}
+
+if (elementos.closeAddBtn) {
+    elementos.closeAddBtn.addEventListener('click', () => {
+        ModalManager.cerrar(elementos.addModal);
+        ModalManager.limpiarFormulario(elementos.addForm);
+    });
+}
+
+if (elementos.saveAddBtn) {
+    elementos.saveAddBtn.addEventListener('click', async (e) => {
+        e.preventDefault();
+        await guardarNuevoUsuario();
+    });
+}
+
+// ======================================
+// EVENT LISTENERS - MODAL EDITAR
+// ======================================
+if (elementos.closeEditBtn) {
+    elementos.closeEditBtn.addEventListener('click', () => {
+        cerrarModalEditar();
+    });
+}
+
+if (elementos.cancelEditBtn) {
+    elementos.cancelEditBtn.addEventListener('click', () => {
+        cerrarModalEditar();
+    });
+}
+
+if (elementos.saveEditBtn) {
+    elementos.saveEditBtn.addEventListener('click', async (e) => {
+        e.preventDefault();
+        await guardarEdicionUsuario();
+    });
+}
+
+// ======================================
+// EVENT LISTENERS - TABS
+// ======================================
+elementos.tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+        const tabName = tab.getAttribute('data-tab');
+        switchTab(tabName);
+    });
 });
 
-function cargarTodasLasTablas() {
-    cargarTablaPorNivel('todo');
-    cargarTablaPorNivel('activo');
-    cargarTablaPorNivel('inactivo');
-}
+function switchTab(tabName) {
+    currentTab = tabName;
 
-function cargarTablaPorNivel(nivel) {
-    const tbodyId = `tabla${nivel.charAt(0).toUpperCase() + nivel.slice(1)}`;
-    const tbody = document.getElementById(tbodyId);
-
-    if (!tbody) {
-        console.error(`No se encontró el tbody con id: ${tbodyId}`);
-        return;
-    }
-
-    tbody.innerHTML = "";
-
-    // Filtrar usuarios según el nivel
-    let usuariosFiltradas = [];
-
-    if (nivel === 'todo') {
-        usuariosFiltradas = usuarios;
-    } else {
-        usuariosFiltradas = usuarios.filter(p =>
-            p.nivel.toLowerCase() === nivel.toLowerCase()
-        );
-    }
-
-    if (usuariosFiltradas.length === 0) {
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-            <td colspan="6" class="px-6 py-8 text-center text-gray-500 dark:text-gray-400 text-lg">
-                No hay usuarios de estado ${nivel}
-            </td>
-        `;
-        tbody.appendChild(tr);
-        return;
-    }
-
-    // En la función cargarTablaPorNivel, dentro del forEach:
-    usuariosFiltradas.forEach(p => {
-        const tr = document.createElement("tr");
-        tr.className = "border-b border-gray-200 dark:border-gray-700 hover:bg-gradient-to-r hover:from-gray-50 hover:to-gray-50 dark:hover:from-gray-800 dark:hover:to-gray-700 transition-all duration-300";
-
-        // Determinar clases CSS según el ESTADO
-        let estadoClass = "";
-        let estadoText = p.estado;
-
-        switch (p.estado.toLowerCase()) {
-            case 'activo':
-                estadoClass = "bg-green-500 text-white";
-                break;
-            case 'inactivo':
-                estadoClass = "bg-red-600 text-white";
-                break;
-            default:
-                estadoClass = "bg-gray-500 text-white";
-        }
-
-        // Determinar clases CSS según el ROL - NUEVO
-        let rolClass = "";
-        let rolText = p.rol;
-
-        switch (p.rol.toLowerCase()) {
-            case 'administrador':
-                rolClass = "bg-red-500 text-white";
-                break;
-            case 'notario':
-                rolClass = "bg-blue-500 text-white";
-                break;
-            case 'juez':
-                rolClass = "bg-purple-500 text-white";
-                break;
-            default:
-                rolClass = "bg-gray-500 text-white";
-        }
-
-        // Determinar texto y color para el botón de activar/desactivar
-        const botonTexto = p.estado.toLowerCase() === 'activo' ? 'Desactivar' : 'Activar';
-        const botonColor = p.estado.toLowerCase() === 'activo' ? 'bg-red-500 hover:bg-red-600' : 'bg-green-500 hover:bg-green-600';
-
-        tr.innerHTML = `
-    <td class="px-6 py-4 text-gray-900 dark:text-white font-medium">${p.nombre}</td>
-    <td class="px-6 py-4 whitespace-nowrap text-gray-900 dark:text-white">${p.apellido}</td>
-    <td class="px-6 py-4 whitespace-nowrap text-center text-gray-900 dark:text-white">${p.email}</td>
-    <td class="px-6 py-4 whitespace-nowrap">
-        <span class="inline-flex items-center justify-center w-24 px-3 py-1 rounded-full text-xs font-semibold relative overflow-hidden state-badge-shimmer ${rolClass}">
-            ${rolText}
-        </span>
-    </td>
-    <td class="px-6 py-4 whitespace-nowrap">
-        <span class="inline-flex items-center justify-center w-20 px-3 py-1 rounded-full text-xs font-semibold relative overflow-hidden state-badge-shimmer ${estadoClass}">
-            ${estadoText}
-        </span>
-    </td>
-    <td class="px-6 py-4 whitespace-nowrap acciones-center">
-        <div class="flex space-x-2 justify-center">
-            <button class="action-btn-view w-20 px-3 py-1 rounded-lg text-xs font-medium transition-all duration-200 shadow-sm relative overflow-hidden">
-                Editar
-            </button>
-            <button class="action-btn-toggle-estado w-20 px-3 py-1 rounded-lg text-xs font-medium transition-all duration-200 shadow-sm relative overflow-hidden text-white ${botonColor}"
-                    data-id="${p.id}"
-                    data-estado="${p.estado}">
-                ${botonTexto}
-            </button>
-        </div>
-    </td>
-`;
-
-        tbody.appendChild(tr);
-    });
-
-    // Agregar event listeners a los botones después de crear la tabla
-    agregarEventListenersABotones();
-}
-
-// CORREGIDO: Función para inicializar el modal
-function inicializarModal() {
-    const openBtn = document.getElementById('openFormBtn');
-    const closeBtn = document.getElementById('closeFormBtn');
-    const modal = document.getElementById('userFormModal');
-
-    if (openBtn && closeBtn && modal) {
-        openBtn.addEventListener('click', () => {
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
-        });
-
-        const closeModal = () => {
-            modal.classList.add('hidden');
-            modal.classList.remove('flex');
-        };
-
-        closeBtn.addEventListener('click', closeModal);
-
-        // Cerrar modal al hacer clic fuera
-        window.addEventListener('click', (e) => {
-            if (e.target === modal) closeModal();
-        });
-
-        // Cerrar modal con ESC
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && modal.classList.contains('flex')) {
-                closeModal();
-            }
-        });
-    }
-}
-
-// CORREGIDO: Función para inicializar tabs
-function inicializarTabs() {
-    const tabs = document.querySelectorAll('.browser-tab');
-    const contents = document.querySelectorAll('.tab-content');
-
-    tabs.forEach(tab => {
-        tab.addEventListener('click', () => {
-            const tabName = tab.getAttribute('data-tab');
-
-            // Remover active de todos los tabs
-            tabs.forEach(t => t.classList.remove('active'));
-
-            // Remover active de todos los contenidos
-            contents.forEach(c => c.classList.remove('active'));
-
-            // Agregar active al tab clickeado
+    elementos.tabs.forEach(tab => {
+        if (tab.getAttribute('data-tab') === tabName) {
             tab.classList.add('active');
+        } else {
+            tab.classList.remove('active');
+        }
+    });
 
-            // Agregar active al contenido correspondiente
-            const targetContent = document.getElementById(tabName);
-            if (targetContent) {
-                targetContent.classList.add('active');
-            }
+    document.querySelectorAll('.tab-content').forEach(content => {
+        if (content.id === tabName) {
+            content.classList.add('active');
+        } else {
+            content.classList.remove('active');
+        }
+    });
 
-            // Recargar la tabla correspondiente
-            if (tabName === 'Todo') {
-                cargarTablaPorNivel('todo');
-            } else if (tabName === 'activo') {
-                cargarTablaPorNivel('activo');
-            } else if (tabName === 'inactivo') {
-                cargarTablaPorNivel('inactivo');
-            }
+    renderTabla(tabName);
+}
+
+// ======================================
+// FUNCIONES DE API - CRUD COMPLETO
+// ======================================
+
+/**
+ * Obtiene todos los usuarios desde el backend
+ */
+async function fetchUsuarios() {
+    try {
+        mostrarCargando(true);
+        const response = await axios.get('/usuarios');
+
+        if (response.data.success) {
+            usuarios = response.data.data;
+            console.log(`✓ ${usuarios.length} usuarios cargados`);
+            renderTabla(currentTab);
+        } else {
+            mostrarError('No se pudieron cargar los usuarios');
+        }
+    } catch (error) {
+        console.error('Error al cargar usuarios:', error);
+        if (error.response?.status === 403) {
+            mostrarError('No tienes permisos para ver los usuarios');
+        } else {
+            mostrarError('Error al cargar la lista de usuarios');
+        }
+    } finally {
+        mostrarCargando(false);
+    }
+}
+
+/**
+ * Guarda un nuevo usuario
+ */
+async function guardarNuevoUsuario() {
+    try {
+        // Validar formulario
+        if (!elementos.addForm.checkValidity()) {
+            elementos.addForm.reportValidity();
+            return;
+        }
+
+        mostrarCargando(true);
+
+        // Obtener datos del formulario
+        const formData = new FormData(elementos.addForm);
+        const datos = Object.fromEntries(formData.entries());
+
+        console.log('Creando usuario:', datos);
+
+        const response = await axios.post('/usuarios', datos);
+
+        if (response.data.success) {
+            mostrarExito('Usuario creado exitosamente');
+            ModalManager.cerrar(elementos.addModal);
+            ModalManager.limpiarFormulario(elementos.addForm);
+            await fetchUsuarios();
+        }
+    } catch (error) {
+        console.error('Error al crear usuario:', error);
+
+        if (error.response?.status === 422) {
+            const errors = error.response.data.errors;
+            const firstError = Object.values(errors)[0][0];
+            mostrarError(firstError);
+        } else if (error.response?.status === 403) {
+            mostrarError('No tienes permisos para crear usuarios');
+        } else {
+            mostrarError('Error al crear el usuario');
+        }
+    } finally {
+        mostrarCargando(false);
+    }
+}
+
+/**
+ * Abre el modal de edición y carga los datos del usuario
+ * @param {number} idUsuario - ID del usuario a editar
+ */
+async function abrirModalEditar(idUsuario) {
+    const usuario = usuarios.find(u => u.id_usuario === idUsuario);
+
+    if (!usuario) {
+        mostrarError('Usuario no encontrado');
+        return;
+    }
+
+    usuarioEnEdicion = usuario;
+
+    // Rellenar formulario con datos del usuario
+    document.getElementById('edit_id_usuario').value = usuario.id_usuario;
+    document.getElementById('edit_nombres').value = usuario.nombres || '';
+    document.getElementById('edit_apellidos').value = usuario.apellidos || '';
+    document.getElementById('edit_email').value = usuario.email_institucional || '';
+    document.getElementById('edit_telefono').value = usuario.telefono || '';
+
+    // Obtener rol principal
+    const rolPrincipal = usuario.usuario_roles
+        ?.find(ur => ur.estado === 'Activo')
+        ?.rol?.rol || 'Notario';
+    document.getElementById('edit_rol').value = rolPrincipal;
+
+    // Limpiar campo de contraseña
+    document.getElementById('edit_password').value = '';
+
+    // Abrir modal
+    ModalManager.abrir(elementos.editModal);
+
+    console.log('Modal de edición abierto para usuario:', usuario.nombres);
+}
+
+/**
+ * Cierra el modal de edición y limpia el formulario
+ */
+function cerrarModalEditar() {
+    ModalManager.cerrar(elementos.editModal);
+    ModalManager.limpiarFormulario(elementos.editForm);
+    usuarioEnEdicion = null;
+}
+
+/**
+ * Guarda los cambios del usuario editado
+ */
+async function guardarEdicionUsuario() {
+    try {
+        // Validar formulario
+        if (!elementos.editForm.checkValidity()) {
+            elementos.editForm.reportValidity();
+            return;
+        }
+
+        const idUsuario = document.getElementById('edit_id_usuario').value;
+
+        if (!idUsuario) {
+            mostrarError('Error: ID de usuario no válido');
+            return;
+        }
+
+        mostrarCargando(true);
+
+        // Obtener datos del formulario
+        const formData = new FormData(elementos.editForm);
+        const datos = Object.fromEntries(formData.entries());
+
+        // Si la contraseña está vacía, eliminarla del objeto
+        if (!datos.password || datos.password.trim() === '') {
+            delete datos.password;
+        }
+
+        console.log('Actualizando usuario:', idUsuario, datos);
+
+        const response = await axios.put(`/usuarios/${idUsuario}`, datos);
+
+        if (response.data.success) {
+            mostrarExito('Usuario actualizado exitosamente');
+            cerrarModalEditar();
+            await fetchUsuarios();
+        }
+    } catch (error) {
+        console.error('Error al actualizar usuario:', error);
+
+        if (error.response?.status === 422) {
+            const errors = error.response.data.errors;
+            const firstError = Object.values(errors)[0][0];
+            mostrarError(firstError);
+        } else if (error.response?.status === 403) {
+            mostrarError('No tienes permisos para editar usuarios');
+        } else if (error.response?.status === 404) {
+            mostrarError('Usuario no encontrado');
+        } else {
+            mostrarError('Error al actualizar el usuario');
+        }
+    } finally {
+        mostrarCargando(false);
+    }
+}
+
+/**
+ * Actualiza el estado de un usuario
+ * @param {number} idUsuario - ID del usuario
+ * @param {string} estadoActual - Estado actual del usuario
+ */
+async function toggleEstado(idUsuario, estadoActual) {
+    const nuevoEstado = estadoActual === 'Activo' ? 'Inactivo' : 'Activo';
+    const accion = nuevoEstado === 'Activo' ? 'activar' : 'desactivar';
+
+    if (!confirm(`¿Estás seguro de ${accion} este usuario?`)) {
+        return;
+    }
+
+    try {
+        mostrarCargando(true);
+
+        const response = await axios.patch(`/usuarios/${idUsuario}/estado`, {
+            estado: nuevoEstado
         });
+
+        if (response.data.success) {
+            mostrarExito(`Usuario ${nuevoEstado === 'Activo' ? 'activado' : 'desactivado'} exitosamente`);
+            await fetchUsuarios();
+        }
+    } catch (error) {
+        console.error('Error al cambiar estado:', error);
+
+        if (error.response?.status === 403) {
+            mostrarError('No tienes permisos para cambiar el estado de usuarios');
+        } else {
+            mostrarError('Error al cambiar el estado del usuario');
+        }
+    } finally {
+        mostrarCargando(false);
+    }
+}
+
+// ======================================
+// FUNCIONES DE RENDERIZADO
+// ======================================
+
+/**
+ * Renderiza la tabla según el filtro activo
+ * @param {string} tabName - Nombre de la pestaña activa
+ */
+function renderTabla(tabName) {
+    let usuariosFiltrados = [];
+    let tabla = null;
+
+    switch (tabName) {
+        case 'Todo':
+            usuariosFiltrados = usuarios;
+            tabla = elementos.tablaTodo;
+            break;
+        case 'activo':
+            usuariosFiltrados = usuarios.filter(u => u.estado === 'Activo');
+            tabla = elementos.tablaActivo;
+            break;
+        case 'inactivo':
+            usuariosFiltrados = usuarios.filter(u => u.estado === 'Inactivo');
+            tabla = elementos.tablaInactivo;
+            break;
+    }
+
+    if (!tabla) return;
+
+    tabla.innerHTML = '';
+
+    if (usuariosFiltrados.length === 0) {
+        tabla.innerHTML = `
+            <tr>
+                <td colspan="6" class="px-6 py-8 text-center text-gray-500 dark:text-gray-400 text-lg">
+                    No hay usuarios ${tabName === 'Todo' ? 'para mostrar' : `en estado ${tabName}`}
+                </td>
+            </tr>
+        `;
+        return;
+    }
+
+    usuariosFiltrados.forEach(usuario => {
+        const row = crearFilaUsuario(usuario);
+        tabla.appendChild(row);
     });
 }
 
-// -------------------------------
-// FUNCIÓN PARA AGREGAR EVENT LISTENERS A BOTONES
-// -------------------------------
-function agregarEventListenersABotones() {
-    // Botones Editar
-    const botonesEditar = document.querySelectorAll('.action-btn-view');
-    botonesEditar.forEach(boton => {
-        boton.addEventListener('click', function (e) {
-            e.preventDefault();
-            // Animación de click
-            this.style.transform = 'scale(0.95)';
-            setTimeout(() => {
-                this.style.transform = 'scale(1)';
-            }, 150);
+/**
+ * Crea una fila de la tabla para un usuario
+ * @param {Object} usuario - Datos del usuario
+ * @returns {HTMLTableRowElement} Fila de la tabla
+ */
+function crearFilaUsuario(usuario) {
+    const tr = document.createElement('tr');
+    tr.className = 'border-b border-gray-200 dark:border-gray-700 hover:bg-gradient-to-r hover:from-gray-50 hover:to-gray-50 dark:hover:from-gray-800 dark:hover:to-gray-700 transition-all duration-300';
 
-            // Aquí iría la lógica para editar
-            console.log('Editar usuario');
-        });
-    });
+    const rolPrincipal = usuario.usuario_roles
+        ?.find(ur => ur.estado === 'Activo')
+        ?.rol?.rol || 'Sin rol';
 
-    // Botones Toggle Estado (Activar/Desactivar)
-    const botonesToggleEstado = document.querySelectorAll('.action-btn-toggle-estado');
-    botonesToggleEstado.forEach(boton => {
-        boton.addEventListener('click', function (e) {
-            e.preventDefault();
-            const idUsuario = this.getAttribute('data-id');
-            const estadoActual = this.getAttribute('data-estado');
-            const nuevoEstado = estadoActual.toLowerCase() === 'activo' ? 'Inactivo' : 'Activo';
-            
-            // Animación de click
-            this.style.transform = 'scale(0.95)';
-            setTimeout(() => {
-                this.style.transform = 'scale(1)';
-            }, 150);
+    // Clases CSS según ESTADO
+    const estadoClasses = {
+        'activo': 'bg-green-500 text-white',
+        'inactivo': 'bg-red-600 text-white'
+    };
+    const estadoClass = estadoClasses[usuario.estado.toLowerCase()] || 'bg-gray-500 text-white';
 
-            const confirmMessage = estadoActual.toLowerCase() === 'activo' 
-                ? '¿Estás seguro de que quieres desactivar este usuario?'
-                : '¿Estás seguro de que quieres activar este usuario?';
-            
-            if (confirm(confirmMessage)) {
-                // Encontrar el usuario en el array
-                const usuarioIndex = usuarios.findIndex(u => u.id == idUsuario);
-                if (usuarioIndex !== -1) {
-                    // Actualizar estado en el array
-                    usuarios[usuarioIndex].estado = nuevoEstado;
-                    usuarios[usuarioIndex].nivel = nuevoEstado.toLowerCase();
-                    
-                    // Actualizar el botón visualmente
-                    this.setAttribute('data-estado', nuevoEstado);
-                    
-                    if (nuevoEstado === 'Inactivo') {
-                        this.classList.remove('bg-red-500', 'hover:bg-red-600');
-                        this.classList.add('bg-green-500', 'hover:bg-green-600');
-                        this.textContent = 'Activar';
-                    } else {
-                        this.classList.remove('bg-green-500', 'hover:bg-green-600');
-                        this.classList.add('bg-red-500', 'hover:bg-red-600');
-                        this.textContent = 'Desactivar';
-                    }
-                    
-                    // También actualizar el badge de estado
-                    const fila = this.closest('tr');
-                    const estadoBadge = fila.querySelector('.state-badge-shimmer:last-of-type');
-                    
-                    if (estadoBadge) {
-                        estadoBadge.textContent = nuevoEstado;
-                        if (nuevoEstado === 'Inactivo') {
-                            estadoBadge.classList.remove('bg-green-500');
-                            estadoBadge.classList.add('bg-red-600');
-                        } else {
-                            estadoBadge.classList.remove('bg-red-600');
-                            estadoBadge.classList.add('bg-green-500');
-                        }
-                    }
-                    
-                    // Recargar la tabla para reflejar cambios
-                    const tabActivo = document.querySelector('.browser-tab.active');
-                    if (tabActivo) {
-                        const tabName = tabActivo.getAttribute('data-tab');
-                        if (tabName === 'Todo') {
-                            cargarTablaPorNivel('todo');
-                        } else if (tabName === 'activo') {
-                            cargarTablaPorNivel('activo');
-                        } else if (tabName === 'inactivo') {
-                            cargarTablaPorNivel('inactivo');
-                        }
-                    }
-                    
-                    console.log(`Usuario ${idUsuario} cambiado a estado: ${nuevoEstado}`);
-                }
-            }
-        });
+    // Clases CSS según ROL
+    const rolClasses = {
+        'administrador': 'bg-red-500 text-white',
+        'notario': 'bg-blue-500 text-white',
+        'juez': 'bg-purple-500 text-white'
+    };
+    const rolClass = rolClasses[rolPrincipal.toLowerCase()] || 'bg-gray-500 text-white';
+
+    // Botón toggle estado
+    const esActivo = usuario.estado.toLowerCase() === 'activo';
+    const botonTexto = esActivo ? 'Desactivar' : 'Activar';
+    const botonColor = esActivo ? 'bg-red-500 hover:bg-red-600' : 'bg-green-500 hover:bg-green-600';
+
+    tr.innerHTML = `
+        <td class="px-6 py-4 text-gray-900 dark:text-white font-medium">${escapeHtml(usuario.nombres)}</td>
+        <td class="px-6 py-4 whitespace-nowrap text-gray-900 dark:text-white">${escapeHtml(usuario.apellidos)}</td>
+        <td class="px-6 py-4 whitespace-nowrap text-center text-gray-900 dark:text-white">${escapeHtml(usuario.email_institucional)}</td>
+        <td class="px-6 py-4 whitespace-nowrap">
+            <span class="inline-flex items-center justify-center w-24 px-3 py-1 rounded-full text-xs font-semibold ${rolClass}">
+                ${escapeHtml(rolPrincipal)}
+            </span>
+        </td>
+        <td class="px-6 py-4 whitespace-nowrap">
+            <span class="inline-flex items-center justify-center w-20 px-3 py-1 rounded-full text-xs font-semibold ${estadoClass}">
+                ${usuario.estado}
+            </span>
+        </td>
+        <td class="px-6 py-4 whitespace-nowrap">
+            <div class="flex space-x-2 justify-center">
+                <button onclick="verDetalles(${usuario.id_usuario})" 
+                        class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition"
+                        title="Ver detalles">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                              d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                              d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                    </svg>
+                </button>
+                <button onclick="abrirModalEditar(${usuario.id_usuario})" 
+                        class="w-20 px-3 py-1 rounded-lg text-xs font-medium bg-blue-500 hover:bg-blue-600 text-white transition-all duration-200 shadow-sm">
+                    Editar
+                </button>
+                <button onclick="toggleEstado(${usuario.id_usuario}, '${usuario.estado}')" 
+                        class="w-24 px-3 py-1 rounded-lg text-xs font-medium transition-all duration-200 shadow-sm text-white ${botonColor}">
+                    ${botonTexto}
+                </button>
+            </div>
+        </td>
+    `;
+
+    return tr;
+}
+
+// ======================================
+// FUNCIONES GLOBALES - Modal Detalles
+// ======================================
+
+/**
+ * Muestra los detalles de un usuario
+ * @param {number} idUsuario - ID del usuario
+ */
+function verDetalles(idUsuario) {
+    const usuario = usuarios.find(u => u.id_usuario === idUsuario);
+    if (!usuario) return;
+
+    const content = document.getElementById('detailsContent');
+    const rolPrincipal = usuario.usuario_roles?.find(ur => ur.estado === 'Activo')?.rol?.rol || 'Sin rol';
+
+    content.innerHTML = `
+        <div class="text-center mb-4">
+            <div class="w-20 h-20 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto text-2xl font-bold mb-2">
+                ${usuario.nombres.charAt(0)}${usuario.apellidos.charAt(0)}
+            </div>
+            <h3 class="text-xl font-bold text-gray-800">${escapeHtml(usuario.nombres)} ${escapeHtml(usuario.apellidos)}</h3>
+            <span class="text-sm text-gray-500">${escapeHtml(rolPrincipal)}</span>
+        </div>
+        <div class="space-y-3 border-t pt-4">
+            <p><strong class="text-gray-600">Email:</strong> ${escapeHtml(usuario.email_institucional)}</p>
+            <p><strong class="text-gray-600">Teléfono:</strong> ${escapeHtml(usuario.telefono || 'No especificado')}</p>
+            <p><strong class="text-gray-600">Estado:</strong> 
+                <span class="px-2 py-1 rounded text-xs ${usuario.estado === 'Activo' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}">
+                    ${usuario.estado}
+                </span>
+            </p>
+            <p><strong class="text-gray-600">Creado:</strong> ${usuario.created_at ? new Date(usuario.created_at).toLocaleDateString() : 'N/A'}</p>
+        </div>
+    `;
+
+    ModalManager.abrir(elementos.detailsModal);
+}
+
+/**
+ * Cierra el modal de detalles
+ */
+function closeDetailsModal() {
+    ModalManager.cerrar(elementos.detailsModal);
+}
+
+// ======================================
+// FUNCIONES DE UTILIDAD
+// ======================================
+
+/**
+ * Escapa HTML para prevenir XSS
+ * @param {string} text - Texto a escapar
+ * @returns {string} Texto escapado
+ */
+function escapeHtml(text) {
+    if (!text) return '';
+    const map = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;'
+    };
+    return text.toString().replace(/[&<>"']/g, m => map[m]);
+}
+
+/**
+ * Muestra/oculta indicador de carga
+ * @param {boolean} mostrar - Si debe mostrar el indicador
+ */
+function mostrarCargando(mostrar) {
+    document.body.style.cursor = mostrar ? 'wait' : 'default';
+
+    // Deshabilitar botones durante la carga
+    const botones = document.querySelectorAll('button');
+    botones.forEach(btn => {
+        btn.disabled = mostrar;
+        if (mostrar) {
+            btn.style.opacity = '0.6';
+        } else {
+            btn.style.opacity = '1';
+        }
     });
 }
 
-// Detectar cambios en preferencia de sistema (para modo auto)
-window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
-    const temaActual = localStorage.getItem('theme-preference') || 'auto';
-    if (temaActual === 'auto') {
-        const nuevoTema = e.matches ? 'dark' : 'light';
-        document.documentElement.setAttribute('data-theme', nuevoTema);
+/**
+ * Muestra mensaje de éxito
+ * @param {string} mensaje - Mensaje a mostrar
+ */
+function mostrarExito(mensaje) {
+    console.log('✓ ' + mensaje);
+    alert('✓ ' + mensaje);
+    // TODO: Implementar notificaciones con Toastify o SweetAlert2
+}
+
+/**
+ * Muestra mensaje de error
+ * @param {string} mensaje - Mensaje a mostrar
+ */
+function mostrarError(mensaje) {
+    console.error('✕ ' + mensaje);
+    alert('✕ ' + mensaje);
+    // TODO: Implementar notificaciones con Toastify o SweetAlert2
+}
+
+// ======================================
+// INICIALIZACIÓN
+// ======================================
+
+document.addEventListener('DOMContentLoaded', async () => {
+    console.log('Inicializando módulo de usuarios...');
+
+    try {
+        // Verificar permisos de administrador
+        const isAdmin = await auth.isAdmin();
+
+        if (!isAdmin) {
+            console.error('No eres administrador');
+            mostrarError('No tienes permisos para acceder a esta página');
+            setTimeout(() => {
+                window.location.href = 'inicio.php';
+            }, 2000);
+            return;
+        }
+
+        // Cargar usuarios al inicio
+        await fetchUsuarios();
+
+        console.log('✓ Módulo de usuarios cargado correctamente');
+        console.log('✓ Sistema de modals optimizado inicializado');
+    } catch (error) {
+        console.error('Error al inicializar módulo de usuarios:', error);
+        mostrarError('Error al inicializar la página');
     }
 });
 
-// Función para limpiar formulario (si existe)
-function limpiarFormulario() {
-    // Si tienes un formulario para crear usuarios
-    const nombreInput = document.getElementById('nombre');
-    const apellidoInput = document.getElementById('apellido');
-    const emailInput = document.getElementById('email');
-    const rolSelect = document.getElementById('rol');
-    const estadoSelect = document.getElementById('estado');
-    
-    if (nombreInput) nombreInput.value = '';
-    if (apellidoInput) apellidoInput.value = '';
-    if (emailInput) emailInput.value = '';
-    if (rolSelect) rolSelect.value = '';
-    if (estadoSelect) estadoSelect.value = 'Activo';
-}
+// Hacer funciones disponibles globalmente para onclick en HTML
+window.verDetalles = verDetalles;
+window.closeDetailsModal = closeDetailsModal;
+window.abrirModalEditar = abrirModalEditar;
+window.toggleEstado = toggleEstado;
