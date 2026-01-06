@@ -8,7 +8,6 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <link rel="stylesheet" href="Style/usuarios.css">
-
   <!-- Axios -->
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
   <script src="services/auth.js"></script>
@@ -16,7 +15,6 @@
 
 <body>
   <?php include 'components/sidebar.php'; ?>
-
   <!-- Main Content -->
   <div class="content">
     <!-- Header Component -->
@@ -40,7 +38,6 @@
             <span class="tab-label">Estado Inactivo</span>
           </div>
         </div>
-
         <div class="tab-content-wrapper">
           <div class="tab-content active" id="Todo">
             <div class="relative overflow-x-auto">
@@ -60,7 +57,6 @@
               </table>
             </div>
           </div>
-
           <div class="tab-content" id="activo">
             <div class="relative overflow-x-auto">
               <table class="w-full text-sm text-left">
@@ -79,7 +75,6 @@
               </table>
             </div>
           </div>
-
           <div class="tab-content" id="inactivo">
             <div class="relative overflow-x-auto">
               <table class="w-full text-sm text-left">
@@ -100,7 +95,6 @@
           </div>
         </div>
       </div>
-
       <!-- Botón Flotante -->
       <div class="fixed bottom-8 right-8 z-50">
         <button id="openFormBtn"
@@ -115,7 +109,6 @@
             Usuario</span>
         </button>
       </div>
-
       <!-- Modal para agregar un nuevo usuario -->
       <div id="userFormModal" class="fixed inset-0 z-50 bg-black bg-opacity-50 hidden items-center justify-center p-4">
         <div class="modal-content rounded-2xl shadow-2xl max-w-2xl w-full overflow-y-auto max-h-[90vh]">
@@ -127,7 +120,6 @@
             </h2>
             <button id="closeFormBtn" class="text-gray-500 hover:text-red-500 transition">✕</button>
           </div>
-
           <section class="p-6 space-y-6">
             <form id="addUserForm" class="space-y-4">
               <div>
@@ -151,35 +143,26 @@
                   <input type="text" id="add_telefono" name="telefono" class="w-full mt-1 border rounded-lg p-2"
                     placeholder="12341234">
                 </div>
-                <div class="w-1/2">
-                  <label class="text-sm font-semibold">Departamento</label>
-                  <select id="add_departamento" name="departamento" class="w-full mt-1 border rounded-lg p-2">
-                    <option>La Libertad</option>
-                    <option>Santa Ana</option>
-                    <option>San Miguel</option>
-                  </select>
-                </div>
               </div>
               <div class="flex gap-4">
                 <div class="w-1/2">
-                  <label class="text-sm font-semibold">Rol</label>
-                  <select id="add_rol" name="rol" class="w-full mt-1 border rounded-lg p-2">
-                    <option value="admin">Administrador</option>
-                    <option value="Colaborador">Colaborador</option>
-                    <option value="Juez">Juez</option>
+                  <label class="text-sm font-semibold">Rol <span class="text-red-500">*</span></label>
+                  <select id="add_rol" name="rol" class="w-full mt-1 border rounded-lg p-2" required>
+                    <option value="">Cargando roles...</option>
                   </select>
                 </div>
                 <div class="w-1/2">
-                  <label class="text-sm font-semibold">Contraseña</label>
+                  <label class="text-sm font-semibold">Contraseña <span class="text-red-500">*</span></label>
                   <input type="password" id="add_password" name="password" class="w-full mt-1 border rounded-lg p-2"
-                    placeholder="••••••••" required>
+                    placeholder="••••••••" required minlength="6">
+                  <small class="text-gray-500 text-xs">Mínimo 6 caracteres</small>
                 </div>
               </div>
             </form>
           </section>
-
           <div class="px-6 py-4 bg-white flex justify-end">
-            <button id="saveAddBtn" class="btn-save-user px-5 py-2 rounded-lg font-medium">Guardar Usuario</button>
+            <button id="saveAddBtn" class="btn-save-user px-5 py-2 rounded-lg font-medium">Guardar
+              Usuario</button>
           </div>
         </div>
       </div>
@@ -198,7 +181,6 @@
           </div>
         </div>
       </div>
-
       <!-- Modal para editar usuario -->
       <div id="editUserModal" class="fixed inset-0 z-50 bg-black bg-opacity-50 hidden items-center justify-center p-4">
         <div class="modal-content rounded-2xl shadow-2xl max-w-2xl w-full overflow-y-auto max-h-[90vh]">
@@ -213,64 +195,48 @@
             </h2>
             <button id="closeEditBtn" class="text-gray-500 hover:text-red-500 transition">✕</button>
           </div>
-
           <section class="p-6 space-y-6">
             <form id="editUserForm" class="space-y-4">
               <input type="hidden" id="edit_id_usuario" name="id_usuario">
-
               <div>
                 <label class="text-sm font-semibold">Nombres</label>
                 <input type="text" id="edit_nombres" name="nombres" class="w-full mt-1 border rounded-lg p-2"
                   placeholder="Ej: Iván Alejandro" required>
               </div>
-
               <div>
                 <label class="text-sm font-semibold">Apellidos</label>
                 <input type="text" id="edit_apellidos" name="apellidos" class="w-full mt-1 border rounded-lg p-2"
                   placeholder="Ej: Barrera Escalante" required>
               </div>
-
               <div>
                 <label class="text-sm font-semibold">Correo electrónico</label>
                 <input type="email" id="edit_email" name="email_institucional" class="w-full mt-1 border rounded-lg p-2"
                   placeholder="email@example.com" required>
               </div>
-
               <div class="flex gap-4">
                 <div class="w-1/2">
                   <label class="text-sm font-semibold">Teléfono</label>
                   <input type="text" id="edit_telefono" name="telefono" class="w-full mt-1 border rounded-lg p-2"
                     placeholder="12341234">
                 </div>
-                <div class="w-1/2">
-                  <label class="text-sm font-semibold">Departamento</label>
-                  <select id="edit_departamento" name="departamento" class="w-full mt-1 border rounded-lg p-2">
-                    <option>La Libertad</option>
-                    <option>Santa Ana</option>
-                    <option>San Miguel</option>
-                  </select>
-                </div>
               </div>
-
               <div class="flex gap-4">
                 <div class="w-1/2">
-                  <label class="text-sm font-semibold">Rol</label>
-                  <select id="edit_rol" name="rol" class="w-full mt-1 border rounded-lg p-2">
-                    <option value="Administrador">Administrador</option>
-                    <option value="Notario">Notario</option>
-                    <option value="Juez">Juez</option>
+                  <label class="text-sm font-semibold">Rol <span class="text-red-500">*</span></label>
+                  <select id="edit_rol" name="rol" class="w-full mt-1 border rounded-lg p-2" required>
+                    <option value="">Cargando roles...</option>
                   </select>
                 </div>
                 <div class="w-1/2">
                   <label class="text-sm font-semibold">Nueva Contraseña (opcional)</label>
                   <input type="password" id="edit_password" name="password" class="w-full mt-1 border rounded-lg p-2"
-                    placeholder="Dejar vacío si no se cambia">
-                  <small class="text-gray-500 text-xs">Solo completa si deseas cambiar la contraseña</small>
+                    placeholder="Dejar vacío si no se cambia" minlength="6">
+                  <small class="text-gray-500 text-xs">Solo completa si deseas cambiar la contraseña
+                    (mín. 6 caracteres)</small>
                 </div>
               </div>
             </form>
           </section>
-
           <div class="px-6 py-4 bg-white flex justify-end gap-3">
             <button id="cancelEditBtn"
               class="px-5 py-2 rounded-lg font-medium bg-gray-200 hover:bg-gray-300 transition">
@@ -285,7 +251,6 @@
     </main>
   </div>
   <script src="JS/usuarios.js"></script>
-
 </body>
 
 </html>

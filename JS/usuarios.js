@@ -1,8 +1,7 @@
 // USUARIOS.JS - Gestión de Usuarios (Solo Administradores)
 // ======================================
-// VERSION OPTIMIZADA CON SISTEMA DE MODALS MEJORADO
+// VERSION OPTIMIZADA CON SISTEMA DE MODALS MEJORADO Y CARGA DINÁMICA DE ROLES
 // ======================================
-
 // ======================================
 // PROTECCIÓN DE RUTA - SOLO ADMINISTRADORES
 // ======================================
@@ -15,46 +14,39 @@
     }
     console.log('✓ Acceso autorizado: Usuario Administrador');
 })();
-
 // ======================================
 // ELEMENTOS DEL DOM
 // ======================================
 const elementos = {
     // Botones principales
     openFormBtn: document.getElementById('openFormBtn'),
-
     // Modal Agregar
     addModal: document.getElementById('userFormModal'),
     closeAddBtn: document.getElementById('closeFormBtn'),
     saveAddBtn: document.getElementById('saveAddBtn'),
     addForm: document.getElementById('addUserForm'),
-
     // Modal Editar
     editModal: document.getElementById('editUserModal'),
     closeEditBtn: document.getElementById('closeEditBtn'),
     cancelEditBtn: document.getElementById('cancelEditBtn'),
     saveEditBtn: document.getElementById('saveEditBtn'),
     editForm: document.getElementById('editUserForm'),
-
     // Modal Detalles
     detailsModal: document.getElementById('viewDetailsModal'),
-
     // Tabs
     tabs: document.querySelectorAll('.browser-tab'),
-
     // Tablas
     tablaTodo: document.getElementById('tablaTodo'),
     tablaActivo: document.getElementById('tablaActivo'),
     tablaInactivo: document.getElementById('tablaInactivo')
 };
-
 // ======================================
 // ESTADO DE LA APLICACIÓN
 // ======================================
 let usuarios = [];
+let rolesDisponibles = []; // NUEVO: Almacena los roles disponibles
 let currentTab = 'Todo';
 let usuarioEnEdicion = null; // Usuario que se está editando
-
 // ======================================
 // CLASE MODAL MANAGER - Gestión centralizada de modals
 // ======================================
@@ -71,13 +63,11 @@ class ModalManager {
         modal.classList.remove('hidden');
         modal.classList.add('flex');
         document.body.style.overflow = 'hidden';
-
         // Agregar listener para cerrar al hacer clic fuera
         setTimeout(() => {
             modal.addEventListener('click', this.clickFueraHandler);
         }, 100);
     }
-
     /**
      * Cierra un modal específico
      * @param {HTMLElement} modal - Elemento del modal a cerrar
@@ -89,7 +79,6 @@ class ModalManager {
         document.body.style.overflow = 'auto';
         modal.removeEventListener('click', this.clickFueraHandler);
     }
-
     /**
      * Handler para cerrar modal al hacer clic fuera
      */
@@ -98,7 +87,6 @@ class ModalManager {
             ModalManager.cerrar(e.currentTarget);
         }
     }
-
     /**
      * Limpia un formulario
      * @param {HTMLFormElement} form - Formulario a limpiar
@@ -112,31 +100,77 @@ class ModalManager {
         }
     }
 }
-
+// ======================================
+// FUNCIONES DE ROLES - CARGA DINÁMICA
+// ======================================
+/**
+ * Carga los roles disponibles desde el backend
+ */
+async function cargarRoles() {
+    try {
+        rolesDisponibles = await auth.getRoles();
+        console.log(`✓ ${rolesDisponibles.length} roles cargados:`, rolesDisponibles);
+        return rolesDisponibles;
+    } catch (error) {
+        console.error('Error al cargar roles:', error);
+        mostrarError('No se pudieron cargar los roles disponibles');
+        return [];
+    }
+}
+/**
+ * Puebla un select con los roles disponibles
+ * @param {HTMLSelectElement} selectElement - Elemento select a poblar
+ * @param {string} selectedRol - Rol a seleccionar (opcional)
+ */
+function poblarSelectRoles(selectElement, selectedRol = null) {
+    if (!selectElement) {
+        console.error('Select element no encontrado');
+        return;
+    }
+    // Limpiar opciones existentes
+    selectElement.innerHTML = '';
+    // Agregar opción por defecto
+    const defaultOption = document.createElement('option');
+    defaultOption.value = '';
+    defaultOption.textContent = 'Seleccione un rol';
+    selectElement.appendChild(defaultOption);
+    // Agregar roles disponibles
+    rolesDisponibles.forEach(rol => {
+        const option = document.createElement('option');
+        option.value = rol.rol; // El nombre del rol (ej: "Administrador")
+        option.textContent = rol.rol;
+        // Seleccionar si coincide con el rol especificado
+        if (selectedRol && rol.rol.toLowerCase() === selectedRol.toLowerCase()) {
+            option.selected = true;
+        }
+        selectElement.appendChild(option);
+    });
+    console.log(`✓ Select poblado con ${rolesDisponibles.length} roles`);
+}
 // ======================================
 // EVENT LISTENERS - MODAL AGREGAR
 // ======================================
 if (elementos.openFormBtn) {
-    elementos.openFormBtn.addEventListener('click', () => {
+    elementos.openFormBtn.addEventListener('click', async () => {
         ModalManager.limpiarFormulario(elementos.addForm);
+        // Poblar select de roles
+        const selectRol = document.getElementById('add_rol');
+        poblarSelectRoles(selectRol);
         ModalManager.abrir(elementos.addModal);
     });
 }
-
 if (elementos.closeAddBtn) {
     elementos.closeAddBtn.addEventListener('click', () => {
         ModalManager.cerrar(elementos.addModal);
         ModalManager.limpiarFormulario(elementos.addForm);
     });
 }
-
 if (elementos.saveAddBtn) {
     elementos.saveAddBtn.addEventListener('click', async (e) => {
         e.preventDefault();
         await guardarNuevoUsuario();
     });
 }
-
 // ======================================
 // EVENT LISTENERS - MODAL EDITAR
 // ======================================
@@ -145,20 +179,17 @@ if (elementos.closeEditBtn) {
         cerrarModalEditar();
     });
 }
-
 if (elementos.cancelEditBtn) {
     elementos.cancelEditBtn.addEventListener('click', () => {
         cerrarModalEditar();
     });
 }
-
 if (elementos.saveEditBtn) {
     elementos.saveEditBtn.addEventListener('click', async (e) => {
         e.preventDefault();
         await guardarEdicionUsuario();
     });
 }
-
 // ======================================
 // EVENT LISTENERS - TABS
 // ======================================
@@ -168,10 +199,8 @@ elementos.tabs.forEach(tab => {
         switchTab(tabName);
     });
 });
-
 function switchTab(tabName) {
     currentTab = tabName;
-
     elementos.tabs.forEach(tab => {
         if (tab.getAttribute('data-tab') === tabName) {
             tab.classList.add('active');
@@ -179,7 +208,6 @@ function switchTab(tabName) {
             tab.classList.remove('active');
         }
     });
-
     document.querySelectorAll('.tab-content').forEach(content => {
         if (content.id === tabName) {
             content.classList.add('active');
@@ -187,14 +215,11 @@ function switchTab(tabName) {
             content.classList.remove('active');
         }
     });
-
     renderTabla(tabName);
 }
-
 // ======================================
 // FUNCIONES DE API - CRUD COMPLETO
 // ======================================
-
 /**
  * Obtiene todos los usuarios desde el backend
  */
@@ -202,7 +227,6 @@ async function fetchUsuarios() {
     try {
         mostrarCargando(true);
         const response = await axios.get('/usuarios');
-
         if (response.data.success) {
             usuarios = response.data.data;
             console.log(`✓ ${usuarios.length} usuarios cargados`);
@@ -221,7 +245,6 @@ async function fetchUsuarios() {
         mostrarCargando(false);
     }
 }
-
 /**
  * Guarda un nuevo usuario
  */
@@ -232,17 +255,18 @@ async function guardarNuevoUsuario() {
             elementos.addForm.reportValidity();
             return;
         }
-
+        // Validar que se haya seleccionado un rol
+        const rol = document.getElementById('add_rol').value;
+        if (!rol) {
+            mostrarError('Por favor selecciona un rol');
+            return;
+        }
         mostrarCargando(true);
-
         // Obtener datos del formulario
         const formData = new FormData(elementos.addForm);
         const datos = Object.fromEntries(formData.entries());
-
         console.log('Creando usuario:', datos);
-
         const response = await axios.post('/usuarios', datos);
-
         if (response.data.success) {
             mostrarExito('Usuario creado exitosamente');
             ModalManager.cerrar(elementos.addModal);
@@ -251,7 +275,6 @@ async function guardarNuevoUsuario() {
         }
     } catch (error) {
         console.error('Error al crear usuario:', error);
-
         if (error.response?.status === 422) {
             const errors = error.response.data.errors;
             const firstError = Object.values(errors)[0][0];
@@ -265,43 +288,36 @@ async function guardarNuevoUsuario() {
         mostrarCargando(false);
     }
 }
-
 /**
  * Abre el modal de edición y carga los datos del usuario
  * @param {number} idUsuario - ID del usuario a editar
  */
 async function abrirModalEditar(idUsuario) {
     const usuario = usuarios.find(u => u.id_usuario === idUsuario);
-
     if (!usuario) {
         mostrarError('Usuario no encontrado');
         return;
     }
-
     usuarioEnEdicion = usuario;
-
     // Rellenar formulario con datos del usuario
     document.getElementById('edit_id_usuario').value = usuario.id_usuario;
     document.getElementById('edit_nombres').value = usuario.nombres || '';
     document.getElementById('edit_apellidos').value = usuario.apellidos || '';
     document.getElementById('edit_email').value = usuario.email_institucional || '';
     document.getElementById('edit_telefono').value = usuario.telefono || '';
-
-    // Obtener rol principal
+    // Obtener rol principal del usuario
     const rolPrincipal = usuario.usuario_roles
         ?.find(ur => ur.estado === 'Activo')
-        ?.rol?.rol || 'Notario';
-    document.getElementById('edit_rol').value = rolPrincipal;
-
+        ?.rol?.rol || '';
+    // Poblar select de roles y seleccionar el rol actual
+    const selectRol = document.getElementById('edit_rol');
+    poblarSelectRoles(selectRol, rolPrincipal);
     // Limpiar campo de contraseña
     document.getElementById('edit_password').value = '';
-
     // Abrir modal
     ModalManager.abrir(elementos.editModal);
-
-    console.log('Modal de edición abierto para usuario:', usuario.nombres);
+    console.log('Modal de edición abierto para usuario:', usuario.nombres, 'con rol:', rolPrincipal);
 }
-
 /**
  * Cierra el modal de edición y limpia el formulario
  */
@@ -310,7 +326,6 @@ function cerrarModalEditar() {
     ModalManager.limpiarFormulario(elementos.editForm);
     usuarioEnEdicion = null;
 }
-
 /**
  * Guarda los cambios del usuario editado
  */
@@ -321,29 +336,27 @@ async function guardarEdicionUsuario() {
             elementos.editForm.reportValidity();
             return;
         }
-
         const idUsuario = document.getElementById('edit_id_usuario').value;
-
         if (!idUsuario) {
             mostrarError('Error: ID de usuario no válido');
             return;
         }
-
+        // Validar que se haya seleccionado un rol
+        const rol = document.getElementById('edit_rol').value;
+        if (!rol) {
+            mostrarError('Por favor selecciona un rol');
+            return;
+        }
         mostrarCargando(true);
-
         // Obtener datos del formulario
         const formData = new FormData(elementos.editForm);
         const datos = Object.fromEntries(formData.entries());
-
         // Si la contraseña está vacía, eliminarla del objeto
         if (!datos.password || datos.password.trim() === '') {
             delete datos.password;
         }
-
         console.log('Actualizando usuario:', idUsuario, datos);
-
         const response = await axios.put(`/usuarios/${idUsuario}`, datos);
-
         if (response.data.success) {
             mostrarExito('Usuario actualizado exitosamente');
             cerrarModalEditar();
@@ -351,7 +364,6 @@ async function guardarEdicionUsuario() {
         }
     } catch (error) {
         console.error('Error al actualizar usuario:', error);
-
         if (error.response?.status === 422) {
             const errors = error.response.data.errors;
             const firstError = Object.values(errors)[0][0];
@@ -367,34 +379,29 @@ async function guardarEdicionUsuario() {
         mostrarCargando(false);
     }
 }
-
 /**
- * Actualiza el estado de un usuario
+ * Actualiza el estado de un usuario (ACTUALIZADO CON PATCH)
  * @param {number} idUsuario - ID del usuario
  * @param {string} estadoActual - Estado actual del usuario
  */
 async function toggleEstado(idUsuario, estadoActual) {
     const nuevoEstado = estadoActual === 'Activo' ? 'Inactivo' : 'Activo';
     const accion = nuevoEstado === 'Activo' ? 'activar' : 'desactivar';
-
     if (!confirm(`¿Estás seguro de ${accion} este usuario?`)) {
         return;
     }
-
     try {
         mostrarCargando(true);
-
+        // ACTUALIZADO: Usar PATCH en lugar de POST
         const response = await axios.patch(`/usuarios/${idUsuario}/estado`, {
             estado: nuevoEstado
         });
-
         if (response.data.success) {
             mostrarExito(`Usuario ${nuevoEstado === 'Activo' ? 'activado' : 'desactivado'} exitosamente`);
             await fetchUsuarios();
         }
     } catch (error) {
         console.error('Error al cambiar estado:', error);
-
         if (error.response?.status === 403) {
             mostrarError('No tienes permisos para cambiar el estado de usuarios');
         } else {
@@ -404,11 +411,9 @@ async function toggleEstado(idUsuario, estadoActual) {
         mostrarCargando(false);
     }
 }
-
 // ======================================
 // FUNCIONES DE RENDERIZADO
 // ======================================
-
 /**
  * Renderiza la tabla según el filtro activo
  * @param {string} tabName - Nombre de la pestaña activa
@@ -416,7 +421,6 @@ async function toggleEstado(idUsuario, estadoActual) {
 function renderTabla(tabName) {
     let usuariosFiltrados = [];
     let tabla = null;
-
     switch (tabName) {
         case 'Todo':
             usuariosFiltrados = usuarios;
@@ -431,11 +435,8 @@ function renderTabla(tabName) {
             tabla = elementos.tablaInactivo;
             break;
     }
-
     if (!tabla) return;
-
     tabla.innerHTML = '';
-
     if (usuariosFiltrados.length === 0) {
         tabla.innerHTML = `
             <tr>
@@ -446,13 +447,11 @@ function renderTabla(tabName) {
         `;
         return;
     }
-
     usuariosFiltrados.forEach(usuario => {
         const row = crearFilaUsuario(usuario);
         tabla.appendChild(row);
     });
 }
-
 /**
  * Crea una fila de la tabla para un usuario
  * @param {Object} usuario - Datos del usuario
@@ -461,31 +460,27 @@ function renderTabla(tabName) {
 function crearFilaUsuario(usuario) {
     const tr = document.createElement('tr');
     tr.className = 'border-b border-gray-200 dark:border-gray-700 hover:bg-gradient-to-r hover:from-gray-50 hover:to-gray-50 dark:hover:from-gray-800 dark:hover:to-gray-700 transition-all duration-300';
-
     const rolPrincipal = usuario.usuario_roles
         ?.find(ur => ur.estado === 'Activo')
         ?.rol?.rol || 'Sin rol';
-
     // Clases CSS según ESTADO
     const estadoClasses = {
         'activo': 'bg-green-500 text-white',
         'inactivo': 'bg-red-600 text-white'
     };
     const estadoClass = estadoClasses[usuario.estado.toLowerCase()] || 'bg-gray-500 text-white';
-
     // Clases CSS según ROL
     const rolClasses = {
         'administrador': 'bg-red-500 text-white',
         'notario': 'bg-blue-500 text-white',
-        'juez': 'bg-purple-500 text-white'
+        'juez': 'bg-purple-500 text-white',
+        'colaborador': 'bg-yellow-500 text-white'
     };
     const rolClass = rolClasses[rolPrincipal.toLowerCase()] || 'bg-gray-500 text-white';
-
     // Botón toggle estado
     const esActivo = usuario.estado.toLowerCase() === 'activo';
     const botonTexto = esActivo ? 'Desactivar' : 'Activar';
     const botonColor = esActivo ? 'bg-red-500 hover:bg-red-600' : 'bg-green-500 hover:bg-green-600';
-
     tr.innerHTML = `
         <td class="px-6 py-4 text-gray-900 dark:text-white font-medium">${escapeHtml(usuario.nombres)}</td>
         <td class="px-6 py-4 whitespace-nowrap text-gray-900 dark:text-white">${escapeHtml(usuario.apellidos)}</td>
@@ -523,14 +518,11 @@ function crearFilaUsuario(usuario) {
             </div>
         </td>
     `;
-
     return tr;
 }
-
 // ======================================
 // FUNCIONES GLOBALES - Modal Detalles
 // ======================================
-
 /**
  * Muestra los detalles de un usuario
  * @param {number} idUsuario - ID del usuario
@@ -538,10 +530,8 @@ function crearFilaUsuario(usuario) {
 function verDetalles(idUsuario) {
     const usuario = usuarios.find(u => u.id_usuario === idUsuario);
     if (!usuario) return;
-
     const content = document.getElementById('detailsContent');
     const rolPrincipal = usuario.usuario_roles?.find(ur => ur.estado === 'Activo')?.rol?.rol || 'Sin rol';
-
     content.innerHTML = `
         <div class="text-center mb-4">
             <div class="w-20 h-20 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto text-2xl font-bold mb-2">
@@ -561,21 +551,17 @@ function verDetalles(idUsuario) {
             <p><strong class="text-gray-600">Creado:</strong> ${usuario.created_at ? new Date(usuario.created_at).toLocaleDateString() : 'N/A'}</p>
         </div>
     `;
-
     ModalManager.abrir(elementos.detailsModal);
 }
-
 /**
  * Cierra el modal de detalles
  */
 function closeDetailsModal() {
     ModalManager.cerrar(elementos.detailsModal);
 }
-
 // ======================================
 // FUNCIONES DE UTILIDAD
 // ======================================
-
 /**
  * Escapa HTML para prevenir XSS
  * @param {string} text - Texto a escapar
@@ -592,14 +578,12 @@ function escapeHtml(text) {
     };
     return text.toString().replace(/[&<>"']/g, m => map[m]);
 }
-
 /**
  * Muestra/oculta indicador de carga
  * @param {boolean} mostrar - Si debe mostrar el indicador
  */
 function mostrarCargando(mostrar) {
     document.body.style.cursor = mostrar ? 'wait' : 'default';
-
     // Deshabilitar botones durante la carga
     const botones = document.querySelectorAll('button');
     botones.forEach(btn => {
@@ -611,7 +595,6 @@ function mostrarCargando(mostrar) {
         }
     });
 }
-
 /**
  * Muestra mensaje de éxito
  * @param {string} mensaje - Mensaje a mostrar
@@ -621,7 +604,6 @@ function mostrarExito(mensaje) {
     alert('✓ ' + mensaje);
     // TODO: Implementar notificaciones con Toastify o SweetAlert2
 }
-
 /**
  * Muestra mensaje de error
  * @param {string} mensaje - Mensaje a mostrar
@@ -631,18 +613,14 @@ function mostrarError(mensaje) {
     alert('✕ ' + mensaje);
     // TODO: Implementar notificaciones con Toastify o SweetAlert2
 }
-
 // ======================================
 // INICIALIZACIÓN
 // ======================================
-
 document.addEventListener('DOMContentLoaded', async () => {
     console.log('Inicializando módulo de usuarios...');
-
     try {
         // Verificar permisos de administrador
         const isAdmin = await auth.isAdmin();
-
         if (!isAdmin) {
             console.error('No eres administrador');
             mostrarError('No tienes permisos para acceder a esta página');
@@ -651,18 +629,18 @@ document.addEventListener('DOMContentLoaded', async () => {
             }, 2000);
             return;
         }
-
+        // NUEVO: Cargar roles disponibles
+        await cargarRoles();
         // Cargar usuarios al inicio
         await fetchUsuarios();
-
         console.log('✓ Módulo de usuarios cargado correctamente');
         console.log('✓ Sistema de modals optimizado inicializado');
+        console.log('✓ Carga dinámica de roles habilitada');
     } catch (error) {
         console.error('Error al inicializar módulo de usuarios:', error);
         mostrarError('Error al inicializar la página');
     }
 });
-
 // Hacer funciones disponibles globalmente para onclick en HTML
 window.verDetalles = verDetalles;
 window.closeDetailsModal = closeDetailsModal;
