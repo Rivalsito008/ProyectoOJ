@@ -266,6 +266,47 @@ async function isAdmin() {
 function getSavedEmail() {
     return localStorage.getItem('sigen-email') || '';
 }
+
+// =============================
+// FUNCIONES DE PERMISOS
+// =============================
+/**
+ * Obtiene las páginas accesibles para el usuario actual
+ * @returns {Promise<Array>} Lista de páginas permitidas
+ */
+async function getAccessiblePages() {
+    try {
+        const response = await axios.get('/auth/permissions');
+        if (response.data.success) {
+            return response.data.data.pages || [];
+        }
+        return [];
+    } catch (error) {
+        console.error('Error al obtener permisos:', error);
+        return [];
+    }
+}
+
+/**
+ * Verifica si el usuario tiene acceso a una página específica
+ * @param {string} page - Nombre del archivo de la página (ej: 'usuarios.php')
+ * @returns {Promise<boolean>} True si tiene acceso, False si no
+ */
+async function hasPageAccess(page) {
+    try {
+        const pages = await getAccessiblePages();
+        // Si tiene wildcard (*), tiene acceso a todo
+        if (pages.includes('*')) {
+            return true;
+        }
+        // Verificar si la página está en la lista
+        return pages.includes(page);
+    } catch (error) {
+        console.error('Error al verificar acceso a página:', error);
+        return false;
+    }
+}
+
 // =============================
 // INTERCEPTOR DE AXIOS
 // =============================
@@ -337,6 +378,9 @@ window.auth = {
     hasRole,
     isAdmin,
     getRoles, // NUEVO: Obtener lista de roles disponibles
+    // Permisos
+    getAccessiblePages, // NUEVO: Obtener páginas accesibles
+    hasPageAccess, // NUEVO: Verificar acceso a página
     // Utilidades
     getSavedEmail
 };

@@ -62,8 +62,10 @@
                 <!-- Contraste -->
                 <div class="card rounded-xl p-6 shadow md:col-span-2">
                     <h2 class="text-xl font-semibold mb-4">Contraste</h2>
-                    <input id="contrastRange" type="range" min="0.8" max="1.6" step="0.1" value="1" class="w-full cursor-pointer">
-                    <p class="mt-2 text-sm">Nivel de contraste: <span id="contrastValue" class="font-semibold">1.0</span></p>
+                    <input id="contrastRange" type="range" min="0.8" max="1.6" step="0.1" value="1"
+                        class="w-full cursor-pointer">
+                    <p class="mt-2 text-sm">Nivel de contraste: <span id="contrastValue"
+                            class="font-semibold">1.0</span></p>
                 </div>
 
                 <!-- Cuenta -->
@@ -80,6 +82,25 @@
                             Activar verificación en dos pasos
                         </button>
                     </div>
+                </div>
+            </div>
+
+            <!-- Modal Editar Perfil -->
+            <div id="editProfileModal" class="modal hidden">
+                <div class="modal-content">
+                    <span class="close cursor-pointer">&times;</span>
+                    <h2>Editar Perfil</h2>
+                    <form id="editProfileForm">
+                        <label for="editNombre">Nombre:</label>
+                        <input type="text" id="editNombre">
+                        <label for="editApellido">Apellido:</label>
+                        <input type="text" id="editApellido">
+                        <label for="editEmail">Email:</label>
+                        <input type="email" id="editEmail">
+                        <label for="editTelefono">Teléfono:</label>
+                        <input type="tel" id="editTelefono">
+                        <button type="submit">Guardar Cambios</button>
+                    </form>
                 </div>
             </div>
         </main>

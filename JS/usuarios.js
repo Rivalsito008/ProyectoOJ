@@ -47,6 +47,8 @@ let usuarios = [];
 let rolesDisponibles = []; // NUEVO: Almacena los roles disponibles
 let currentTab = 'Todo';
 let usuarioEnEdicion = null; // Usuario que se está editando
+let datosOriginalesEdicion = {}; // NUEVO: Almacena los datos originales del formulario de edición
+let usuarioActualId = null; // NUEVO: ID del usuario que ha iniciado sesión
 // ======================================
 // CLASE MODAL MANAGER - Gestión centralizada de modals
 // ======================================
@@ -299,21 +301,44 @@ async function abrirModalEditar(idUsuario) {
         return;
     }
     usuarioEnEdicion = usuario;
+
+    // Obtener rol principal del usuario
+    const rolPrincipal = usuario.usuario_roles
+        ?.find(ur => ur.estado === 'Activo')
+        ?.rol?.rol || '';
+
     // Rellenar formulario con datos del usuario
     document.getElementById('edit_id_usuario').value = usuario.id_usuario;
     document.getElementById('edit_nombres').value = usuario.nombres || '';
     document.getElementById('edit_apellidos').value = usuario.apellidos || '';
     document.getElementById('edit_email').value = usuario.email_institucional || '';
     document.getElementById('edit_telefono').value = usuario.telefono || '';
-    // Obtener rol principal del usuario
-    const rolPrincipal = usuario.usuario_roles
-        ?.find(ur => ur.estado === 'Activo')
-        ?.rol?.rol || '';
+
     // Poblar select de roles y seleccionar el rol actual
     const selectRol = document.getElementById('edit_rol');
     poblarSelectRoles(selectRol, rolPrincipal);
+
     // Limpiar campo de contraseña
     document.getElementById('edit_password').value = '';
+
+    // NUEVO: Guardar datos originales para detectar cambios
+    datosOriginalesEdicion = {
+        nombres: usuario.nombres || '',
+        apellidos: usuario.apellidos || '',
+        email_institucional: usuario.email_institucional || '',
+        telefono: usuario.telefono || '',
+        rol: rolPrincipal,
+        password: ''
+    };
+
+    // NUEVO: Deshabilitar botón de guardar inicialmente
+    elementos.saveEditBtn.disabled = true;
+    elementos.saveEditBtn.style.opacity = '0.5';
+    elementos.saveEditBtn.style.cursor = 'not-allowed';
+
+    // NUEVO: Agregar listeners para detectar cambios
+    agregarListenersDeteccionCambios();
+
     // Abrir modal
     ModalManager.abrir(elementos.editModal);
     console.log('Modal de edición abierto para usuario:', usuario.nombres, 'con rol:', rolPrincipal);
@@ -325,6 +350,10 @@ function cerrarModalEditar() {
     ModalManager.cerrar(elementos.editModal);
     ModalManager.limpiarFormulario(elementos.editForm);
     usuarioEnEdicion = null;
+    datosOriginalesEdicion = {};
+
+    // NUEVO: Remover listeners de detección de cambios
+    removerListenersDeteccionCambios();
 }
 /**
  * Guarda los cambios del usuario editado
@@ -387,7 +416,21 @@ async function guardarEdicionUsuario() {
 async function toggleEstado(idUsuario, estadoActual) {
     const nuevoEstado = estadoActual === 'Activo' ? 'Inactivo' : 'Activo';
     const accion = nuevoEstado === 'Activo' ? 'activar' : 'desactivar';
-    if (!confirm(`¿Estás seguro de ${accion} este usuario?`)) {
+
+    // Confirmación con SweetAlert2
+    const result = await Swal.fire({
+        title: '¿Estás seguro?',
+        text: `¿Deseas ${accion} este usuario?`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: nuevoEstado === 'Activo' ? '#10b981' : '#ef4444',
+        cancelButtonColor: '#6b7280',
+        confirmButtonText: `Sí, ${accion}`,
+        cancelButtonText: 'Cancelar',
+        reverseButtons: true
+    });
+
+    if (!result.isConfirmed) {
         return;
     }
     try {
@@ -421,17 +464,21 @@ async function toggleEstado(idUsuario, estadoActual) {
 function renderTabla(tabName) {
     let usuariosFiltrados = [];
     let tabla = null;
+
+    // NUEVO: Filtrar el usuario actual (sesión activa)
+    const usuariosSinActual = usuarios.filter(u => u.id_usuario !== usuarioActualId);
+
     switch (tabName) {
         case 'Todo':
-            usuariosFiltrados = usuarios;
+            usuariosFiltrados = usuariosSinActual;
             tabla = elementos.tablaTodo;
             break;
         case 'activo':
-            usuariosFiltrados = usuarios.filter(u => u.estado === 'Activo');
+            usuariosFiltrados = usuariosSinActual.filter(u => u.estado === 'Activo');
             tabla = elementos.tablaActivo;
             break;
         case 'inactivo':
-            usuariosFiltrados = usuarios.filter(u => u.estado === 'Inactivo');
+            usuariosFiltrados = usuariosSinActual.filter(u => u.estado === 'Inactivo');
             tabla = elementos.tablaInactivo;
             break;
     }
@@ -560,6 +607,85 @@ function closeDetailsModal() {
     ModalManager.cerrar(elementos.detailsModal);
 }
 // ======================================
+// FUNCIONES DE DETECCIÓN DE CAMBIOS - MODAL EDITAR
+// ======================================
+/**
+ * Agrega listeners a los campos del formulario de edición para detectar cambios
+ */
+function agregarListenersDeteccionCambios() {
+    const campos = [
+        document.getElementById('edit_nombres'),
+        document.getElementById('edit_apellidos'),
+        document.getElementById('edit_email'),
+        document.getElementById('edit_telefono'),
+        document.getElementById('edit_rol'),
+        document.getElementById('edit_password')
+    ];
+
+    campos.forEach(campo => {
+        if (campo) {
+            campo.addEventListener('input', verificarCambiosFormulario);
+            campo.addEventListener('change', verificarCambiosFormulario);
+        }
+    });
+}
+
+/**
+ * Remueve los listeners de detección de cambios
+ */
+function removerListenersDeteccionCambios() {
+    const campos = [
+        document.getElementById('edit_nombres'),
+        document.getElementById('edit_apellidos'),
+        document.getElementById('edit_email'),
+        document.getElementById('edit_telefono'),
+        document.getElementById('edit_rol'),
+        document.getElementById('edit_password')
+    ];
+
+    campos.forEach(campo => {
+        if (campo) {
+            campo.removeEventListener('input', verificarCambiosFormulario);
+            campo.removeEventListener('change', verificarCambiosFormulario);
+        }
+    });
+}
+
+/**
+ * Verifica si hay cambios en el formulario de edición
+ */
+function verificarCambiosFormulario() {
+    const datosActuales = {
+        nombres: document.getElementById('edit_nombres').value || '',
+        apellidos: document.getElementById('edit_apellidos').value || '',
+        email_institucional: document.getElementById('edit_email').value || '',
+        telefono: document.getElementById('edit_telefono').value || '',
+        rol: document.getElementById('edit_rol').value || '',
+        password: document.getElementById('edit_password').value || ''
+    };
+
+    // Verificar si hay algún cambio
+    const hayCambios =
+        datosActuales.nombres !== datosOriginalesEdicion.nombres ||
+        datosActuales.apellidos !== datosOriginalesEdicion.apellidos ||
+        datosActuales.email_institucional !== datosOriginalesEdicion.email_institucional ||
+        datosActuales.telefono !== datosOriginalesEdicion.telefono ||
+        datosActuales.rol !== datosOriginalesEdicion.rol ||
+        datosActuales.password !== datosOriginalesEdicion.password;
+
+    // Habilitar/deshabilitar botón según haya cambios
+    if (hayCambios) {
+        elementos.saveEditBtn.disabled = false;
+        elementos.saveEditBtn.style.opacity = '1';
+        elementos.saveEditBtn.style.cursor = 'pointer';
+    } else {
+        elementos.saveEditBtn.disabled = true;
+        elementos.saveEditBtn.style.opacity = '0.5';
+        elementos.saveEditBtn.style.cursor = 'not-allowed';
+    }
+}
+
+// ======================================
 // FUNCIONES DE UTILIDAD
 // ======================================
 /**
@@ -601,8 +727,14 @@ function mostrarCargando(mostrar) {
  */
 function mostrarExito(mensaje) {
     console.log('✓ ' + mensaje);
-    alert('✓ ' + mensaje);
-    // TODO: Implementar notificaciones con Toastify o SweetAlert2
+    Swal.fire({
+        icon: 'success',
+        title: '¡Éxito!',
+        text: mensaje,
+        confirmButtonColor: '#10b981',
+        timer: 3000,
+        timerProgressBar: true
+    });
 }
 /**
  * Muestra mensaje de error
@@ -610,8 +742,12 @@ function mostrarExito(mensaje) {
  */
 function mostrarError(mensaje) {
     console.error('✕ ' + mensaje);
-    alert('✕ ' + mensaje);
-    // TODO: Implementar notificaciones con Toastify o SweetAlert2
+    Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: mensaje,
+        confirmButtonColor: '#ef4444'
+    });
 }
 // ======================================
 // INICIALIZACIÓN
@@ -629,6 +765,14 @@ document.addEventListener('DOMContentLoaded', async () => {
             }, 2000);
             return;
         }
+
+        // NUEVO: Obtener ID del usuario actual (sesión activa)
+        const usuarioActual = await auth.getUserData(true);
+        if (usuarioActual) {
+            usuarioActualId = usuarioActual.id_usuario;
+            console.log('✓ Usuario actual identificado:', usuarioActual.nombres, '(ID:', usuarioActualId, ')');
+        }
+
         // NUEVO: Cargar roles disponibles
         await cargarRoles();
         // Cargar usuarios al inicio
@@ -636,6 +780,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         console.log('✓ Módulo de usuarios cargado correctamente');
         console.log('✓ Sistema de modals optimizado inicializado');
         console.log('✓ Carga dinámica de roles habilitada');
+        console.log('✓ Sistema de detección de cambios habilitado');
+        console.log('✓ Filtrado de usuario actual habilitado');
     } catch (error) {
         console.error('Error al inicializar módulo de usuarios:', error);
         mostrarError('Error al inicializar la página');
