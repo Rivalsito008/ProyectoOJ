@@ -44,11 +44,11 @@ const elementos = {
 // ESTADO DE LA APLICACIÓN
 // ======================================
 let usuarios = [];
-let rolesDisponibles = []; // NUEVO: Almacena los roles disponibles
+let rolesDisponibles = []; // Almacena los roles disponibles
 let currentTab = 'Todo';
 let usuarioEnEdicion = null; // Usuario que se está editando
-let datosOriginalesEdicion = {}; // NUEVO: Almacena los datos originales del formulario de edición
-let usuarioActualId = null; // NUEVO: ID del usuario que ha iniciado sesión
+let datosOriginalesEdicion = {}; // Almacena los datos originales del formulario de edición
+let usuarioActualId = null; // ID del usuario que ha iniciado sesión
 // ======================================
 // CLASE MODAL MANAGER - Gestión centralizada de modals
 // ======================================
@@ -227,12 +227,13 @@ function switchTab(tabName) {
  */
 async function fetchUsuarios() {
     try {
-        mostrarCargando(true);
+        mostrarCargandoDatos('Cargando usuarios...');
         const response = await axios.get('/usuarios');
         if (response.data.success) {
             usuarios = response.data.data;
             console.log(`✓ ${usuarios.length} usuarios cargados`);
             renderTabla(currentTab);
+            cerrarCargando();
         } else {
             mostrarError('No se pudieron cargar los usuarios');
         }
@@ -244,7 +245,7 @@ async function fetchUsuarios() {
             mostrarError('Error al cargar la lista de usuarios');
         }
     } finally {
-        mostrarCargando(false);
+        cerrarCargando();
     }
 }
 /**
@@ -721,6 +722,26 @@ function mostrarCargando(mostrar) {
         }
     });
 }
+
+/**
+ * Muestra/oculta indicador de carga
+ * @param {string} mensaje - Mensaje a mostrar al inicio de carga de usuarios
+ */
+function mostrarCargandoDatos(mensaje = 'Cargando...') {
+    Swal.fire({
+        title: mensaje,
+        allowOutsideClick: false,
+        showConfirmButton: false,
+        didOpen: () => {
+            Swal.showLoading();
+        }
+    });
+}
+
+function cerrarCargando() {
+    Swal.close();
+}
+
 /**
  * Muestra mensaje de éxito
  * @param {string} mensaje - Mensaje a mostrar

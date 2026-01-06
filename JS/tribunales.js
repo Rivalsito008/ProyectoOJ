@@ -1,22 +1,17 @@
-// Configuración de Axios
-const API_BASE_URL = 'http://localhost:8000/api';
 
-const api = axios.create({
-    baseURL: API_BASE_URL,
-    headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
-    }
-});
+// PROTECCION DE RUTA - SOLO ADMINS
+(async function () {
+    console.log();
+    const hasPermission = await auth.requireRole(['admin', 'juez'], 'inicio.php');
 
-// Manejo global de errores
-api.interceptors.response.use(
-    response => response,
-    error => {
-        console.error('Error de API:', error.response?.data || error.message);
-        return Promise.reject(error);
+    if (!hasPermission) {
+        console.error('Acceso denegado: No tienes permisos de administrador');
+        return;
     }
-);
+
+    console.log('✓ Acceso autorizado');
+})();
+
 
 // Aplicar tema y preferencias al cargar
 (function () {
@@ -38,6 +33,7 @@ api.interceptors.response.use(
 let tiposTribunal = [];
 let numeracionesTribunal = [];
 let departamentosData = [];
+let materiaTribunal = [];
 
 // Variables globales para modo edición
 let modoEdicion = false;
@@ -64,7 +60,7 @@ document.addEventListener('DOMContentLoaded', async function () {
         await cargarTodasLasTablas();
         inicializarModal();
         inicializarTabs();
-        
+
         // Cerrar el SweetAlert cuando todo haya cargado
         Swal.close();
     } catch (error) {
@@ -90,17 +86,17 @@ document.addEventListener('DOMContentLoaded', async function () {
             abrirModalCrear();
         });
     }
-    
+
     // Botón para GUARDAR/ACTUALIZAR
     const btnGuardar = document.querySelector('.btn-save-tribu');
     if (btnGuardar) {
         btnGuardar.replaceWith(btnGuardar.cloneNode(true));
         const newBtnGuardar = document.querySelector('.btn-save-tribu');
-        newBtnGuardar.addEventListener('click', async function(e) {
+        newBtnGuardar.addEventListener('click', async function (e) {
             e.preventDefault();
-            
+
             if (this.disabled) return;
-            
+
             await guardarOActualizarTribunal();
         });
     }
@@ -125,7 +121,7 @@ async function cargarTablaPorEstado(estado) {
 
     try {
         const response = await api.get('/tribunales');
-        
+
         let tribunales = [];
         if (response.data && response.data.data) {
             tribunales = response.data.data;
@@ -163,7 +159,7 @@ async function cargarTablaPorEstado(estado) {
         tribunalesFiltrados.forEach(t => {
             const tr = document.createElement("tr");
             tr.className = "border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors";
-            
+
             // Funciones helper
             const getTipo = () => {
                 if (t.tipo_tribunal) {
@@ -210,7 +206,7 @@ async function cargarTablaPorEstado(estado) {
             const estadoTribunal = t.estado || 'Activo';
             const estadoNormalizado = estadoTribunal.trim().toLowerCase();
             const esActivo = estadoNormalizado === 'activo';
-            
+
             const textoBoton = esActivo ? 'Desactivar' : 'Activar';
             const colorBoton = esActivo ? 'bg-red-500 hover:bg-red-600' : 'bg-green-500 hover:bg-green-600';
 
@@ -245,7 +241,7 @@ async function cargarTablaPorEstado(estado) {
     } catch (error) {
         let mensajeError = 'Error desconocido';
         let mostrarSweetAlert = false;
-        
+
         if (error.response) {
             mensajeError = `Error ${error.response.status}: ${error.response.data.message || 'Error del servidor'}`;
         } else if (error.request) {
@@ -255,7 +251,7 @@ async function cargarTablaPorEstado(estado) {
         } else {
             mensajeError = error.message;
         }
-        
+
         // Mostrar error en la tabla
         tbody.innerHTML = `
             <tr>
@@ -264,7 +260,7 @@ async function cargarTablaPorEstado(estado) {
                 </td>
             </tr>
         `;
-        
+
         // Mostrar SweetAlert para errores de conexión
         if (mostrarSweetAlert) {
             Swal.fire({
@@ -311,7 +307,7 @@ function abrirModalCrear() {
     modoEdicion = false;
     tribunalEnEdicion = null;
     limpiarFormulario();
-    
+
     const modalTitle = document.querySelector('.modal-header h2');
     if (modalTitle) {
         modalTitle.innerHTML = `
@@ -323,7 +319,7 @@ function abrirModalCrear() {
         `;
     }
     document.querySelector('.btn-save-tribu').textContent = 'Guardar Tribunal';
-    
+
     const modal = document.getElementById('userFormModal');
     modal.classList.remove('hidden');
     modal.classList.add('flex');
@@ -332,12 +328,12 @@ function abrirModalCrear() {
 async function abrirModalEditar(idTribunal) {
     modoEdicion = true;
     tribunalEnEdicion = idTribunal;
-    
+
     try {
         const modal = document.getElementById('userFormModal');
         modal.classList.remove('hidden');
         modal.classList.add('flex');
-        
+
         const modalTitle = document.querySelector('.modal-header h2');
         if (modalTitle) {
             modalTitle.innerHTML = `
@@ -349,12 +345,12 @@ async function abrirModalEditar(idTribunal) {
             `;
         }
         document.querySelector('.btn-save-tribu').textContent = 'Actualizar Tribunal';
-        
+
         const response = await api.get(`/tribunales/${idTribunal}`);
         const tribunal = response.data.data || response.data;
-        
+
         await llenarFormularioEdicion(tribunal);
-        
+
     } catch (error) {
         Swal.fire({
             icon: 'error',
@@ -370,7 +366,7 @@ function cerrarModal() {
     const modal = document.getElementById('userFormModal');
     modal.classList.add('hidden');
     modal.classList.remove('flex');
-    
+
     modoEdicion = false;
     tribunalEnEdicion = null;
     limpiarFormulario();
@@ -380,29 +376,29 @@ async function llenarFormularioEdicion(tribunal) {
     document.getElementById('nombreTribunal').value = tribunal.tribunal || '';
     document.getElementById('direccion').value = tribunal.direccion || '';
     document.getElementById('estado').value = tribunal.estado || 'Activo';
-    
+
     if (tribunal.tipo_tribunal) {
         document.getElementById('tipoTribunal').value = tribunal.tipo_tribunal.id;
-        
+
         const event = new Event('change');
         document.getElementById('tipoTribunal').dispatchEvent(event);
     }
-    
+
     if (tribunal.numeracion_tribunal) {
         document.getElementById('numeracion').value = tribunal.numeracion_tribunal.id;
     }
-    
+
     if (tribunal.distrito && tribunal.distrito.municipio && tribunal.distrito.municipio.departamento) {
         const departamentoId = tribunal.distrito.municipio.departamento.id;
         const municipioId = tribunal.distrito.municipio.id;
         const distritoId = tribunal.distrito.id;
-        
+
         document.getElementById('departamento').value = departamentoId;
-        
+
         await cargarMunicipiosPorDepartamento(departamentoId);
         await new Promise(resolve => setTimeout(resolve, 100));
         document.getElementById('municipio').value = municipioId;
-        
+
         await cargarDistritosPorMunicipio(municipioId);
         await new Promise(resolve => setTimeout(resolve, 100));
         document.getElementById('distrito').value = distritoId;
@@ -420,7 +416,7 @@ function limpiarFormulario() {
     document.getElementById('distrito').innerHTML = '<option value="">Seleccione un municipio primero...</option>';
     document.getElementById('direccion').value = '';
     document.getElementById('estado').value = 'Activo';
-    
+
     const materiaSelect = document.getElementById('materia');
     if (materiaSelect) {
         materiaSelect.innerHTML = '<option value="">Seleccione tipo primero...</option>';
@@ -479,14 +475,14 @@ function agregarEventListenersABotones() {
     botonesEditar.forEach(boton => {
         boton.addEventListener('click', function (e) {
             e.preventDefault();
-            
+
             this.style.transform = 'scale(0.95)';
             setTimeout(() => {
                 this.style.transform = 'scale(1)';
             }, 150);
-            
+
             const idTribunal = this.closest('tr').querySelector('.action-btn-toggle-estado').getAttribute('data-id');
-            
+
             abrirModalEditar(idTribunal);
         });
     });
@@ -498,14 +494,14 @@ function agregarEventListenersABotones() {
             const idTribunal = this.getAttribute('data-id');
             const estadoActual = this.getAttribute('data-estado');
             const nombreTribunal = this.getAttribute('data-nombre');
-            
+
             this.style.transform = 'scale(0.95)';
             setTimeout(() => {
                 this.style.transform = 'scale(1)';
             }, 150);
 
             const esActivo = estadoActual === 'Activo';
-            
+
             const result = await Swal.fire({
                 title: esActivo ? '¿Desactivar tribunal?' : '¿Activar tribunal?',
                 html: `¿Estás seguro de que quieres <strong>${esActivo ? 'DESACTIVAR' : 'ACTIVAR'}</strong> el tribunal<br><strong>"${nombreTribunal}"</strong>?`,
@@ -517,17 +513,17 @@ function agregarEventListenersABotones() {
                 cancelButtonText: 'Cancelar',
                 reverseButtons: true
             });
-            
+
             if (result.isConfirmed) {
                 try {
                     this.textContent = 'Cambiando...';
                     this.disabled = true;
-                    
+
                     const resultado = await toggleEstadoTribunal(idTribunal);
                     const nuevoEstado = resultado.data?.estado || (estadoActual === 'Activo' ? 'Inactivo' : 'Activo');
-                    
+
                     this.setAttribute('data-estado', nuevoEstado);
-                    
+
                     if (nuevoEstado === 'Inactivo') {
                         this.classList.remove('bg-red-500', 'hover:bg-red-600');
                         this.classList.add('bg-green-500', 'hover:bg-green-600');
@@ -537,9 +533,9 @@ function agregarEventListenersABotones() {
                         this.classList.add('bg-red-500', 'hover:bg-red-600');
                         this.textContent = 'Desactivar';
                     }
-                    
+
                     this.disabled = false;
-                    
+
                     await Swal.fire({
                         icon: 'success',
                         title: '¡Estado actualizado!',
@@ -547,7 +543,7 @@ function agregarEventListenersABotones() {
                         timer: 2000,
                         showConfirmButton: false
                     });
-                    
+
                     const tabActivo = document.querySelector('.browser-tab.active');
                     if (tabActivo) {
                         const tabName = tabActivo.getAttribute('data-tab');
@@ -555,7 +551,7 @@ function agregarEventListenersABotones() {
                             await cargarTablaPorEstado(tabName.toLowerCase());
                         }
                     }
-                    
+
                 } catch (error) {
                     await Swal.fire({
                         icon: 'error',
@@ -563,7 +559,7 @@ function agregarEventListenersABotones() {
                         text: error.response?.data?.message || 'No se pudo cambiar el estado del tribunal',
                         confirmButtonColor: '#3B82F6'
                     });
-                    
+
                     this.disabled = false;
                     this.textContent = estadoActual === 'Activo' ? 'Desactivar' : 'Activar';
                 }
@@ -577,11 +573,11 @@ function agregarEventListenersABotones() {
 // ============================================
 async function guardarOActualizarTribunal() {
     const botonGuardar = document.querySelector('.btn-save-tribu');
-    
+
     if (botonGuardar.disabled) {
         return;
     }
-    
+
     const tribunalData = {
         tribunal: document.getElementById('nombreTribunal').value.trim(),
         direccion: document.getElementById('direccion').value.trim(),
@@ -591,7 +587,7 @@ async function guardarOActualizarTribunal() {
         estado: document.getElementById('estado').value
     };
 
-    if (!tribunalData.tribunal || !tribunalData.direccion || 
+    if (!tribunalData.tribunal || !tribunalData.direccion ||
         !tribunalData.id_tipo_tribunal || !tribunalData.id_distrito) {
         await Swal.fire({
             icon: 'warning',
@@ -608,7 +604,7 @@ async function guardarOActualizarTribunal() {
         botonGuardar.disabled = true;
 
         let resultado;
-        
+
         if (modoEdicion && tribunalEnEdicion) {
             resultado = await actualizarTribunal(tribunalEnEdicion, tribunalData);
             await Swal.fire({
@@ -628,9 +624,9 @@ async function guardarOActualizarTribunal() {
                 showConfirmButton: false
             });
         }
-        
+
         cerrarModal();
-        
+
         const tabActivo = document.querySelector('.browser-tab.active');
         if (tabActivo) {
             const tabName = tabActivo.getAttribute('data-tab');
@@ -638,7 +634,7 @@ async function guardarOActualizarTribunal() {
         } else {
             await cargarTablaPorEstado('todo');
         }
-        
+
     } catch (error) {
         const errorMessage = error.response?.data?.message || error.message || 'Error desconocido';
         await Swal.fire({
@@ -687,7 +683,7 @@ async function cargarSelectsConDatosReales() {
     try {
         const responseTipos = await api.get('/tipos-tribunal');
         tiposTribunal = responseTipos.data.data || responseTipos.data;
-        
+
         const tipoSelect = document.getElementById('tipoTribunal');
         tipoSelect.innerHTML = '<option value="">Seleccione un tipo...</option>';
         tiposTribunal.forEach(tipo => {
@@ -696,7 +692,7 @@ async function cargarSelectsConDatosReales() {
 
         const responseNumeraciones = await api.get('/numeraciones-tribunal');
         numeracionesTribunal = responseNumeraciones.data.data || responseNumeraciones.data;
-        
+
         const numeracionSelect = document.getElementById('numeracion');
         numeracionSelect.innerHTML = '<option value="">Seleccione numeración...</option>';
         numeracionSelect.innerHTML += '<option value="">Sin numeración</option>';
@@ -706,7 +702,7 @@ async function cargarSelectsConDatosReales() {
 
         const responseDepartamentos = await api.get('/departamentos');
         departamentosData = responseDepartamentos.data.data || responseDepartamentos.data;
-        
+
         const departamentoSelect = document.getElementById('departamento');
         departamentoSelect.innerHTML = '<option value="">Seleccione un departamento...</option>';
         departamentosData.forEach(depto => {
@@ -726,20 +722,20 @@ function configurarSelectsDependientes() {
     const distritoSelect = document.getElementById('distrito');
 
     if (departamentoSelect) {
-        departamentoSelect.addEventListener('change', async function() {
+        departamentoSelect.addEventListener('change', async function () {
             const idDepartamento = this.value;
-            
+
             municipioSelect.innerHTML = '<option value="">Seleccione municipio...</option>';
             distritoSelect.innerHTML = '<option value="">Seleccione distrito...</option>';
             municipioSelect.value = '';
             distritoSelect.value = '';
-            
+
             if (idDepartamento) {
                 municipioSelect.innerHTML = '<option value="">Cargando municipios...</option>';
                 municipioSelect.disabled = true;
-                
+
                 await cargarMunicipiosPorDepartamento(idDepartamento);
-                
+
                 municipioSelect.disabled = false;
             } else {
                 municipioSelect.disabled = false;
@@ -748,18 +744,18 @@ function configurarSelectsDependientes() {
     }
 
     if (municipioSelect) {
-        municipioSelect.addEventListener('change', async function() {
+        municipioSelect.addEventListener('change', async function () {
             const idMunicipio = this.value;
-            
+
             distritoSelect.innerHTML = '<option value="">Seleccione distrito...</option>';
             distritoSelect.value = '';
-            
+
             if (idMunicipio) {
                 distritoSelect.innerHTML = '<option value="">Cargando distritos...</option>';
                 distritoSelect.disabled = true;
-                
+
                 await cargarDistritosPorMunicipio(idMunicipio);
-                
+
                 distritoSelect.disabled = false;
             } else {
                 distritoSelect.disabled = false;
@@ -769,12 +765,12 @@ function configurarSelectsDependientes() {
 
     const tipoTribunalSelect = document.getElementById('tipoTribunal');
     const materiaSelect = document.getElementById('materia');
-    
+
     if (tipoTribunalSelect && materiaSelect) {
-        tipoTribunalSelect.addEventListener('change', function() {
+        tipoTribunalSelect.addEventListener('change', function () {
             const tipoId = this.value;
             const tipo = tiposTribunal.find(t => t.id_tipo_tribunal == tipoId);
-            
+
             materiaSelect.innerHTML = '';
             if (tipo && tipo.materia) {
                 materiaSelect.innerHTML = `<option value="${tipo.materia.id_materia}">${tipo.materia.materia}</option>`;
@@ -789,10 +785,10 @@ async function cargarMunicipiosPorDepartamento(idDepartamento) {
     try {
         const response = await api.get(`/municipios?departamento_id=${idDepartamento}`);
         const municipios = response.data.data || response.data;
-        
+
         const municipioSelect = document.getElementById('municipio');
         municipioSelect.innerHTML = '<option value="">Seleccione municipio...</option>';
-        
+
         if (municipios && municipios.length > 0) {
             municipios.forEach(municipio => {
                 const option = document.createElement('option');
@@ -814,10 +810,10 @@ async function cargarDistritosPorMunicipio(idMunicipio) {
     try {
         const response = await api.get(`/distritos?municipio_id=${idMunicipio}`);
         const distritos = response.data.data || response.data;
-        
+
         const distritoSelect = document.getElementById('distrito');
         distritoSelect.innerHTML = '<option value="">Seleccione distrito...</option>';
-        
+
         if (distritos && distritos.length > 0) {
             distritos.forEach(distrito => {
                 const option = document.createElement('option');

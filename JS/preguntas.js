@@ -1,16 +1,15 @@
-// -------------------------------
-// CONFIGURACIÓN DE AXIOS - VERSIÓN MEJORADA
-// -------------------------------
-const API_BASE_URL = 'http://localhost:8000/api';
+// PROTECCION DE RUTA - SOLO ADMINS
+(async function () {
+    console.log();
+    const hasPermission = await auth.requireRole(['admin', 'colaborador'], 'inicio.php');
 
-// Crear instancia de Axios con configuración específica
-const api = axios.create({
-    baseURL: API_BASE_URL,
-    headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
+    if (!hasPermission) {
+        console.error('Acceso denegado: No tienes permisos de administrador');
+        return;
     }
-});
+
+    console.log('✓ Acceso autorizado');
+})();
 
 // Interceptor para requests
 api.interceptors.request.use(
@@ -20,7 +19,7 @@ api.interceptors.request.use(
         if (token) {
             config.headers.Authorization = `Bearer ${token}`;
         }
-        
+
         // Agregar timestamp para evitar cache en GET
         if (config.method === 'get') {
             config.params = {
@@ -28,7 +27,7 @@ api.interceptors.request.use(
                 _t: Date.now()
             };
         }
-        
+
         console.log(`[${config.method?.toUpperCase()}] ${config.url}`);
         return config;
     },
@@ -46,48 +45,48 @@ api.interceptors.response.use(
     },
     error => {
         const { response } = error;
-        
+
         if (!response) {
             console.error('Error de red/conexion');
             mostrarError('No hay conexión con el servidor. Verifica tu internet.');
             return Promise.reject(error);
         }
-        
+
         const { status, data } = response;
-        
+
         // Manejo específico de errores HTTP
         switch (status) {
             case 401:
                 console.error('No autorizado - Token expirado o invalido');
                 mostrarError('Tu sesión ha expirado. Por favor, inicia sesión nuevamente.');
                 break;
-                
+
             case 403:
                 console.error('Acceso prohibido');
                 mostrarError('No tienes permisos para realizar esta acción.');
                 break;
-                
+
             case 404:
                 console.error('Recurso no encontrado');
                 mostrarError('El recurso solicitado no existe.');
                 break;
-                
+
             case 422:
                 console.error('Error de validacion:', data.errors);
                 const errores = Object.values(data.errors || {}).flat().join('\n');
                 mostrarError('Errores de validación:\n' + errores);
                 break;
-                
+
             case 500:
                 console.error('Error interno del servidor');
                 mostrarError('Error interno del servidor. Por favor, intenta más tarde.');
                 break;
-                
+
             default:
                 console.error(`Error ${status}:`, data);
                 mostrarError(data?.message || `Error ${status}: ${data?.error || 'Error desconocido'}`);
         }
-        
+
         return Promise.reject(error);
     }
 );
@@ -149,15 +148,15 @@ function cerrarCargando() {
 async function cargarDatosIniciales() {
     try {
         console.log('Cargando datos iniciales...');
-        
+
         // Cargar niveles de riesgo y ámbitos desde API si existen endpoints
         // Por ahora usamos valores estáticos que coinciden con tu BD
         await cargarNivelesRiesgo();
         await cargarAmbitos();
-        
+
         // Cargar preguntas
         await cargarPreguntasDesdeAPI();
-        
+
         console.log('Datos iniciales cargados correctamente');
     } catch (error) {
         console.error('Error al cargar datos iniciales:', error);
@@ -176,7 +175,7 @@ async function cargarNivelesRiesgo() {
             'extremo': { id: 4, nombre: 'Extremo', valor_puntaje: 4 },
             'activadora': { id: 5, nombre: 'Activadora', valor_puntaje: 100 }
         };
-        
+
         console.log('Niveles de riesgo cargados:', nivelesRiesgoMap);
     } catch (error) {
         console.error('Error al cargar niveles de riesgo:', error);
@@ -195,7 +194,7 @@ async function cargarAmbitos() {
             'Vulnerabilidad de Víctima': 4,
             'Riesgos de la Víctima': 5
         };
-        
+
         console.log('Ambitos cargados:', ambitosMap);
     } catch (error) {
         console.error('Error al cargar ambitos:', error);
@@ -207,16 +206,16 @@ async function cargarPreguntasDesdeAPI() {
     try {
         console.log('Cargando preguntas desde API...');
         mostrarCargando('Cargando preguntas...');
-        
+
         const response = await api.get('/preguntas');
         preguntas = response.data.data || response.data;
-        
+
         console.log(`${preguntas.length} preguntas cargadas`);
         console.log('Muestra de pregunta:', preguntas[0]);
-        
+
         // Actualizar todas las tablas
         cargarTodasLasTablas();
-        
+
         cerrarCargando();
         return preguntas;
     } catch (error) {
@@ -308,7 +307,7 @@ function cargarTablaPorNivel(nivel) {
         // Determinar estado actual y clase para badge de estado
         const estadoActual = (p.estado || 'Inactivo').toLowerCase();
         const estadoBadgeClass = estadoActual === 'activo' ? 'bg-green-600' : 'bg-red-600';
-        
+
         // Formatear puntaje
         const puntajeFormateado = p.puntaje !== null && p.puntaje !== undefined ? `${p.puntaje} pts` : '0 pts';
 
@@ -356,18 +355,18 @@ function cargarTablaPorNivel(nivel) {
 async function crearPregunta(datosPregunta) {
     try {
         mostrarCargando('Creando pregunta...');
-        
+
         // Obtener IDs correctos según el mapeo
         const idAmbito = obtenerIdAmbito(datosPregunta.ambito);
         const idNivelRiesgo = obtenerIdNivelRiesgo(datosPregunta.nivel_riesgo);
-        
+
         console.log('Mapeando:', {
             ambito: datosPregunta.ambito,
             id_ambito: idAmbito,
             nivel_riesgo: datosPregunta.nivel_riesgo,
             id_nivel_riesgo: idNivelRiesgo
         });
-        
+
         // Formato exacto que espera el backend
         const datosBackend = {
             pregunta: datosPregunta.pregunta,
@@ -377,15 +376,15 @@ async function crearPregunta(datosPregunta) {
         };
 
         console.log('Enviando al backend:', datosBackend);
-        
+
         const response = await api.post('/preguntas', datosBackend);
-        
+
         cerrarCargando();
         mostrarExito('Pregunta creada exitosamente');
-        
+
         // Recargar datos
         await cargarPreguntasDesdeAPI();
-        
+
         return response.data;
     } catch (error) {
         cerrarCargando();
@@ -398,36 +397,36 @@ async function crearPregunta(datosPregunta) {
 async function actualizarPregunta(id, datosActualizados) {
     try {
         mostrarCargando('Actualizando pregunta...');
-        
+
         // Preparar datos en formato backend
         const datosBackend = {};
-        
+
         if (datosActualizados.pregunta) {
             datosBackend.pregunta = datosActualizados.pregunta;
         }
-        
+
         if (datosActualizados.ambito) {
             datosBackend.id_ambito = obtenerIdAmbito(datosActualizados.ambito);
         }
-        
+
         if (datosActualizados.nivel_riesgo) {
             datosBackend.id_nivel_riesgo = obtenerIdNivelRiesgo(datosActualizados.nivel_riesgo);
         }
-        
+
         if (datosActualizados.estado) {
             datosBackend.estado = datosActualizados.estado;
         }
-        
+
         console.log('Actualizando pregunta ID', id, 'con:', datosBackend);
-        
+
         const response = await api.put(`/preguntas/${id}`, datosBackend);
-        
+
         cerrarCargando();
         mostrarExito('Pregunta actualizada exitosamente');
-        
+
         // Recargar datos
         await cargarPreguntasDesdeAPI();
-        
+
         return response.data;
     } catch (error) {
         cerrarCargando();
@@ -440,28 +439,28 @@ async function actualizarPregunta(id, datosActualizados) {
 async function actualizarEstadoPregunta(id, nuevoEstado) {
     try {
         mostrarCargando('Actualizando estado...');
-        
+
         // Usar el endpoint PUT genérico con solo el estado
         const response = await api.put(`/preguntas/${id}`, {
             estado: nuevoEstado
         });
-        
+
         // Actualizar localmente
         const index = preguntas.findIndex(p => p.id == id);
         if (index !== -1) {
             preguntas[index].estado = nuevoEstado;
         }
-        
+
         cerrarCargando();
         mostrarExito(`Pregunta ${nuevoEstado.toLowerCase()} exitosamente`);
-        
+
         // Recargar tabla actual
         const tabActivo = document.querySelector('.browser-tab.active');
         if (tabActivo) {
             const tabName = tabActivo.getAttribute('data-tab');
             cargarTablaPorNivel(tabName === 'todo' ? 'todo' : tabName);
         }
-        
+
         return response.data;
     } catch (error) {
         cerrarCargando();
@@ -488,12 +487,12 @@ async function obtenerPreguntaPorId(id) {
 function obtenerIdNivelRiesgo(nombreNivel) {
     const nivelNormalizado = nombreNivel.toLowerCase().trim();
     const nivel = nivelesRiesgoMap[nivelNormalizado];
-    
+
     if (!nivel) {
         console.warn(`Nivel de riesgo no encontrado: "${nombreNivel}". Usando Bajo por defecto.`);
         return 1; // Default: Bajo
     }
-    
+
     return nivel.id;
 }
 
@@ -504,12 +503,12 @@ function obtenerNombreNivelRiesgo(idNivel) {
 
 function obtenerIdAmbito(nombreAmbito) {
     const id = ambitosMap[nombreAmbito];
-    
+
     if (!id) {
         console.warn(`Ambito no encontrado: "${nombreAmbito}". Usando primer ambito por defecto.`);
         return 1; // Default: Conducta del agresor
     }
-    
+
     return id;
 }
 
@@ -524,14 +523,14 @@ function obtenerNombreAmbito(idAmbito) {
 async function cargarPreguntaParaEditar(id) {
     try {
         mostrarCargando('Cargando pregunta...');
-        
+
         const pregunta = await obtenerPreguntaPorId(id);
-        
+
         cerrarCargando();
-        
+
         // Mostrar modal de edición
         mostrarModalEdicion(pregunta);
-        
+
         return pregunta;
     } catch (error) {
         cerrarCargando();
@@ -547,35 +546,35 @@ function mostrarModalEdicion(pregunta) {
         console.error('Modal no encontrado');
         return;
     }
-    
+
     console.log('Datos de la pregunta a editar:', pregunta);
-    
+
     // Cambiar título
     const titulo = modal.querySelector('h2');
     if (titulo) titulo.textContent = 'Editar Pregunta';
-    
+
     // Llenar campo de pregunta
     const inputPregunta = document.getElementById('pregunta');
     if (inputPregunta) {
         inputPregunta.value = pregunta.pregunta || '';
         console.log('Campo pregunta llenado:', pregunta.pregunta);
     }
-    
+
     // Seleccionar ámbito - CORREGIDO
     const selectAmbito = document.getElementById('ambito');
     if (selectAmbito && pregunta.ambito) {
         console.log('Buscando ambito:', pregunta.ambito);
-        console.log('Opciones disponibles:', Array.from(selectAmbito.options).map(o => ({value: o.value, text: o.text})));
-        
+        console.log('Opciones disponibles:', Array.from(selectAmbito.options).map(o => ({ value: o.value, text: o.text })));
+
         // Buscar comparando en minúsculas (case insensitive)
         let encontrado = false;
         const ambitoBuscado = pregunta.ambito.trim().toLowerCase();
-        
+
         for (let i = 0; i < selectAmbito.options.length; i++) {
             const option = selectAmbito.options[i];
             const optionText = option.text.trim().toLowerCase();
             const optionValue = option.value.trim().toLowerCase();
-            
+
             if (optionText === ambitoBuscado || optionValue === ambitoBuscado) {
                 selectAmbito.selectedIndex = i;
                 encontrado = true;
@@ -583,13 +582,13 @@ function mostrarModalEdicion(pregunta) {
                 break;
             }
         }
-        
+
         if (!encontrado) {
             console.warn('No se encontro el ambito:', pregunta.ambito);
             console.warn('Buscado (lowercase):', ambitoBuscado);
         }
     }
-    
+
     // Seleccionar nivel de riesgo por nombre
     const selectRiesgo = document.getElementById('riesgo');
     if (selectRiesgo && pregunta.nivel_riesgo) {
@@ -607,14 +606,14 @@ function mostrarModalEdicion(pregunta) {
             console.warn('No se encontro el nivel de riesgo:', pregunta.nivel_riesgo);
         }
     }
-    
+
     // Estado
     const selectEstado = document.getElementById('estado');
     if (selectEstado) {
         selectEstado.value = pregunta.estado || 'Activo';
         console.log('Estado seleccionado:', pregunta.estado);
     }
-    
+
     // Guardar ID para la actualización
     const btnGuardar = document.getElementById('btnGuardarPregunta');
     if (btnGuardar) {
@@ -622,7 +621,7 @@ function mostrarModalEdicion(pregunta) {
         btnGuardar.textContent = 'Actualizar Pregunta';
         console.log('ID de pregunta guardado para edicion:', pregunta.id);
     }
-    
+
     // Mostrar modal
     modal.classList.remove('hidden');
     modal.classList.add('flex');
@@ -631,45 +630,45 @@ function mostrarModalEdicion(pregunta) {
 
 async function guardarPregunta(e) {
     e.preventDefault();
-    
+
     // Obtener valores del formulario
     const pregunta = document.getElementById('pregunta').value.trim();
     const ambito = document.getElementById('ambito').value;
     const riesgo = document.getElementById('riesgo').value;
     const estado = document.getElementById('estado').value;
-    
+
     // Validaciones
     if (!pregunta) {
         mostrarError('Por favor, escribe la pregunta');
         return;
     }
-    
+
     if (!ambito) {
         mostrarError('Por favor, selecciona un ámbito');
         return;
     }
-    
+
     if (!riesgo) {
         mostrarError('Por favor, selecciona un nivel de riesgo');
         return;
     }
-    
+
     const datosPregunta = {
         pregunta,
         ambito,
         nivel_riesgo: riesgo,
         estado
     };
-    
+
     // Verificar si es edición o creación
     const btnGuardar = document.getElementById('btnGuardarPregunta');
     const idEdicion = btnGuardar.getAttribute('data-id-edicion');
-    
+
     try {
         if (idEdicion) {
             // Es una edición (PUT)
             await actualizarPregunta(idEdicion, datosPregunta);
-            
+
             // Limpiar atributo de edición
             btnGuardar.removeAttribute('data-id-edicion');
             btnGuardar.textContent = 'Guardar Pregunta';
@@ -677,11 +676,11 @@ async function guardarPregunta(e) {
             // Es una creación (POST)
             await crearPregunta(datosPregunta);
         }
-        
+
         // Cerrar modal y limpiar formulario
         closeQuestionModal();
         limpiarFormulario();
-        
+
     } catch (error) {
         console.error('❌ Error al guardar pregunta:', error);
         // El error ya se maneja en las funciones individuales
@@ -697,13 +696,13 @@ function agregarEventListenersABotones() {
     botonesEditar.forEach(boton => {
         boton.addEventListener('click', async function (e) {
             e.preventDefault();
-            
+
             // Animación al hacer clic
             this.style.transform = 'scale(0.95)';
             setTimeout(() => {
                 this.style.transform = '';
             }, 150);
-            
+
             const idPregunta = this.getAttribute('data-id');
             await cargarPreguntaParaEditar(idPregunta);
         });
@@ -714,23 +713,23 @@ function agregarEventListenersABotones() {
     botonesToggleEstado.forEach(boton => {
         boton.addEventListener('click', async function (e) {
             e.preventDefault();
-            
+
             // Animación al hacer clic
             this.style.transform = 'scale(0.95)';
             setTimeout(() => {
                 this.style.transform = '';
             }, 150);
-            
+
             const idPregunta = this.getAttribute('data-id');
             const estadoActual = this.getAttribute('data-estado');
             const nuevoEstado = estadoActual.toLowerCase() === 'activo' ? 'Inactivo' : 'Activo';
-            
+
             // Confirmación con SweetAlert2
             const esActivo = estadoActual.toLowerCase() === 'activo';
-            
+
             const result = await Swal.fire({
                 title: esActivo ? '¿Desactivar pregunta?' : '¿Activar pregunta?',
-                text: esActivo 
+                text: esActivo
                     ? '¿Estás seguro de que quieres desactivar esta pregunta?'
                     : '¿Estás seguro de que quieres activar esta pregunta?',
                 icon: 'question',
@@ -741,7 +740,7 @@ function agregarEventListenersABotones() {
                 cancelButtonText: 'Cancelar',
                 reverseButtons: true
             });
-            
+
             if (result.isConfirmed) {
                 await actualizarEstadoPregunta(idPregunta, nuevoEstado);
             }
@@ -764,15 +763,15 @@ function inicializarEventListeners() {
         openQuestionBtn.addEventListener('click', () => {
             questionFormModal.classList.remove('hidden');
             questionFormModal.classList.add('flex');
-            
+
             // Restaurar título y botón
             const titulo = questionFormModal.querySelector('h2');
             if (titulo) titulo.textContent = 'Nueva Pregunta';
-            
+
             const btnGuardar = document.getElementById('btnGuardarPregunta');
             btnGuardar.removeAttribute('data-id-edicion');
             btnGuardar.textContent = 'Guardar Pregunta';
-            
+
             limpiarFormulario();
         });
     }
@@ -804,25 +803,25 @@ function inicializarEventListeners() {
         browserTabs.forEach(tab => {
             tab.addEventListener('click', () => {
                 const tabName = tab.getAttribute('data-tab');
-                
+
                 // Remove active class from all tabs
                 browserTabs.forEach(t => t.classList.remove('active'));
-                
+
                 // Add active class to clicked tab
                 tab.classList.add('active');
-                
+
                 // Remove active class from all contents
                 const tabContents = document.querySelectorAll('.tab-content');
                 tabContents.forEach(content => {
                     content.classList.remove('active');
                 });
-                
+
                 // Add active class to selected content
                 const selectedContent = document.getElementById(tabName);
                 if (selectedContent) {
                     selectedContent.classList.add('active');
                 }
-                
+
                 // Recargar la tabla específica
                 cargarTablaPorNivel(tabName);
             });
@@ -856,13 +855,13 @@ function limpiarFormulario() {
 // -------------------------------
 document.addEventListener("DOMContentLoaded", async function () {
     console.log("DOM cargado, inicializando aplicacion...");
-    
+
     // Inicializar event listeners
     inicializarEventListeners();
-    
+
     // Cargar datos iniciales
     await cargarDatosIniciales();
-    
+
     console.log("Aplicacion inicializada correctamente");
 });
 

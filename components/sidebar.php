@@ -146,12 +146,12 @@ $menu_items = [
 
         // Filtrar items del menú según permisos
         async function initializeSidebarPermissions() {
-            console.log('🎨 [Sidebar] Inicializando permisos del menú...');
+            console.log('Inicializando permisos del menú...');
 
             try {
                 // Obtener todas las páginas accesibles
                 const pages = await auth.getAccessiblePages();
-                console.log('📋 [Sidebar] Páginas accesibles:', pages);
+                console.log('Páginas accesibles:', pages);
 
                 // Obtener todos los items del menú
                 const menuItems = document.querySelectorAll('.nav-item');
@@ -159,22 +159,22 @@ $menu_items = [
 
                 menuItems.forEach(item => {
                     const page = item.dataset.page;
-                    console.log(`🔍 [Sidebar] Verificando acceso a: ${page}`);
+                    // console.log(`Verificando acceso a: ${page}`);
 
                     // Si tiene wildcard (*) o la página está en la lista
                     if (pages.includes('*') || pages.includes(page)) {
                         item.classList.remove('hidden');
                         visibleCount++;
-                        console.log(`✅ [Sidebar] Mostrando: ${page}`);
+                        // console.log(`Mostrando: ${page}`);
                     } else {
                         item.classList.add('hidden');
-                        console.log(`🚫 [Sidebar] Ocultando: ${page}`);
+                        // console.log(`Ocultando: ${page}`);
                     }
                 });
 
-                console.log(`🎨 [Sidebar] Menú inicializado. Items visibles: ${visibleCount}/${menuItems.length}`);
+                console.log(`Menú inicializado. Items visibles: ${visibleCount}/${menuItems.length}`);
             } catch (error) {
-                console.error('❌ [Sidebar] Error al inicializar permisos:', error);
+                console.error('Error al inicializar permisos:', error);
             }
         }
 
