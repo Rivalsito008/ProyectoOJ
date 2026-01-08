@@ -2,16 +2,18 @@
 // PROTECCION DE RUTA - SOLO ADMINS
 (async function () {
     console.log();
-    const hasPermission = await auth.requireRole(['admin', 'juez'], 'inicio.php');
+    const hasPermission = await auth.requireRole(['admin', 'juez', 'notario'], 'inicio.php');
 
     if (!hasPermission) {
-        console.error('Acceso denegado: No tienes permisos de administrador');
+        console.error('Acceso denegado: No tienes permisos');
         return;
     }
 
     console.log('✓ Acceso autorizado');
 })();
 
+// // definimos api como instancia de axios creada en auth.js
+const api = axios;
 
 // Aplicar tema y preferencias al cargar
 (function () {

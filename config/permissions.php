@@ -35,6 +35,7 @@ return [
         'dashboardDepar.php',
         'form.php',
         'respuestas2.php',
+        'preguntas.php',
         'configuracion.php'
     ],
 
@@ -44,7 +45,7 @@ return [
         'dashboardDepar.php',
         'form.php',
         'respuestas2.php',
-        'preguntas.php',
+        'tribunales.php',
         'configuracion.php'
     ],
 

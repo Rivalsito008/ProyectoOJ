@@ -11,6 +11,9 @@
     console.log('✓ Acceso autorizado');
 })();
 
+// definimos api como instancia de axios creada en auth.js
+const api = axios;
+
 // Interceptor para requests
 api.interceptors.request.use(
     config => {
