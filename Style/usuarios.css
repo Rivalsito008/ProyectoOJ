@@ -901,6 +901,39 @@ tbody tr:hover {
     transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
+/* ===== SWEETALERT2 TOAST FIX ===== */
+/* Prevenir que SweetAlert2 agregue padding al body cuando muestra el toast */
+body.swal2-toast-shown {
+    padding-right: 0 !important;
+}
+
+body.swal2-shown:not(.swal2-no-backdrop):not(.swal2-toast-shown) {
+    padding-right: 0 !important;
+}
+
+/* Asegurar que el header no se vea afectado por el toast */
+.header-bg {
+    padding-right: 0 !important;
+    margin-right: 0 !important;
+}
+
+/* Prevenir que el contenedor principal se vea afectado */
+.content {
+    padding-right: 0 !important;
+    margin-right: 0 !important;
+}
+
+/* Asegurar que el toast no cause scroll horizontal */
+.swal2-container.swal2-top-end {
+    padding: 1em !important;
+}
+
+/* Prevenir overflow en el body cuando se muestra el toast */
+html.swal2-toast-shown,
+html.swal2-toast-shown body {
+    overflow-x: hidden !important;
+}
+
 /* ===== RESPONSIVE ===== */
 @media (max-width: 768px) {
     .action-btn-view,

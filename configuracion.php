@@ -14,13 +14,6 @@
 </head>
 
 <body>
-    <?php
-    $usuario = [
-        'nombre' => 'Admin User',
-        'rol' => 'Administrador',
-        'email' => 'admin@sigen.com'
-    ];
-    ?>
     <!-- Sidebar Component -->
     <?php include 'components/sidebar.php'; ?>
 
@@ -72,8 +65,8 @@
                 <div class="card rounded-xl p-6 shadow md:col-span-2">
                     <h2 class="text-xl font-semibold mb-4">Cuenta</h2>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-                        <button id="btnEditarPerfil" class="btn-config py-3 rounded-lg transition">
-                            Editar perfil
+                        <button id="btnVerPerfil" class="btn-config py-3 rounded-lg transition">
+                            Ver perfil
                         </button>
                         <button id="btnCambiarClave" class="btn-config py-3 rounded-lg transition">
                             Solicitar cambio de contraseña
@@ -85,27 +78,24 @@
                 </div>
             </div>
 
-            <!-- Modal Editar Perfil -->
-            <div id="editProfileModal" class="modal hidden">
-                <div class="modal-content">
-                    <span class="close cursor-pointer">&times;</span>
-                    <h2>Editar Perfil</h2>
-                    <form id="editProfileForm">
-                        <label for="editNombre">Nombre:</label>
-                        <input type="text" id="editNombre">
-                        <label for="editApellido">Apellido:</label>
-                        <input type="text" id="editApellido">
-                        <label for="editEmail">Email:</label>
-                        <input type="email" id="editEmail">
-                        <label for="editTelefono">Teléfono:</label>
-                        <input type="tel" id="editTelefono">
-                        <button type="submit">Guardar Cambios</button>
-                    </form>
+            <!-- Modal ver perfil -->
+            <div id="viewProfileModal"
+                class="fixed inset-0 z-50 bg-black bg-opacity-50 hidden items-center justify-center p-4">
+                <div class="modal-content rounded-2xl shadow-2xl max-w-md w-full bg-white overflow-hidden">
+                    <div class="modal-header flex justify-between items-center p-5 border-b">
+                        <h2 class="text-lg font-semibold flex items-center gap-2">
+                            Detalles de perfil
+                        </h2>
+                        <button onclick="closeProfileModal()"
+                            class="text-gray-500 hover:text-red-500 transition">✕</button>
+                    </div>
+                    <div class="p-6 space-y-4" id="profileContent">
+                    </div>
                 </div>
             </div>
         </main>
     </div>
-    <script src="JS/configuracion.js"></script>
+    <script src="JS/configuracion.js" type="module"></script>
 </body>
 
 </html>

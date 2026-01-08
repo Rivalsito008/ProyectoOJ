@@ -1,6 +1,15 @@
-// PROTECCION DE RUTA - SOLO ADMINS
+// PROTECCION DE RUTA - SOLO ADMINS Y COLABORADORES
 (async function () {
-    console.log();
+    const t = localStorage.getItem('theme-preference') || 'auto';
+    let f = t;
+    if (t === 'auto') {
+        f = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+    document.documentElement.setAttribute('data-theme', f);
+
+    const fontSize = localStorage.getItem('font-size') || '16';
+    document.documentElement.style.setProperty('--font-size', fontSize + 'px');
+
     const hasPermission = await auth.requireRole(['admin', 'colaborador'], 'inicio.php');
 
     if (!hasPermission) {

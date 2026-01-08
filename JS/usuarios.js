@@ -1,7 +1,12 @@
+import ModalManager from "./utils/ModalManager.js";
+import { inicializarObserverPadding } from './utils/ManageToastSW2.js';
+import { eliminarPaddingSweetAlert } from './utils/ManageToastSW2.js';
+import { mostrarExitoToast } from './utils/ManageToastSW2.js';
+import { mostrarError } from './utils/ManageToastSW2.js';
+
 // USUARIOS.JS - Gestión de Usuarios (Solo Administradores)
 // ======================================
-// VERSION OPTIMIZADA CON SISTEMA DE MODALS MEJORADO Y CARGA DINÁMICA DE ROLES
-// ======================================
+
 // ======================================
 // PROTECCIÓN DE RUTA - SOLO ADMINISTRADORES
 // ======================================
@@ -49,59 +54,8 @@ let currentTab = 'Todo';
 let usuarioEnEdicion = null; // Usuario que se está editando
 let datosOriginalesEdicion = {}; // Almacena los datos originales del formulario de edición
 let usuarioActualId = null; // ID del usuario que ha iniciado sesión
-// ======================================
-// CLASE MODAL MANAGER - Gestión centralizada de modals
-// ======================================
-class ModalManager {
-    /**
-     * Abre un modal específico
-     * @param {HTMLElement} modal - Elemento del modal a abrir
-     */
-    static abrir(modal) {
-        if (!modal) {
-            console.error('Modal no encontrado');
-            return;
-        }
-        modal.classList.remove('hidden');
-        modal.classList.add('flex');
-        document.body.style.overflow = 'hidden';
-        // Agregar listener para cerrar al hacer clic fuera
-        setTimeout(() => {
-            modal.addEventListener('click', this.clickFueraHandler);
-        }, 100);
-    }
-    /**
-     * Cierra un modal específico
-     * @param {HTMLElement} modal - Elemento del modal a cerrar
-     */
-    static cerrar(modal) {
-        if (!modal) return;
-        modal.classList.add('hidden');
-        modal.classList.remove('flex');
-        document.body.style.overflow = 'auto';
-        modal.removeEventListener('click', this.clickFueraHandler);
-    }
-    /**
-     * Handler para cerrar modal al hacer clic fuera
-     */
-    static clickFueraHandler(e) {
-        if (e.target === e.currentTarget) {
-            ModalManager.cerrar(e.currentTarget);
-        }
-    }
-    /**
-     * Limpia un formulario
-     * @param {HTMLFormElement} form - Formulario a limpiar
-     */
-    static limpiarFormulario(form) {
-        if (form) {
-            form.reset();
-            // Limpiar también campos hidden
-            const hiddenInputs = form.querySelectorAll('input[type="hidden"]');
-            hiddenInputs.forEach(input => input.value = '');
-        }
-    }
-}
+
+
 // ======================================
 // FUNCIONES DE ROLES - CARGA DINÁMICA
 // ======================================
@@ -223,17 +177,16 @@ function switchTab(tabName) {
 // FUNCIONES DE API - CRUD COMPLETO
 // ======================================
 /**
- * Obtiene todos los usuarios desde el backend
+ * Obtiene usuarios SIN mostrar modal (para uso en inicialización)
  */
-async function fetchUsuarios() {
+async function fetchUsuariosSinModal() {
     try {
-        mostrarCargandoDatos('Cargando usuarios...');
         const response = await axios.get('/usuarios');
+        
         if (response.data.success) {
             usuarios = response.data.data;
             console.log(`✓ ${usuarios.length} usuarios cargados`);
             renderTabla(currentTab);
-            cerrarCargando();
         } else {
             mostrarError('No se pudieron cargar los usuarios');
         }
@@ -244,8 +197,34 @@ async function fetchUsuarios() {
         } else {
             mostrarError('Error al cargar la lista de usuarios');
         }
-    } finally {
-        cerrarCargando();
+    }
+}
+
+/**
+ * Obtiene todos los usuarios desde el backend (con modal propio)
+ */
+async function fetchUsuarios() {
+    try {
+        const response = await axios.get('/usuarios');
+        
+        // No cerrar ningún modal aquí para evitar interferir con toasts
+        // El modal de carga ya debería estar cerrado antes de llamar a esta función
+        
+        if (response.data.success) {
+            usuarios = response.data.data;
+            console.log(`✓ ${usuarios.length} usuarios cargados`);
+            renderTabla(currentTab);
+        } else {
+            mostrarError('No se pudieron cargar los usuarios');
+        }
+    } catch (error) {
+        console.error('Error al cargar usuarios:', error);
+        
+        if (error.response?.status === 403) {
+            mostrarError('No tienes permisos para ver los usuarios');
+        } else {
+            mostrarError('Error al cargar la lista de usuarios');
+        }
     }
 }
 /**
@@ -264,20 +243,39 @@ async function guardarNuevoUsuario() {
             mostrarError('Por favor selecciona un rol');
             return;
         }
-        mostrarCargando(true);
+        
+        // Mostrar modal de carga antes de crear usuario
+        mostrarCargandoDatos('Creando usuario...');
+        
         // Obtener datos del formulario
         const formData = new FormData(elementos.addForm);
         const datos = Object.fromEntries(formData.entries());
         console.log('Creando usuario:', datos);
+        
         const response = await axios.post('/usuarios', datos);
+        
+        // Cerrar modal de carga inmediatamente
+        cerrarCargando();
+        
         if (response.data.success) {
-            mostrarExito('Usuario creado exitosamente');
+            // Esperar un momento para que el modal se cierre completamente antes de mostrar el toast
+            await new Promise(resolve => setTimeout(resolve, 200));
+            
+            // Mostrar notificación de éxito CON TOAST
+            mostrarExitoToast('Usuario creado exitosamente');
+            
             ModalManager.cerrar(elementos.addModal);
             ModalManager.limpiarFormulario(elementos.addForm);
+            
+            // Esperar un momento antes de recargar usuarios para no interferir con el toast
+            await new Promise(resolve => setTimeout(resolve, 500));
             await fetchUsuarios();
         }
     } catch (error) {
         console.error('Error al crear usuario:', error);
+        // Cerrar modal de carga en caso de error
+        cerrarCargando();
+        
         if (error.response?.status === 422) {
             const errors = error.response.data.errors;
             const firstError = Object.values(errors)[0][0];
@@ -287,8 +285,6 @@ async function guardarNuevoUsuario() {
         } else {
             mostrarError('Error al crear el usuario');
         }
-    } finally {
-        mostrarCargando(false);
     }
 }
 /**
@@ -322,7 +318,7 @@ async function abrirModalEditar(idUsuario) {
     // Limpiar campo de contraseña
     document.getElementById('edit_password').value = '';
 
-    // NUEVO: Guardar datos originales para detectar cambios
+    // Guardar datos originales para detectar cambios
     datosOriginalesEdicion = {
         nombres: usuario.nombres || '',
         apellidos: usuario.apellidos || '',
@@ -332,12 +328,12 @@ async function abrirModalEditar(idUsuario) {
         password: ''
     };
 
-    // NUEVO: Deshabilitar botón de guardar inicialmente
+    // Deshabilitar botón de guardar inicialmente
     elementos.saveEditBtn.disabled = true;
     elementos.saveEditBtn.style.opacity = '0.5';
     elementos.saveEditBtn.style.cursor = 'not-allowed';
 
-    // NUEVO: Agregar listeners para detectar cambios
+    // Agregar listeners para detectar cambios
     agregarListenersDeteccionCambios();
 
     // Abrir modal
@@ -353,7 +349,7 @@ function cerrarModalEditar() {
     usuarioEnEdicion = null;
     datosOriginalesEdicion = {};
 
-    // NUEVO: Remover listeners de detección de cambios
+    // Remover listeners de detección de cambios
     removerListenersDeteccionCambios();
 }
 /**
@@ -377,7 +373,10 @@ async function guardarEdicionUsuario() {
             mostrarError('Por favor selecciona un rol');
             return;
         }
-        mostrarCargando(true);
+        
+        // Mostrar modal de carga antes de actualizar
+        mostrarCargandoDatos('Actualizando usuario...');
+        
         // Obtener datos del formulario
         const formData = new FormData(elementos.editForm);
         const datos = Object.fromEntries(formData.entries());
@@ -386,14 +385,30 @@ async function guardarEdicionUsuario() {
             delete datos.password;
         }
         console.log('Actualizando usuario:', idUsuario, datos);
+        
         const response = await axios.put(`/usuarios/${idUsuario}`, datos);
+        
+        // Cerrar modal de carga
+        cerrarCargando();
+        
         if (response.data.success) {
-            mostrarExito('Usuario actualizado exitosamente');
+            // Esperar un momento para que el modal se cierre completamente antes de mostrar el toast
+            await new Promise(resolve => setTimeout(resolve, 200));
+            
+            // Mostrar notificación de éxito CON TOAST
+            mostrarExitoToast('Usuario actualizado exitosamente');
+            
             cerrarModalEditar();
+            
+            // Esperar un momento antes de recargar usuarios para no interferir con el toast
+            await new Promise(resolve => setTimeout(resolve, 500));
             await fetchUsuarios();
         }
     } catch (error) {
         console.error('Error al actualizar usuario:', error);
+        // Cerrar modal de carga en caso de error
+        cerrarCargando();
+        
         if (error.response?.status === 422) {
             const errors = error.response.data.errors;
             const firstError = Object.values(errors)[0][0];
@@ -405,8 +420,6 @@ async function guardarEdicionUsuario() {
         } else {
             mostrarError('Error al actualizar el usuario');
         }
-    } finally {
-        mostrarCargando(false);
     }
 }
 /**
@@ -428,31 +441,52 @@ async function toggleEstado(idUsuario, estadoActual) {
         cancelButtonColor: '#6b7280',
         confirmButtonText: `Sí, ${accion}`,
         cancelButtonText: 'Cancelar',
-        reverseButtons: true
+        reverseButtons: true,
+        didClose: () => {
+            // Eliminar padding después de cerrar el modal de confirmación
+            eliminarPaddingSweetAlert();
+        }
     });
+
+    // Eliminar padding después de que se cierre el modal (ya sea confirmado o cancelado)
+    eliminarPaddingSweetAlert();
 
     if (!result.isConfirmed) {
         return;
     }
     try {
-        mostrarCargando(true);
-        // ACTUALIZADO: Usar PATCH en lugar de POST
+        // Mostrar modal de carga antes de cambiar estado
+        mostrarCargandoDatos(`${nuevoEstado === 'Activo' ? 'Activando' : 'Desactivando'} usuario...`);
+        
+        // Usar PATCH en lugar de POST
         const response = await axios.patch(`/usuarios/${idUsuario}/estado`, {
             estado: nuevoEstado
         });
+        
+        // Cerrar modal de carga
+        cerrarCargando();
+        
         if (response.data.success) {
-            mostrarExito(`Usuario ${nuevoEstado === 'Activo' ? 'activado' : 'desactivado'} exitosamente`);
+            // Esperar un momento para que el modal se cierre completamente antes de mostrar el toast
+            await new Promise(resolve => setTimeout(resolve, 200));
+            
+            // Mostrar notificación de éxito CON TOAST
+            mostrarExitoToast(`Usuario ${nuevoEstado === 'Activo' ? 'activado' : 'desactivado'} exitosamente`);
+            
+            // Esperar un momento antes de recargar usuarios para no interferir con el toast
+            await new Promise(resolve => setTimeout(resolve, 500));
             await fetchUsuarios();
         }
     } catch (error) {
         console.error('Error al cambiar estado:', error);
+        // Cerrar modal de carga en caso de error
+        cerrarCargando();
+        
         if (error.response?.status === 403) {
             mostrarError('No tienes permisos para cambiar el estado de usuarios');
         } else {
             mostrarError('Error al cambiar el estado del usuario');
         }
-    } finally {
-        mostrarCargando(false);
     }
 }
 // ======================================
@@ -466,7 +500,7 @@ function renderTabla(tabName) {
     let usuariosFiltrados = [];
     let tabla = null;
 
-    // NUEVO: Filtrar el usuario actual (sesión activa)
+    // Filtrar el usuario actual (sesión activa)
     const usuariosSinActual = usuarios.filter(u => u.id_usuario !== usuarioActualId);
 
     switch (tabName) {
@@ -705,27 +739,13 @@ function escapeHtml(text) {
     };
     return text.toString().replace(/[&<>"']/g, m => map[m]);
 }
-/**
- * Muestra/oculta indicador de carga
- * @param {boolean} mostrar - Si debe mostrar el indicador
- */
-function mostrarCargando(mostrar) {
-    document.body.style.cursor = mostrar ? 'wait' : 'default';
-    // Deshabilitar botones durante la carga
-    const botones = document.querySelectorAll('button');
-    botones.forEach(btn => {
-        btn.disabled = mostrar;
-        if (mostrar) {
-            btn.style.opacity = '0.6';
-        } else {
-            btn.style.opacity = '1';
-        }
-    });
-}
 
+// ======================================
+// FUNCIONES DE NOTIFICACIÓN MEJORADAS
+// ======================================
 /**
- * Muestra/oculta indicador de carga
- * @param {string} mensaje - Mensaje a mostrar al inicio de carga de usuarios
+ * Muestra modal de carga con SweetAlert2
+ * @param {string} mensaje - Mensaje a mostrar
  */
 function mostrarCargandoDatos(mensaje = 'Cargando...') {
     Swal.fire({
@@ -738,47 +758,31 @@ function mostrarCargandoDatos(mensaje = 'Cargando...') {
     });
 }
 
+/**
+ * Cierra el modal de carga y elimina el padding del body
+ */
 function cerrarCargando() {
     Swal.close();
+    // Eliminar padding que SweetAlert2 pueda haber agregado
+    eliminarPaddingSweetAlert();
 }
 
-/**
- * Muestra mensaje de éxito
- * @param {string} mensaje - Mensaje a mostrar
- */
-function mostrarExito(mensaje) {
-    console.log('✓ ' + mensaje);
-    Swal.fire({
-        icon: 'success',
-        title: '¡Éxito!',
-        text: mensaje,
-        confirmButtonColor: '#10b981',
-        timer: 3000,
-        timerProgressBar: true
-    });
-}
-/**
- * Muestra mensaje de error
- * @param {string} mensaje - Mensaje a mostrar
- */
-function mostrarError(mensaje) {
-    console.error('✕ ' + mensaje);
-    Swal.fire({
-        icon: 'error',
-        title: 'Error',
-        text: mensaje,
-        confirmButtonColor: '#ef4444'
-    });
-}
 // ======================================
 // INICIALIZACIÓN
 // ======================================
 document.addEventListener('DOMContentLoaded', async () => {
-    console.log('Inicializando módulo de usuarios...');
+    
+    // Inicializar observer para eliminar padding de SweetAlert2
+    inicializarObserverPadding();
+    
+    // 🔧 CAMBIO CRÍTICO: Mostrar modal de carga ANTES de cualquier operación asíncrona
+    mostrarCargandoDatos();
+    
     try {
         // Verificar permisos de administrador
         const isAdmin = await auth.isAdmin();
         if (!isAdmin) {
+            cerrarCargando();
             console.error('No eres administrador');
             mostrarError('No tienes permisos para acceder a esta página');
             setTimeout(() => {
@@ -787,27 +791,35 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
 
-        // NUEVO: Obtener ID del usuario actual (sesión activa)
+        // Obtener ID del usuario actual (sesión activa)
         const usuarioActual = await auth.getUserData(true);
         if (usuarioActual) {
             usuarioActualId = usuarioActual.id_usuario;
             console.log('✓ Usuario actual identificado:', usuarioActual.nombres, '(ID:', usuarioActualId, ')');
         }
 
-        // NUEVO: Cargar roles disponibles
+        // Cargar roles disponibles
         await cargarRoles();
-        // Cargar usuarios al inicio
-        await fetchUsuarios();
+        
+        // Cargar usuarios (NO mostrar otro modal aquí)
+        await fetchUsuariosSinModal();
+        
+        // Cerrar modal una vez cargado todo
+        cerrarCargando();
+        
         console.log('✓ Módulo de usuarios cargado correctamente');
         console.log('✓ Sistema de modals optimizado inicializado');
         console.log('✓ Carga dinámica de roles habilitada');
         console.log('✓ Sistema de detección de cambios habilitado');
         console.log('✓ Filtrado de usuario actual habilitado');
+        console.log('✓ Sistema de notificaciones TOAST implementado');
     } catch (error) {
+        cerrarCargando();
         console.error('Error al inicializar módulo de usuarios:', error);
         mostrarError('Error al inicializar la página');
     }
 });
+
 // Hacer funciones disponibles globalmente para onclick en HTML
 window.verDetalles = verDetalles;
 window.closeDetailsModal = closeDetailsModal;

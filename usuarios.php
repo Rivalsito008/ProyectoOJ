@@ -253,7 +253,7 @@
       </div>
     </main>
   </div>
-  <script src="JS/usuarios.js"></script>
+  <script src="JS/usuarios.js" type="module"></script>
 </body>
 
 </html>
