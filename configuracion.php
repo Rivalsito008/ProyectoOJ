@@ -10,6 +10,9 @@
 
     <!-- Axios -->
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+    <!-- SweetAlert -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="services/auth.js"></script>
 </head>
 
@@ -80,8 +83,9 @@
 
             <!-- Modal ver perfil -->
             <div id="viewProfileModal"
-                class="fixed inset-0 z-50 bg-black bg-opacity-50 hidden items-center justify-center p-4">
-                <div class="modal-content rounded-2xl shadow-2xl max-w-md w-full bg-white overflow-hidden">
+                class="fixed inset-0 z-50 bg-black bg-opacity-50 hidden items-center justify-center p-4 ">
+                <div class="modal-content rounded-2xl shadow-2xl max-w-md w-full bg-white 
+            max-h-[90vh] flex flex-col overflow-hidden">
                     <div class="modal-header flex justify-between items-center p-5 border-b">
                         <h2 class="text-lg font-semibold flex items-center gap-2">
                             Detalles de perfil

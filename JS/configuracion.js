@@ -1,4 +1,7 @@
 import ModalManager from './utils/ModalManager.js';
+import { inicializarObserverPadding } from './utils/ManageToastSW2.js';
+import { eliminarPaddingSweetAlert } from './utils/ManageToastSW2.js';
+import { mostrarExitoToast } from './utils/ManageToastSW2.js';
 import { mostrarError } from './utils/ManageToastSW2.js';
 
 // ======================================
@@ -9,7 +12,7 @@ import { mostrarError } from './utils/ManageToastSW2.js';
     const rolesPermitidos = ['admin', 'juez', 'colaborador', 'notario']
     const hasPermission = await auth.requireRole(rolesPermitidos, 'inicio.php');
     if (!hasPermission) {
-        console.error('Acceso denegado: No tienes permisos de administrador');
+        console.error('Acceso denegado: No tienes permisos');
         return;
     }
     console.log('✓ Acceso autorizado: Usuario Administrador');
@@ -110,8 +113,18 @@ window.addEventListener('DOMContentLoaded', () => {
 
 const elementos = {
     profileModal: document.getElementById('viewProfileModal'),
-    btnAbrirPerfil: document.getElementById('btnVerPerfil')
+    btnAbrirPerfil: document.getElementById('btnVerPerfil'),
 };
+
+// ======================================
+// VARIABLE PARA CONTROLAR EL MODO DE EDICIÓN
+// ======================================
+let modoEdicion = false;
+
+// ======================================
+// VARIABLES PARA DETECTAR CAMBIOS
+// ======================================
+let datosOriginales = null;
 
 function escapeHtml(text) {
     if (!text) return '';
@@ -125,21 +138,34 @@ function escapeHtml(text) {
     return text.toString().replace(/[&<>"']/g, m => map[m]);
 }
 
-async function verPerfil(idUsuario) {
-    const usuario = datosPerfil;
-    if (!usuario) return;
+// ======================================
+// FUNCIÓN PARA VERIFICAR SI HAY CAMBIOS SIN GUARDAR
+// ======================================
+function hayCambiosSinGuardar() {
+    if (!modoEdicion || !datosOriginales) return false;
 
-    if (!datosPerfil) {
-        await fetchProfileData();
+    const nombres = document.getElementById('editNombres')?.value.trim();
+    const apellidos = document.getElementById('editApellidos')?.value.trim();
+    const telefono = document.getElementById('editTelefono')?.value.trim();
+
+    return nombres !== datosOriginales.nombres ||
+        apellidos !== datosOriginales.apellidos ||
+        (telefono || '') !== (datosOriginales.telefono || '');
+}
+
+// ======================================
+// FUNCIÓN PARA RENDERIZAR EL MODAL EN MODO VISTA
+// ======================================
+function renderModoVista(usuario) {
+    function capitalizeText(text) {
+        let firstLetter = text.charAt(0).toUpperCase();
+        let restLetters = text.slice(1);
+        return `${firstLetter}${restLetters}`;
     }
 
-    if (!datosPerfil) {
-        await mostrarError('No se encontraron los datos del perfil.');
-    }
+    const rolPrincipal = usuario.roles.length > 0 ? capitalizeText(usuario.roles[0]) : 'Sin rol';
 
-    const content = document.getElementById('profileContent');
-    const rolPrincipal = usuario.usuario_roles?.find(ur => ur.estado === 'Activo')?.rol?.rol || 'Sin rol';
-    content.innerHTML = `
+    return `
         <div class="text-center mb-4">
             <div class="w-20 h-20 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto text-2xl font-bold mb-2">
                 ${usuario.nombres.charAt(0)}${usuario.apellidos.charAt(0)}
@@ -156,17 +182,345 @@ async function verPerfil(idUsuario) {
                 </span>
             </p>
         </div>
-        <div class="space-y-6 border-t pt-4 flex justify-end">
-            <button class="w-30 px-4 py-3 rounded-lg text-sm font-medium bg-blue-500 hover:bg-blue-600 text-white transition-all duration-200 shadow-sm" title="Editar perfil">
-                <!-- 
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 22 22" stroke-width="1.5" stroke="currentColor" class="w-8 h-5">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
-                </svg>
-                -->
-                Editar
+        <div class="border-t pt-4 flex justify-end gap-2">
+            <button onclick="activarModoEdicion()" class="px-4 py-2 rounded-lg text-sm font-medium bg-blue-500 hover:bg-blue-600 text-white transition-all duration-200 shadow-sm">
+                Editar Perfil
             </button>
         </div>
     `;
+}
+
+// ======================================
+// FUNCIÓN PARA RENDERIZAR EL MODAL EN MODO EDICIÓN
+// ======================================
+function renderModoEdicion(usuario) {
+    function capitalizeText(text) {
+        let firstLetter = text.charAt(0).toUpperCase();
+        let restLetters = text.slice(1);
+        return `${firstLetter}${restLetters}`;
+    }
+
+    const rolPrincipal = usuario.roles.length > 0 ? capitalizeText(usuario.roles[0]) : 'Sin rol';
+
+    return `
+        <div class="text-center mb-4">
+            <div class="w-20 h-20 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto text-2xl font-bold mb-2">
+                ${usuario.nombres.charAt(0)}${usuario.apellidos.charAt(0)}
+            </div>
+            <h3 class="text-xl font-bold text-gray-800">Editar Perfil</h3>
+            <span class="text-sm text-gray-500">${escapeHtml(rolPrincipal)}</span>
+        </div>
+        <form id="formEditarPerfil" class="space-y-4 border-t pt-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Nombres</label>
+                <input 
+                    type="text" 
+                    id="editNombres" 
+                    value="${escapeHtml(usuario.nombres)}"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    required
+                >
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Apellidos</label>
+                <input 
+                    type="text" 
+                    id="editApellidos" 
+                    value="${escapeHtml(usuario.apellidos)}"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    required
+                >
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Teléfono</label>
+                <input 
+                    type="tel" 
+                    id="editTelefono" 
+                    value="${escapeHtml(usuario.telefono || '')}"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="Ingrese su teléfono"
+                >
+            </div>
+            <div class="bg-gray-50 p-3 rounded-lg">
+                <p class="text-sm text-gray-600"><strong>Email:</strong> ${escapeHtml(usuario.email_institucional)}</p>
+                <p class="text-sm text-gray-500 mt-1">El email y rol no pueden ser modificados</p>
+            </div>
+        </form>
+        <div class="border-t pt-4 flex justify-end gap-2">
+            <button onclick="cancelarEdicion()" class="px-4 py-2 rounded-lg text-sm font-medium bg-gray-300 hover:bg-gray-400 text-gray-700 transition-all duration-200 shadow-sm">
+                Cancelar
+            </button>
+            <button id="btnGuardarCambios" onclick="guardarCambios()" disabled class="px-4 py-2 rounded-lg text-sm font-medium bg-green-500 hover:bg-green-600 text-white transition-all duration-200 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed">
+                Guardar Cambios
+            </button>
+        </div>
+    `;
+}
+
+// ======================================
+// FUNCIÓN PARA VERIFICAR CAMBIOS Y ACTUALIZAR BOTÓN
+// ======================================
+function verificarCambiosYActualizarBoton() {
+    const btnGuardar = document.getElementById('btnGuardarCambios');
+    if (!btnGuardar) return;
+    
+    const hayCambios = hayCambiosSinGuardar();
+    btnGuardar.disabled = !hayCambios;
+}
+
+// ======================================
+// FUNCIÓN PARA ACTIVAR MODO EDICIÓN
+// ======================================
+function activarModoEdicion() {
+    modoEdicion = true;
+
+    // Guardar copia de los datos originales
+    datosOriginales = {
+        nombres: datosPerfil.nombres,
+        apellidos: datosPerfil.apellidos,
+        telefono: datosPerfil.telefono
+    };
+
+    const content = document.getElementById('profileContent');
+
+    // Activar scroll solo en modo edición
+    content.classList.add(
+        'overflow-y-auto',
+        'max-h-[80vh]',
+        'pr-2'
+    );
+
+    content.innerHTML = renderModoEdicion(datosPerfil);
+
+    // Configurar el modal para que no se cierre al hacer clic fuera
+    configurarProteccionModal();
+
+    // Agregar listeners para detectar cambios en tiempo real
+    setTimeout(() => {
+        const inputNombres = document.getElementById('editNombres');
+        const inputApellidos = document.getElementById('editApellidos');
+        const inputTelefono = document.getElementById('editTelefono');
+
+        if (inputNombres) inputNombres.addEventListener('input', verificarCambiosYActualizarBoton);
+        if (inputApellidos) inputApellidos.addEventListener('input', verificarCambiosYActualizarBoton);
+        if (inputTelefono) inputTelefono.addEventListener('input', verificarCambiosYActualizarBoton);
+    }, 0);
+}
+
+// ======================================
+// FUNCIÓN PARA CANCELAR EDICIÓN Y VOLVER A MODO VISTA
+// ======================================
+async function cancelarEdicion() {
+    // Si hay cambios, pedir confirmación
+    if (hayCambiosSinGuardar()) {
+        const confirmacion = await Swal.fire({
+            title: '¿Descartar cambios?',
+            text: 'Hay cambios sin guardar que se perderán',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Sí, descartar',
+            cancelButtonText: 'No, continuar editando'
+        });
+
+        if (!confirmacion.isConfirmed) {
+            return; // El usuario decidió no descartar, mantener modo edición
+        }
+    }
+
+    // Proceder a cancelar
+    modoEdicion = false;
+    datosOriginales = null;
+
+    const content = document.getElementById('profileContent');
+
+    // Remover scroll del modo edición
+    content.classList.remove(
+        'overflow-y-auto',
+        'max-h-[80vh]',
+        'pr-2'
+    );
+
+    content.innerHTML = renderModoVista(datosPerfil);
+
+    // Restaurar comportamiento normal del modal
+    restaurarComportamientoModal();
+}
+
+// ======================================
+// FUNCIÓN PARA GUARDAR LOS CAMBIOS
+// ======================================
+async function guardarCambios() {
+    const nombres = document.getElementById('editNombres').value.trim();
+    const apellidos = document.getElementById('editApellidos').value.trim();
+    const telefono = document.getElementById('editTelefono').value.trim();
+
+    // Validaciones básicas
+    if (!nombres || !apellidos) {
+        await mostrarError('Los campos Nombres y Apellidos son obligatorios');
+        return;
+    }
+
+    try {
+        // Aquí realizas la petición para actualizar los datos
+        const response = await axios.put('/auth/update-profile', {
+            nombres: nombres,
+            apellidos: apellidos,
+            telefono: telefono || null
+        });
+
+        if (response.data.success) {
+            // Actualizar los datos locales
+            datosPerfil.nombres = nombres;
+            datosPerfil.apellidos = apellidos;
+            datosPerfil.telefono = telefono;
+
+            mostrarExitoToast('Datos actualizados con éxito.');
+
+            // Limpiar datos originales
+            datosOriginales = null;
+
+            // Volver al modo vista
+            modoEdicion = false;
+            const content = document.getElementById('profileContent');
+
+            // Remover scroll del modo edición
+            content.classList.remove(
+                'overflow-y-auto',
+                'max-h-[80vh]',
+                'pr-2'
+            );
+
+            content.innerHTML = renderModoVista(datosPerfil);
+
+            // Restaurar comportamiento normal del modal
+            restaurarComportamientoModal();
+        } else {
+            await mostrarError('No se pudo actualizar el perfil');
+        }
+    } catch (error) {
+        console.error('Error al actualizar el perfil:', error);
+        await mostrarError('Error al actualizar el perfil. Intente nuevamente.');
+    }
+}
+
+// ======================================
+// FUNCIÓN PARA CONFIGURAR PROTECCIÓN DEL MODAL EN MODO EDICIÓN
+// ======================================
+function configurarProteccionModal() {
+    const modal = elementos.profileModal;
+    if (!modal) return;
+
+    // Remover listener anterior si existe
+    if (modal._clickOutsideHandler) {
+        modal.removeEventListener('click', modal._clickOutsideHandler);
+    }
+
+    // Crear nuevo listener que bloquea el cierre en modo edición
+    modal._clickOutsideHandler = async function (e) {
+        // Si el clic fue directamente en el modal (no en su contenido)
+        if (e.target === modal && modoEdicion) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            // Si hay cambios, mostrar confirmación
+            if (hayCambiosSinGuardar()) {
+                // Guardar los valores actuales antes de mostrar el SweetAlert
+                const valoresActuales = {
+                    nombres: document.getElementById('editNombres')?.value.trim(),
+                    apellidos: document.getElementById('editApellidos')?.value.trim(),
+                    telefono: document.getElementById('editTelefono')?.value.trim()
+                };
+
+                const confirmacion = await Swal.fire({
+                    title: '¿Cerrar sin guardar?',
+                    text: 'Hay cambios sin guardar que se perderán',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Sí, cerrar',
+                    cancelButtonText: 'No, continuar editando'
+                });
+
+                if (confirmacion.isConfirmed) {
+                    // Usuario confirmó cerrar
+                    modoEdicion = false;
+                    datosOriginales = null;
+                    closeProfileModal();
+                } else {
+                    // Usuario canceló - verificar si el modal se cerró y reabrirlo
+                    const modalEstaAbierto = modal.classList.contains('flex') ||
+                        modal.style.display === 'flex' ||
+                        !modal.classList.contains('hidden');
+
+                    if (!modalEstaAbierto) {
+                        // El modal se cerró, reabrirlo en modo edición
+                        ModalManager.abrir(modal);
+
+                        // Esperar un momento para que el DOM se actualice
+                        setTimeout(() => {
+                            // Restaurar los valores que el usuario había ingresado
+                            if (document.getElementById('editNombres')) {
+                                document.getElementById('editNombres').value = valoresActuales.nombres;
+                            }
+                            if (document.getElementById('editApellidos')) {
+                                document.getElementById('editApellidos').value = valoresActuales.apellidos;
+                            }
+                            if (document.getElementById('editTelefono')) {
+                                document.getElementById('editTelefono').value = valoresActuales.telefono;
+                            }
+
+                            // Verificar estado del botón después de restaurar
+                            verificarCambiosYActualizarBoton();
+                        }, 0);
+                    }
+                }
+            } else {
+                // No hay cambios, cerrar normalmente
+                modoEdicion = false;
+                datosOriginales = null;
+                closeProfileModal();
+            }
+        }
+    };
+
+    modal.addEventListener('click', modal._clickOutsideHandler);
+}
+
+// ======================================
+// FUNCIÓN PARA RESTAURAR COMPORTAMIENTO NORMAL DEL MODAL
+// ======================================
+function restaurarComportamientoModal() {
+    const modal = elementos.profileModal;
+    if (!modal || !modal._clickOutsideHandler) return;
+
+    // Remover el listener de protección
+    modal.removeEventListener('click', modal._clickOutsideHandler);
+    modal._clickOutsideHandler = null;
+}
+
+async function verPerfil(idUsuario) {
+    const usuario = datosPerfil;
+    if (!usuario) return;
+
+    if (!datosPerfil) {
+        await fetchProfileData();
+    }
+
+    if (!datosPerfil) {
+        await mostrarError('No se encontraron los datos del perfil.');
+        return;
+    }
+
+    // Siempre iniciar en modo vista
+    modoEdicion = false;
+    datosOriginales = null;
+
+    const content = document.getElementById('profileContent');
+    content.innerHTML = renderModoVista(usuario);
+
     ModalManager.abrir(elementos.profileModal);
 }
 
@@ -193,7 +547,29 @@ async function fetchProfileData() {
 /**
  * Cierra el modal de detalles
  */
-function closeProfileModal() {
+async function closeProfileModal() {
+    // Si está en modo edición y hay cambios, pedir confirmación
+    if (modoEdicion && hayCambiosSinGuardar()) {
+        const confirmacion = await Swal.fire({
+            title: '¿Cerrar sin guardar?',
+            text: 'Hay cambios sin guardar que se perderán',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Sí, cerrar',
+            cancelButtonText: 'No, continuar editando'
+        });
+
+        if (!confirmacion.isConfirmed) {
+            return; // No cerrar el modal
+        }
+    }
+
+    // Resetear al modo vista al cerrar
+    modoEdicion = false;
+    datosOriginales = null;
+    restaurarComportamientoModal();
     ModalManager.cerrar(elementos.profileModal);
 }
 
@@ -205,4 +581,8 @@ elementos.btnAbrirPerfil.addEventListener('click', async function () {
     await verPerfil();
 })
 
+// Exponer funciones globalmente para que puedan ser llamadas desde los botones
 window.closeProfileModal = closeProfileModal;
+window.activarModoEdicion = activarModoEdicion;
+window.cancelarEdicion = cancelarEdicion;
+window.guardarCambios = guardarCambios;
