@@ -307,10 +307,15 @@
                 <div class="space-y-2 mb-2" id="denuncianteTelefonosLista">
                   <!-- Primer teléfono -->
                   <div class="flex gap-2 items-center">
+                    <select
+                      class="border border-gray-300 rounded-lg p-3 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 phone-code-select">
+                      <option value="">Código</option>
+                      <!-- Se poblará dinámicamente desde JS -->
+                    </select>
                     <input type="tel" placeholder="Número de teléfono"
                       class="border border-gray-300 rounded-lg p-3 flex-grow focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
                     <select
-                      class="border border-gray-300 rounded-lg p-3 focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
+                      class="border border-gray-300 rounded-lg p-3 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 contact-type-select">
                       <option value="">Tipo</option>
                       <!-- Se poblará dinámicamente desde la API -->
                     </select>
@@ -760,10 +765,15 @@
                 <div class="space-y-2 mb-2" id="victimaTelefonosLista">
                   <!-- Primer teléfono -->
                   <div class="flex gap-2 items-center">
+                    <select
+                      class="border border-gray-300 rounded-lg p-3 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 phone-code-select">
+                      <option value="">Código</option>
+                      <!-- Se poblará dinámicamente desde JS -->
+                    </select>
                     <input type="tel" placeholder="Número de teléfono"
                       class="border border-gray-300 rounded-lg p-3 flex-grow focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
                     <select
-                      class="border border-gray-300 rounded-lg p-3 focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
+                      class="border border-gray-300 rounded-lg p-3 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 contact-type-select">
                       <option value="">Tipo</option>
                       <!-- Se poblará dinámicamente desde la API -->
                     </select>
@@ -1562,10 +1572,15 @@
                 <div class="space-y-2 mb-2" id="agresorTelefonosLista">
                   <!-- Primer teléfono -->
                   <div class="flex gap-2 items-center">
+                    <select
+                      class="border border-gray-300 rounded-lg p-3 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 phone-code-select">
+                      <option value="">Código</option>
+                      <!-- Se poblará dinámicamente desde JS -->
+                    </select>
                     <input type="tel" placeholder="Número de teléfono"
                       class="border border-gray-300 rounded-lg p-3 flex-grow focus:border-blue-500">
                     <select
-                      class="border border-gray-300 rounded-lg p-3 focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
+                      class="border border-gray-300 rounded-lg p-3 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 contact-type-select">
                       <option value="">Tipo</option>
                       <!-- Se poblará dinámicamente desde la API -->
                     </select>

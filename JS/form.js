@@ -56,6 +56,36 @@ const preguntasPorPagina = 8;
 let paginaActual = 0;
 
 // ============================================
+// CÓDIGOS TELEFÓNICOS
+// ============================================
+
+const codigosTelefonicos = [
+    { codigo: '+1', pais: 'Estados Unidos/Canadá' },
+    { codigo: '+52', pais: 'México' },
+    { codigo: '+503', pais: 'El Salvador' },
+    { codigo: '+502', pais: 'Guatemala' },
+    { codigo: '+504', pais: 'Honduras' },
+    { codigo: '+505', pais: 'Nicaragua' },
+    { codigo: '+506', pais: 'Costa Rica' },
+    { codigo: '+507', pais: 'Panamá' },
+    { codigo: '+51', pais: 'Perú' },
+    { codigo: '+54', pais: 'Argentina' },
+    { codigo: '+55', pais: 'Brasil' },
+    { codigo: '+56', pais: 'Chile' },
+    { codigo: '+57', pais: 'Colombia' },
+    { codigo: '+58', pais: 'Venezuela' },
+    { codigo: '+591', pais: 'Bolivia' },
+    { codigo: '+593', pais: 'Ecuador' },
+    { codigo: '+595', pais: 'Paraguay' },
+    { codigo: '+598', pais: 'Uruguay' },
+    { codigo: '+34', pais: 'España' },
+    { codigo: '+44', pais: 'Reino Unido' },
+    { codigo: '+33', pais: 'Francia' },
+    { codigo: '+39', pais: 'Italia' },
+    { codigo: '+49', pais: 'Alemania' }
+];
+
+// ============================================
 // FUNCIONES DE CARGA DE DATOS
 // ============================================
 
@@ -67,18 +97,18 @@ async function cargarPreguntas() {
         if (response.data && response.data.data) {
             preguntas = response.data.data;
             preguntasAPI = response.data.data;
-            console.log('✅ Preguntas cargadas:', preguntas.length);
+            console.log(' Preguntas cargadas:', preguntas.length);
             renderizarPreguntasEnFormulario();
         }
     } catch (error) {
-        console.error('❌ Error al cargar preguntas:', error);
+        console.error(' Error al cargar preguntas:', error);
     }
 }
 
 function renderizarPreguntasEnFormulario() {
     const container = document.getElementById('preguntasForm');
     if (!container) {
-        console.warn('⚠️ Contenedor preguntasForm no encontrado');
+        console.warn(' Contenedor preguntasForm no encontrado');
         return;
     }
 
@@ -209,7 +239,7 @@ function renderizarPreguntasEnFormulario() {
     // Agregar controles de paginación compactos
     agregarControlesPaginacion(container, inicio, fin);
 
-    console.log('✅ Preguntas renderizadas (página', paginaActual + 1, ')');
+    console.log(' Preguntas renderizadas (página', paginaActual + 1, ')');
 }
 
 function agregarControlesPaginacion(container, inicio, fin) {
@@ -300,7 +330,7 @@ async function cargarCatalogos() {
 
         if (response.data.success) {
             catalogos = response.data.data;
-            console.log('✅ Catálogos cargados:', Object.keys(catalogos));
+            console.log(' Catálogos cargados:', Object.keys(catalogos));
 
             // Verificar que se cargaron profesiones y ocupaciones
             console.log('🔍 Verificando catálogos:');
@@ -315,7 +345,7 @@ async function cargarCatalogos() {
             ocultarLoading();
         }
     } catch (error) {
-        console.error('❌ Error al cargar catálogos:', error);
+        console.error(' Error al cargar catálogos:', error);
         mostrarError('Error al cargar los catálogos.');
         ocultarLoading();
     }
@@ -324,12 +354,12 @@ async function cargarCatalogos() {
 function poblarEntornosViolencia() {
     const container = document.getElementById('entornoViolenciaContainer');
     if (!container) {
-        console.warn('⚠️ Contenedor entornoViolenciaContainer no encontrado');
+        console.warn(' Contenedor entornoViolenciaContainer no encontrado');
         return;
     }
 
     if (!catalogos.entornos_violencia) {
-        console.warn('⚠️ No hay datos de entornos_violencia');
+        console.warn(' No hay datos de entornos_violencia');
         return;
     }
 
@@ -369,7 +399,7 @@ function poblarEntornosViolencia() {
         }
     });
 
-    console.log('✅ Entornos de violencia poblados desde BD');
+    console.log(' Entornos de violencia poblados desde BD');
 }
 
 async function cargarGeografia() {
@@ -379,11 +409,11 @@ async function cargarGeografia() {
 
         if (response.data) {
             geografiaData.departamentos = response.data.data || response.data;
-            console.log('✅ Departamentos cargados:', geografiaData.departamentos.length);
+            console.log(' Departamentos cargados:', geografiaData.departamentos.length);
             poblarDepartamentos();
         }
     } catch (error) {
-        console.error('❌ Error al cargar geografía:', error);
+        console.error(' Error al cargar geografía:', error);
     }
 }
 
@@ -402,10 +432,10 @@ async function cargarTribunales() {
         if (response.data) {
             const todosTribunales = response.data.data || response.data;
             tribunalesData = todosTribunales.filter(t => t.estado === 'Activo');
-            console.log('✅ Tribunales cargados:', tribunalesData.length);
+            console.log(' Tribunales cargados:', tribunalesData.length);
         }
     } catch (error) {
-        console.error('❌ Error al cargar tribunales:', error);
+        console.error(' Error al cargar tribunales:', error);
     }
 }
 
@@ -444,18 +474,18 @@ function poblarTodosLosSelects() {
     poblarSelect('lugarHecho', catalogos.lugares_hecho, 'id', 'nombre');
     poblarSelect('frecuenciaAgresiones', catalogos.frecuencias_agresion, 'id', 'nombre');
 
-    console.log('✅ Selects poblados');
+    console.log(' Selects poblados');
 }
 
 function poblarSelect(selectId, data, valueField, textField) {
     const select = document.getElementById(selectId);
     if (!select) {
-        console.warn(`⚠️ Select ${selectId} no encontrado en DOM`);
+        console.warn(` Select ${selectId} no encontrado en DOM`);
         return;
     }
 
     if (!data || !Array.isArray(data) || data.length === 0) {
-        console.warn(`⚠️ No hay datos para poblar ${selectId}`);
+        console.warn(` No hay datos para poblar ${selectId}`);
         select.innerHTML = `<option value="">No hay datos disponibles</option>`;
         return;
     }
@@ -480,7 +510,7 @@ function poblarSelect(selectId, data, valueField, textField) {
         select.appendChild(option);
     });
 
-    console.log(`✅ Select ${selectId} poblado con ${data.length} opciones`);
+    console.log(` Select ${selectId} poblado con ${data.length} opciones`);
 }
 
 function poblarDepartamentos() {
@@ -535,10 +565,10 @@ function configurarCascadaGeografica() {
                 if (response.data) {
                     const municipios = response.data.data || response.data;
                     poblarSelect(config.muni, municipios, 'id_municipio', 'municipio');
-                    console.log(`✅ Municipios cargados para ${idDepartamento}: ${municipios.length}`);
+                    console.log(` Municipios cargados para ${idDepartamento}: ${municipios.length}`);
                 }
             } catch (error) {
-                console.error('❌ Error al cargar municipios:', error);
+                console.error(' Error al cargar municipios:', error);
             }
         });
 
@@ -555,10 +585,10 @@ function configurarCascadaGeografica() {
                 if (response.data) {
                     const distritos = response.data.data || response.data;
                     poblarSelect(config.dist, distritos, 'id_distrito', 'distrito');
-                    console.log(`✅ Distritos cargados para ${idMunicipio}: ${distritos.length}`);
+                    console.log(` Distritos cargados para ${idMunicipio}: ${distritos.length}`);
                 }
             } catch (error) {
-                console.error('❌ Error al cargar distritos:', error);
+                console.error(' Error al cargar distritos:', error);
             }
         });
     });
@@ -630,18 +660,26 @@ function inicializarTelefonos() {
 function poblarPrimerTelefono(prefijo) {
     const lista = document.getElementById(`${prefijo}TelefonosLista`);
     if (!lista) {
-        console.warn(`⚠️ Lista de teléfonos de ${prefijo} no encontrada`);
+        console.warn(` Lista de teléfonos de ${prefijo} no encontrada`);
         return;
     }
 
-    const primerSelect = lista.querySelector('select');
-    if (!primerSelect) {
-        console.warn(`⚠️ Select de teléfono de ${prefijo} no encontrado`);
+    // Obtener los selects específicamente por su clase
+    const primerPhoneCodeSelect = lista.querySelector('.phone-code-select');
+    const selectTipoContacto = lista.querySelector('.contact-type-select');
+
+    if (!selectTipoContacto) {
+        console.warn(` Select de tipo de contacto de ${prefijo} no encontrado`);
         return;
     }
 
-    // Limpiar opciones existentes
-    primerSelect.innerHTML = '<option value="">Seleccione tipo</option>';
+    // Poblar el select de código telefónico
+    if (primerPhoneCodeSelect) {
+        poblarCodigosTelefonicos(primerPhoneCodeSelect);
+    }
+
+    // Limpiar opciones existentes del select de tipo
+    selectTipoContacto.innerHTML = '<option value="">Seleccione tipo</option>';
 
     // Poblar desde catálogos
     if (catalogos.tipos_contacto && catalogos.tipos_contacto.length > 0) {
@@ -649,11 +687,11 @@ function poblarPrimerTelefono(prefijo) {
             const option = document.createElement('option');
             option.value = tipo.id_tipo_contacto;
             option.textContent = tipo.tipo_contacto;
-            primerSelect.appendChild(option);
+            selectTipoContacto.appendChild(option);
         });
-        console.log(`✅ Primer teléfono de ${prefijo} poblado con ${catalogos.tipos_contacto.length} tipos`);
+        console.log(` Primer teléfono de ${prefijo} poblado con ${catalogos.tipos_contacto.length} tipos`);
     } else {
-        console.warn(`⚠️ No hay tipos_contacto en catálogos para ${prefijo}`);
+        console.warn(` No hay tipos_contacto en catálogos para ${prefijo}`);
         // Opciones por defecto
         const opcionesDefault = [
             { value: 1, text: 'Celular Personal' },
@@ -666,7 +704,7 @@ function poblarPrimerTelefono(prefijo) {
             const option = document.createElement('option');
             option.value = opcion.value;
             option.textContent = opcion.text;
-            primerSelect.appendChild(option);
+            selectTipoContacto.appendChild(option);
         });
     }
 }
@@ -686,16 +724,25 @@ function agregarTelefono(prefijo, lista) {
     const nuevoTelefono = document.createElement('div');
     nuevoTelefono.className = 'flex gap-2 items-center mb-2';
     nuevoTelefono.innerHTML = `
+        <select class="border border-gray-300 rounded-lg p-3 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 phone-code-select">
+            <option value="">Código</option>
+        </select>
         <input type="tel" placeholder="Número de teléfono"
             class="border border-gray-300 rounded-lg p-3 flex-grow focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
-        <select class="border border-gray-300 rounded-lg p-3 focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
+        <select class="border border-gray-300 rounded-lg p-3 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 contact-type-select">
             <option value="">Seleccione tipo</option>
         </select>
         <button type="button" class="text-red-500 hover:text-red-700 font-bold px-3 py-2 eliminar-telefono">✕</button>
     `;
 
+    // Poblar select de código telefónico
+    const phoneCodeSelect = nuevoTelefono.querySelector('.phone-code-select');
+    if (phoneCodeSelect) {
+        poblarCodigosTelefonicos(phoneCodeSelect);
+    }
+
     // Poblar select de tipos de contacto
-    const selectTipo = nuevoTelefono.querySelector('select');
+    const selectTipo = nuevoTelefono.querySelector('.contact-type-select');
     if (catalogos.tipos_contacto && catalogos.tipos_contacto.length > 0) {
         catalogos.tipos_contacto.forEach(tipo => {
             const option = document.createElement('option');
@@ -731,6 +778,25 @@ function agregarTelefono(prefijo, lista) {
     });
 
     lista.appendChild(nuevoTelefono);
+}
+
+// ============================================
+// FUNCIÓN PARA POBLAR CÓDIGOS TELEFÓNICOS
+// ============================================
+
+function poblarCodigosTelefonicos(selectElement) {
+    if (!selectElement) return;
+
+    // Limpiar opciones existentes excepto la primera
+    selectElement.innerHTML = '<option value="">Código</option>';
+
+    // Agregar cada código telefónico
+    codigosTelefonicos.forEach(item => {
+        const option = document.createElement('option');
+        option.value = item.codigo;
+        option.textContent = `${item.codigo} (${item.pais})`;
+        selectElement.appendChild(option);
+    });
 }
 
 // ============================================
@@ -827,7 +893,7 @@ function setupConditionalFields() {
     // Generador de texto
     setupGeneradorTexto();
 
-    console.log('✅ Campos condicionales configurados');
+    console.log(' Campos condicionales configurados');
 }
 
 function setupCheckboxesTrabajo(prefijo) {
@@ -1016,7 +1082,7 @@ function setupCamposDiscapacidadAgresor() {
 function setupGeneradorTexto() {
     const btnGenerar = document.getElementById('generarTextoBtn');
     if (!btnGenerar) {
-        console.warn('⚠️ Botón generarTextoBtn no encontrado');
+        console.warn(' Botón generarTextoBtn no encontrado');
         return;
     }
 
@@ -1025,7 +1091,7 @@ function setupGeneradorTexto() {
         generarTextoAutomatico();
     });
 
-    console.log('✅ Generador de texto configurado');
+    console.log(' Generador de texto configurado');
 }
 
 function generarTextoAutomatico() {
@@ -1067,9 +1133,9 @@ function generarTextoAutomatico() {
     if (window.editor && typeof window.editor.setData === 'function') {
         try {
             window.editor.setData(textoGenerado);
-            console.log('✅ Texto insertado en CKEditor');
+            console.log(' Texto insertado en CKEditor');
         } catch (error) {
-            console.error('❌ Error con CKEditor:', error);
+            console.error(' Error con CKEditor:', error);
         }
     }
 
@@ -1077,14 +1143,14 @@ function generarTextoAutomatico() {
     const textarea = document.getElementById('relacionHechos');
     if (textarea) {
         textarea.value = textoGenerado;
-        console.log('✅ Texto insertado en textarea');
+        console.log(' Texto insertado en textarea');
     }
 
     // 3. Actualizar previsualización
     const preview = document.getElementById('previewRelacion');
     if (preview) {
         preview.innerHTML = `<div class="whitespace-pre-line text-gray-800">${textoGenerado}</div>`;
-        console.log('✅ Previsualización actualizada');
+        console.log(' Previsualización actualizada');
     }
 
     mostrarExito('Texto generado automáticamente');
@@ -1179,7 +1245,7 @@ function copiarDatosDenuncianteAVictima() {
 
     copiarTelefonos('denunciante', 'victima');
 
-    console.log('✅ Datos copiados');
+    console.log(' Datos copiados');
     mostrarExito('Datos del denunciante copiados automáticamente');
 }
 
@@ -1822,7 +1888,7 @@ document.getElementById('imprimirBtn')?.addEventListener('click', function () {
 function inicializarCKEditor() {
     // Verificar si CKEditor está disponible
     if (typeof ClassicEditor === 'undefined') {
-        console.warn('⚠️ CKEditor no está disponible. Usando textarea simple.');
+        console.warn(' CKEditor no está disponible. Usando textarea simple.');
 
         // Hacer visible el textarea como fallback
         const textarea = document.getElementById('relacionHechos');
@@ -1837,13 +1903,13 @@ function inicializarCKEditor() {
     // Si CKEditor está disponible, inicializarlo
     const editorContainer = document.querySelector('#editor-container');
     if (!editorContainer) {
-        console.error('❌ No se encontró el contenedor del editor (#editor-container)');
+        console.error(' No se encontró el contenedor del editor (#editor-container)');
         return;
     }
 
     // Verificar si ya hay un editor inicializado
     if (window.editor) {
-        console.log('✅ CKEditor ya está inicializado');
+        console.log(' CKEditor ya está inicializado');
         return;
     }
 
@@ -1867,7 +1933,7 @@ function inicializarCKEditor() {
         })
         .then(editor => {
             window.editor = editor;
-            console.log('✅ CKEditor inicializado correctamente');
+            console.log(' CKEditor inicializado correctamente');
 
             // Configurar el botón para usar CKEditor
             const btnGenerar = document.getElementById('generarTextoBtn');
@@ -1888,7 +1954,7 @@ function inicializarCKEditor() {
             });
         })
         .catch(error => {
-            console.error('❌ Error al inicializar CKEditor:', error);
+            console.error(' Error al inicializar CKEditor:', error);
             console.error('Detalles del error:', error.message);
 
             // Fallback a textarea
@@ -1919,7 +1985,7 @@ document.addEventListener('DOMContentLoaded', async function () {
             cargarTribunales()
         ]);
 
-        console.log('✅ Datos iniciales cargados');
+        console.log(' Datos iniciales cargados');
 
         // Inicializar CKEditor
         inicializarCKEditor();
@@ -1975,9 +2041,9 @@ document.addEventListener('DOMContentLoaded', async function () {
         }, 1000);
 
     } catch (error) {
-        console.error('❌ Error en inicialización:', error);
+        console.error(' Error en inicialización:', error);
         mostrarError('Error al inicializar el formulario.');
     }
 });
 
-console.log('✅ form.js cargado y listo');
+console.log(' form.js cargado y listo');
