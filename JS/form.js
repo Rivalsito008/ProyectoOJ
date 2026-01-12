@@ -372,18 +372,18 @@ function poblarEntornosViolencia() {
         const checkbox = document.createElement('input');
         checkbox.type = 'checkbox';
         checkbox.name = 'entornoViolencia';
-        checkbox.value = entorno.id_entorno_violencia;
+        checkbox.value = entorno.id;
         checkbox.className = 'text-blue-600';
 
         const span = document.createElement('span');
-        span.textContent = entorno.entorno_violencia;
+        span.textContent = entorno.nombre;
 
         label.appendChild(checkbox);
         label.appendChild(span);
         container.appendChild(label);
 
         // Si es "OTRO", agregar input para especificar
-        if (entorno.entorno_violencia.toUpperCase().includes('OTRO')) {
+        if (entorno.nombre && entorno.nombre.toUpperCase().includes('OTRO')) {
             const inputOtro = document.createElement('input');
             inputOtro.type = 'text';
             inputOtro.id = 'entornoOtraTexto';
@@ -466,8 +466,8 @@ function poblarTodosLosSelects() {
     poblarSelect('victimaRangoIngresos', catalogos.rangos_ingresos, 'id', 'nombre');
     poblarSelect('victimaFrecuenciaIngreso', catalogos.frecuencias_ingreso, 'id', 'nombre');
 
-    poblarSelect('agresorTipoArmas', catalogos.tipos_arma, 'id_tipo_arma', 'tipo_arma');
-    poblarSelect('agresorTipoFormacion', catalogos.tipos_formacion, 'id_tipo_formacion_especial', 'tipo_formacion_especial');
+    poblarSelect('agresorTipoArmas', catalogos.tipos_arma, 'id', 'nombre');
+    poblarSelect('agresorTipoFormacion', catalogos.tipos_formacion, 'id', 'nombre');
     poblarSelect('agresorFrecuenciaAlcohol', catalogos.frecuencias_consumo, 'id', 'nombre');
     poblarSelect('agresorFrecuenciaDrogas', catalogos.frecuencias_consumo, 'id', 'nombre');
 
@@ -685,8 +685,8 @@ function poblarPrimerTelefono(prefijo) {
     if (catalogos.tipos_contacto && catalogos.tipos_contacto.length > 0) {
         catalogos.tipos_contacto.forEach(tipo => {
             const option = document.createElement('option');
-            option.value = tipo.id_tipo_contacto;
-            option.textContent = tipo.tipo_contacto;
+            option.value = tipo.id;
+            option.textContent = tipo.nombre;
             selectTipoContacto.appendChild(option);
         });
         console.log(` Primer teléfono de ${prefijo} poblado con ${catalogos.tipos_contacto.length} tipos`);
