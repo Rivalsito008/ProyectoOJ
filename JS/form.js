@@ -746,8 +746,8 @@ function agregarTelefono(prefijo, lista) {
     if (catalogos.tipos_contacto && catalogos.tipos_contacto.length > 0) {
         catalogos.tipos_contacto.forEach(tipo => {
             const option = document.createElement('option');
-            option.value = tipo.id_tipo_contacto;
-            option.textContent = tipo.tipo_contacto;
+            option.value = tipo.id;
+            option.textContent = tipo.nombre;
             selectTipo.appendChild(option);
         });
     } else {

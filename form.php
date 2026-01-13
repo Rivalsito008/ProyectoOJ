@@ -260,7 +260,7 @@
               </div>
 
               <!-- Dirección de trabajo -->
-              <div id="denuncianteDireccionTrabajoContainer">
+              <div id="denuncianteDireccionTrabajoContainer" class="md:col-span-2">
                 <label class="block text-gray-700 text-sm font-medium mb-2">Dirección de trabajo</label>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                   <select id="denuncianteDeptoTrabajo"
@@ -600,7 +600,7 @@
               </div>
 
               <!-- Dirección de trabajo -->
-              <div id="victimaDireccionTrabajoContainer">
+              <div id="victimaDireccionTrabajoContainer" class="md:col-span-2">
                 <label class="block text-gray-700 text-sm font-medium mb-2">Dirección de trabajo</label>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                   <select id="victimaDeptoTrabajo"
@@ -1386,7 +1386,7 @@
               </div>
 
               <!-- Dirección de trabajo -->
-              <div id="agresorDireccionTrabajoContainer">
+              <div id="agresorDireccionTrabajoContainer" class="md:col-span-2">
                 <label class="block text-gray-700 text-sm font-medium mb-2">Dirección de trabajo</label>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                   <select id="agresorDeptoTrabajo"
