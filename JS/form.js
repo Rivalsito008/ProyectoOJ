@@ -1,4 +1,4 @@
-// JS/form.js - Formulario DEFINITIVO - TODAS las funcionalidades
+
 // ============================================
 // CONFIGURACIÓN Y CONSTANTES
 // ============================================
@@ -56,6 +56,17 @@ const preguntasPorPagina = 8;
 let paginaActual = 0;
 
 // ============================================
+// ALMACENAMIENTO TEMPORAL DE DATOS - NUEVO
+// ============================================
+
+let datosTemporales = {
+    relacionHechos: '', // Se captura en Paso 3, se envía en Paso 4
+    denunciante: null,
+    victimas: [],
+    agresores: []
+};
+
+// ============================================
 // CÓDIGOS TELEFÓNICOS
 // ============================================
 
@@ -86,6 +97,57 @@ const codigosTelefonicos = [
 ];
 
 // ============================================
+// FUNCIONES HELPER PARA CONVERSIÓN ENUM - NUEVO
+// ============================================
+
+function convertirAEnum(valor) {
+    if (!valor) return 'NO';
+
+    const valorLower = valor.toLowerCase();
+    if (valorLower === 'si' || valorLower === 'sí') return 'SI';
+    if (valorLower === 'no') return 'NO';
+    if (valorLower === 'no_sabe' || valorLower === 'no sabe') return 'NO SABE';
+
+    return 'NO'; // Default
+}
+
+function convertirAEnumNoSeSabe(valor) {
+    if (!valor) return 'NO';
+
+    const valorLower = valor.toLowerCase();
+    if (valorLower === 'si' || valorLower === 'sí') return 'SI';
+    if (valorLower === 'no') return 'NO';
+    if (valorLower === 'no se sabe' || valorLower === 'no_se_sabe') return 'NO SE SABE';
+
+    return 'NO'; // Default
+}
+
+function obtenerTextoRelacionHechos() {
+    // Intentar obtener de CKEditor primero
+    if (window.editor && typeof window.editor.getData === 'function') {
+        try {
+            const data = window.editor.getData();
+            if (data) {
+                console.log('Texto obtenido de CKEditor');
+                return data;
+            }
+        } catch (error) {
+            console.warn('Error al obtener datos de CKEditor:', error);
+        }
+    }
+
+    // Fallback a textarea
+    const textarea = document.getElementById('relacionHechos');
+    if (textarea && textarea.value) {
+        console.log('Texto obtenido de textarea');
+        return textarea.value;
+    }
+
+    console.warn('No se pudo obtener texto de relación de hechos');
+    return '';
+}
+
+// ============================================
 // FUNCIONES DE CARGA DE DATOS
 // ============================================
 
@@ -97,24 +159,23 @@ async function cargarPreguntas() {
         if (response.data && response.data.data) {
             preguntas = response.data.data;
             preguntasAPI = response.data.data;
-            console.log(' Preguntas cargadas:', preguntas.length);
+            console.log('✓ Preguntas cargadas:', preguntas.length);
             renderizarPreguntasEnFormulario();
         }
     } catch (error) {
-        console.error(' Error al cargar preguntas:', error);
+        console.error('Error al cargar preguntas:', error);
     }
 }
 
 function renderizarPreguntasEnFormulario() {
     const container = document.getElementById('preguntasForm');
     if (!container) {
-        console.warn(' Contenedor preguntasForm no encontrado');
+        console.warn('Contenedor preguntasForm no encontrado');
         return;
     }
 
     container.innerHTML = '';
 
-    // Calcular índices para paginación
     const inicio = paginaActual * preguntasPorPagina;
     const fin = Math.min(inicio + preguntasPorPagina, preguntas.length);
     const preguntasPagina = preguntas.slice(inicio, fin);
@@ -124,11 +185,9 @@ function renderizarPreguntasEnFormulario() {
         return;
     }
 
-    // Contenedor principal SIN borde negro - solo fondo suave
     const contenedorPrincipal = document.createElement('div');
     contenedorPrincipal.className = 'rounded-lg p-4 bg-gray-50';
 
-    // Agrupar por ámbito
     const preguntasPorAmbito = {};
     preguntasPagina.forEach(pregunta => {
         const nombreAmbito = pregunta.ambito?.ambito || 'Sin ámbito';
@@ -138,7 +197,6 @@ function renderizarPreguntasEnFormulario() {
         preguntasPorAmbito[nombreAmbito].push(pregunta);
     });
 
-    // Renderizar cada ámbito
     Object.keys(preguntasPorAmbito).forEach(nombreAmbito => {
         const ambitoDiv = document.createElement('div');
         ambitoDiv.className = 'mb-4 rounded-lg p-4 bg-white shadow-sm hover:shadow-md hover:bg-blue-50 transition-all duration-200';
@@ -155,7 +213,6 @@ function renderizarPreguntasEnFormulario() {
             const preguntaDiv = document.createElement('div');
             preguntaDiv.className = 'p-3 rounded-md hover:bg-gray-50 transition-colors duration-150';
 
-            // Calcular número real de pregunta
             const numeroPregunta = inicio + preguntasPagina.indexOf(pregunta) + 1;
 
             preguntaDiv.innerHTML = `
@@ -163,8 +220,7 @@ function renderizarPreguntasEnFormulario() {
                 <div class="flex items-center space-x-6">
                     <label class="flex items-center space-x-2 cursor-pointer">
                         <div class="relative">
-                            <input type="radio" name="pregunta_${pregunta.id_pregunta}" value="Si" 
-                                   class="sr-only">
+                            <input type="radio" name="pregunta_${pregunta.id_pregunta}" value="Si" class="sr-only">
                             <div class="w-4 h-4 rounded-full border border-gray-400 flex items-center justify-center radio-visual">
                                 <div class="w-2 h-2 rounded-full bg-transparent"></div>
                             </div>
@@ -173,8 +229,7 @@ function renderizarPreguntasEnFormulario() {
                     </label>
                     <label class="flex items-center space-x-2 cursor-pointer">
                         <div class="relative">
-                            <input type="radio" name="pregunta_${pregunta.id_pregunta}" value="No" 
-                                   class="sr-only">
+                            <input type="radio" name="pregunta_${pregunta.id_pregunta}" value="No" class="sr-only">
                             <div class="w-4 h-4 rounded-full border border-gray-400 flex items-center justify-center radio-visual">
                                 <div class="w-2 h-2 rounded-full bg-transparent"></div>
                             </div>
@@ -184,14 +239,12 @@ function renderizarPreguntasEnFormulario() {
                 </div>
             `;
 
-            // Configurar selección visual
             const radioSi = preguntaDiv.querySelector('input[value="Si"]');
             const radioNo = preguntaDiv.querySelector('input[value="No"]');
             const visualSi = preguntaDiv.querySelectorAll('.radio-visual')[0];
             const visualNo = preguntaDiv.querySelectorAll('.radio-visual')[1];
 
             function actualizarVisual() {
-                // Resetear ambos
                 visualSi.style.borderColor = '#9ca3af';
                 visualSi.querySelector('div').style.backgroundColor = 'transparent';
                 visualNo.style.borderColor = '#9ca3af';
@@ -206,14 +259,11 @@ function renderizarPreguntasEnFormulario() {
                 }
             }
 
-            // Event listeners
             radioSi.addEventListener('change', actualizarVisual);
             radioNo.addEventListener('change', actualizarVisual);
 
-            // Event listeners para clicks en el label
             preguntaDiv.querySelectorAll('label').forEach(label => {
                 label.addEventListener('click', function (e) {
-                    // Solo si no se hizo click directamente en el input
                     if (e.target.tagName !== 'INPUT') {
                         const radio = this.querySelector('input');
                         if (radio) {
@@ -224,9 +274,7 @@ function renderizarPreguntasEnFormulario() {
                 });
             });
 
-            // Inicializar sin selección
             actualizarVisual();
-
             preguntasDiv.appendChild(preguntaDiv);
         });
 
@@ -235,25 +283,20 @@ function renderizarPreguntasEnFormulario() {
     });
 
     container.appendChild(contenedorPrincipal);
-
-    // Agregar controles de paginación compactos
     agregarControlesPaginacion(container, inicio, fin);
 
-    console.log(' Preguntas renderizadas (página', paginaActual + 1, ')');
+    console.log('✓ Preguntas renderizadas (página', paginaActual + 1, ')');
 }
 
 function agregarControlesPaginacion(container, inicio, fin) {
     const totalPaginas = Math.ceil(preguntas.length / preguntasPorPagina);
 
-    // Contenedor de paginación COMPACTO
     const paginacionDiv = document.createElement('div');
     paginacionDiv.className = 'mt-6 pt-4 border-t border-gray-200';
 
-    // Controles de navegación compactos
     const controlesDiv = document.createElement('div');
     controlesDiv.className = 'flex items-center justify-between';
 
-    // Información de página compacta - MUCHO MÁS PEQUEÑA
     const infoDiv = document.createElement('div');
     infoDiv.className = 'text-xs text-gray-500';
     infoDiv.innerHTML = `
@@ -262,7 +305,6 @@ function agregarControlesPaginacion(container, inicio, fin) {
         <span>Preguntas ${inicio + 1}-${fin} de ${preguntas.length}</span>
     `;
 
-    // Botones de navegación compactos
     const navegacionDiv = document.createElement('div');
     navegacionDiv.className = 'flex items-center space-x-2';
 
@@ -289,7 +331,6 @@ function agregarControlesPaginacion(container, inicio, fin) {
     paginacionDiv.appendChild(controlesDiv);
     container.appendChild(paginacionDiv);
 
-    // Event listeners para controles de paginación
     const btnAnterior = document.getElementById('paginaAnterior');
     const btnSiguiente = document.getElementById('paginaSiguiente');
 
@@ -313,10 +354,6 @@ function agregarControlesPaginacion(container, inicio, fin) {
     }
 }
 
-// ============================================
-// MODIFICACIÓN: FUNCIÓN PARA RESTABLECER PAGINACIÓN
-// ============================================
-
 function restablecerPaginacionPreguntas() {
     paginaActual = 0;
     renderizarPreguntasEnFormulario();
@@ -330,10 +367,9 @@ async function cargarCatalogos() {
 
         if (response.data.success) {
             catalogos = response.data.data;
-            console.log(' Catálogos cargados:', Object.keys(catalogos));
+            console.log('✓ Catálogos cargados:', Object.keys(catalogos));
 
-            // Verificar que se cargaron profesiones y ocupaciones
-            console.log('🔍 Verificando catálogos:');
+            console.log('Verificando catálogos:');
             console.log('- Profesiones:', catalogos.profesiones?.length || 0);
             console.log('- Ocupaciones:', catalogos.ocupaciones?.length || 0);
             console.log('- Tipos contacto:', catalogos.tipos_contacto?.length || 0);
@@ -345,7 +381,7 @@ async function cargarCatalogos() {
             ocultarLoading();
         }
     } catch (error) {
-        console.error(' Error al cargar catálogos:', error);
+        console.error('Error al cargar catálogos:', error);
         mostrarError('Error al cargar los catálogos.');
         ocultarLoading();
     }
@@ -354,12 +390,12 @@ async function cargarCatalogos() {
 function poblarEntornosViolencia() {
     const container = document.getElementById('entornoViolenciaContainer');
     if (!container) {
-        console.warn(' Contenedor entornoViolenciaContainer no encontrado');
+        console.warn('Contenedor entornoViolenciaContainer no encontrado');
         return;
     }
 
     if (!catalogos.entornos_violencia) {
-        console.warn(' No hay datos de entornos_violencia');
+        console.warn('No hay datos de entornos_violencia');
         return;
     }
 
@@ -382,7 +418,6 @@ function poblarEntornosViolencia() {
         label.appendChild(span);
         container.appendChild(label);
 
-        // Si es "OTRO", agregar input para especificar
         if (entorno.nombre && entorno.nombre.toUpperCase().includes('OTRO')) {
             const inputOtro = document.createElement('input');
             inputOtro.type = 'text';
@@ -399,7 +434,7 @@ function poblarEntornosViolencia() {
         }
     });
 
-    console.log(' Entornos de violencia poblados desde BD');
+    console.log('✓ Entornos de violencia poblados desde BD');
 }
 
 async function cargarGeografia() {
@@ -409,11 +444,11 @@ async function cargarGeografia() {
 
         if (response.data) {
             geografiaData.departamentos = response.data.data || response.data;
-            console.log(' Departamentos cargados:', geografiaData.departamentos.length);
+            console.log('✓ Departamentos cargados:', geografiaData.departamentos.length);
             poblarDepartamentos();
         }
     } catch (error) {
-        console.error(' Error al cargar geografía:', error);
+        console.error('Error al cargar geografía:', error);
     }
 }
 
@@ -432,10 +467,10 @@ async function cargarTribunales() {
         if (response.data) {
             const todosTribunales = response.data.data || response.data;
             tribunalesData = todosTribunales.filter(t => t.estado === 'Activo');
-            console.log(' Tribunales cargados:', tribunalesData.length);
+            console.log('✓ Tribunales cargados:', tribunalesData.length);
         }
     } catch (error) {
-        console.error(' Error al cargar tribunales:', error);
+        console.error('Error al cargar tribunales:', error);
     }
 }
 
@@ -450,8 +485,6 @@ function poblarTodosLosSelects() {
         poblarSelect(`${prefix}TipoDocumento`, catalogos.tipos_documento, 'id', 'nombre');
         poblarSelect(`${prefix}NivelEducativo`, catalogos.niveles_educativos, 'id', 'nombre');
         poblarSelect(`${prefix}EstadoFamiliar`, catalogos.estados_familiares, 'id', 'nombre');
-
-        // Catálogos de ENUMs
         poblarSelect(`${prefix}Nacionalidad`, catalogos.nacionalidades, 'id', 'nombre');
         poblarSelect(`${prefix}Sexo`, catalogos.sexos, 'id', 'nombre');
         poblarSelect(`${prefix}Profesion`, catalogos.profesiones, 'id', 'nombre');
@@ -474,18 +507,18 @@ function poblarTodosLosSelects() {
     poblarSelect('lugarHecho', catalogos.lugares_hecho, 'id', 'nombre');
     poblarSelect('frecuenciaAgresiones', catalogos.frecuencias_agresion, 'id', 'nombre');
 
-    console.log(' Selects poblados');
+    console.log('✓ Selects poblados');
 }
 
 function poblarSelect(selectId, data, valueField, textField) {
     const select = document.getElementById(selectId);
     if (!select) {
-        console.warn(` Select ${selectId} no encontrado en DOM`);
+        console.warn(`Select ${selectId} no encontrado en DOM`);
         return;
     }
 
     if (!data || !Array.isArray(data) || data.length === 0) {
-        console.warn(` No hay datos para poblar ${selectId}`);
+        console.warn(`No hay datos para poblar ${selectId}`);
         select.innerHTML = `<option value="">No hay datos disponibles</option>`;
         return;
     }
@@ -496,7 +529,6 @@ function poblarSelect(selectId, data, valueField, textField) {
     if (defaultOption) {
         select.appendChild(defaultOption);
     } else {
-        // Agregar opción por defecto si no existe
         const optionDefault = document.createElement('option');
         optionDefault.value = "";
         optionDefault.textContent = "Seleccione...";
@@ -510,8 +542,12 @@ function poblarSelect(selectId, data, valueField, textField) {
         select.appendChild(option);
     });
 
-    console.log(` Select ${selectId} poblado con ${data.length} opciones`);
+    console.log(`✓ Select ${selectId} poblado con ${data.length} opciones`);
 }
+
+// ============================================
+// FUNCIONES DE GEOGRAFÍA Y TELÉFONOS
+// ============================================
 
 function poblarDepartamentos() {
     if (!geografiaData.departamentos) return;
@@ -565,10 +601,10 @@ function configurarCascadaGeografica() {
                 if (response.data) {
                     const municipios = response.data.data || response.data;
                     poblarSelect(config.muni, municipios, 'id_municipio', 'municipio');
-                    console.log(` Municipios cargados para ${idDepartamento}: ${municipios.length}`);
+                    console.log(`✓ Municipios cargados para ${idDepartamento}: ${municipios.length}`);
                 }
             } catch (error) {
-                console.error(' Error al cargar municipios:', error);
+                console.error('Error al cargar municipios:', error);
             }
         });
 
@@ -585,10 +621,10 @@ function configurarCascadaGeografica() {
                 if (response.data) {
                     const distritos = response.data.data || response.data;
                     poblarSelect(config.dist, distritos, 'id_distrito', 'distrito');
-                    console.log(` Distritos cargados para ${idMunicipio}: ${distritos.length}`);
+                    console.log(`✓ Distritos cargados para ${idMunicipio}: ${distritos.length}`);
                 }
             } catch (error) {
-                console.error(' Error al cargar distritos:', error);
+                console.error('Error al cargar distritos:', error);
             }
         });
     });
@@ -649,7 +685,6 @@ function inicializarTelefonos() {
     setupTelefonosDinamicos('victima');
     setupTelefonosDinamicos('agresor');
 
-    // Poblar el primer teléfono que ya está en el HTML
     setTimeout(() => {
         poblarPrimerTelefono('denunciante');
         poblarPrimerTelefono('victima');
@@ -660,28 +695,24 @@ function inicializarTelefonos() {
 function poblarPrimerTelefono(prefijo) {
     const lista = document.getElementById(`${prefijo}TelefonosLista`);
     if (!lista) {
-        console.warn(` Lista de teléfonos de ${prefijo} no encontrada`);
+        console.warn(`Lista de teléfonos de ${prefijo} no encontrada`);
         return;
     }
 
-    // Obtener los selects específicamente por su clase
     const primerPhoneCodeSelect = lista.querySelector('.phone-code-select');
     const selectTipoContacto = lista.querySelector('.contact-type-select');
 
     if (!selectTipoContacto) {
-        console.warn(` Select de tipo de contacto de ${prefijo} no encontrado`);
+        console.warn(`Select de tipo de contacto de ${prefijo} no encontrado`);
         return;
     }
 
-    // Poblar el select de código telefónico
     if (primerPhoneCodeSelect) {
         poblarCodigosTelefonicos(primerPhoneCodeSelect);
     }
 
-    // Limpiar opciones existentes del select de tipo
     selectTipoContacto.innerHTML = '<option value="">Seleccione tipo</option>';
 
-    // Poblar desde catálogos
     if (catalogos.tipos_contacto && catalogos.tipos_contacto.length > 0) {
         catalogos.tipos_contacto.forEach(tipo => {
             const option = document.createElement('option');
@@ -689,10 +720,9 @@ function poblarPrimerTelefono(prefijo) {
             option.textContent = tipo.nombre;
             selectTipoContacto.appendChild(option);
         });
-        console.log(` Primer teléfono de ${prefijo} poblado con ${catalogos.tipos_contacto.length} tipos`);
+        console.log(`✓ Primer teléfono de ${prefijo} poblado con ${catalogos.tipos_contacto.length} tipos`);
     } else {
-        console.warn(` No hay tipos_contacto en catálogos para ${prefijo}`);
-        // Opciones por defecto
+        console.warn(`No hay tipos_contacto en catálogos para ${prefijo}`);
         const opcionesDefault = [
             { value: 1, text: 'Celular Personal' },
             { value: 2, text: 'Celular Trabajo' },
@@ -735,13 +765,11 @@ function agregarTelefono(prefijo, lista) {
         <button type="button" class="text-red-500 hover:text-red-700 font-bold px-3 py-2 eliminar-telefono">✕</button>
     `;
 
-    // Poblar select de código telefónico
     const phoneCodeSelect = nuevoTelefono.querySelector('.phone-code-select');
     if (phoneCodeSelect) {
         poblarCodigosTelefonicos(phoneCodeSelect);
     }
 
-    // Poblar select de tipos de contacto
     const selectTipo = nuevoTelefono.querySelector('.contact-type-select');
     if (catalogos.tipos_contacto && catalogos.tipos_contacto.length > 0) {
         catalogos.tipos_contacto.forEach(tipo => {
@@ -751,7 +779,6 @@ function agregarTelefono(prefijo, lista) {
             selectTipo.appendChild(option);
         });
     } else {
-        // Opciones por defecto
         const opcionesDefault = [
             { value: 1, text: 'Celular Personal' },
             { value: 2, text: 'Celular Trabajo' },
@@ -767,7 +794,6 @@ function agregarTelefono(prefijo, lista) {
         });
     }
 
-    // Evento para eliminar
     const btnEliminar = nuevoTelefono.querySelector('.eliminar-telefono');
     btnEliminar.addEventListener('click', function () {
         if (lista.children.length > 1) {
@@ -780,17 +806,11 @@ function agregarTelefono(prefijo, lista) {
     lista.appendChild(nuevoTelefono);
 }
 
-// ============================================
-// FUNCIÓN PARA POBLAR CÓDIGOS TELEFÓNICOS
-// ============================================
-
 function poblarCodigosTelefonicos(selectElement) {
     if (!selectElement) return;
 
-    // Limpiar opciones existentes excepto la primera
     selectElement.innerHTML = '<option value="">Código</option>';
 
-    // Agregar cada código telefónico
     codigosTelefonicos.forEach(item => {
         const option = document.createElement('option');
         option.value = item.codigo;
@@ -835,13 +855,12 @@ function crearFormularioHijo(numero) {
         <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
             <input type="text" id="hijo${numero}Nombre" placeholder="Nombre completo" 
                    class="border border-gray-300 rounded-lg p-2">
+            <select id="hijo${numero}Sexo" class="border border-gray-300 rounded-lg p-2">
+                <option value="">Sexo</option>
+                <option value="M">Masculino</option>
+                <option value="F">Femenino</option>
+            </select>
             <input type="number" id="hijo${numero}Edad" placeholder="Edad" min="0" 
-                   class="border border-gray-300 rounded-lg p-2">
-            <input type="text" id="hijo${numero}Escolaridad" placeholder="Escolaridad" 
-                   class="border border-gray-300 rounded-lg p-2">
-            <input type="text" id="hijo${numero}NombrePadre" placeholder="Nombre del padre" 
-                   class="border border-gray-300 rounded-lg p-2">
-            <input type="text" id="hijo${numero}NombreMadre" placeholder="Nombre de la madre" 
                    class="border border-gray-300 rounded-lg p-2">
         </div>
     `;
@@ -853,9 +872,8 @@ function crearFormularioHijo(numero) {
 // ============================================
 
 function setupConditionalFields() {
-    console.log('⚙️ Configurando campos condicionales...');
+    console.log('Configurando campos condicionales...');
 
-    // Estado familiar
     ['denunciante', 'victima', 'agresor'].forEach(prefijo => {
         const selectEstado = document.getElementById(`${prefijo}EstadoFamiliar`);
         const containerConyuge = document.getElementById(`${prefijo}NombreConyugeContainer`);
@@ -872,28 +890,24 @@ function setupConditionalFields() {
         }
     });
 
-    // Checkboxes de trabajo
     setupCheckboxesTrabajo('denunciante');
     setupCheckboxesTrabajo('victima');
     setupCheckboxesTrabajo('agresor');
 
-    // Víctima
     setupCamposIngresoVictima();
     setupCamposLesionesVictima();
     setupCamposHospitalizacionesVictima();
     setupCamposAtencionesMedicasVictima();
 
-    // Agresor
     setupCamposConsumoAgresor('Alcohol');
     setupCamposConsumoAgresor('Drogas');
     setupCamposArmasAgresor();
     setupCamposFormacionAgresor();
     setupCamposDiscapacidadAgresor();
 
-    // Generador de texto
     setupGeneradorTexto();
 
-    console.log(' Campos condicionales configurados');
+    console.log('✓ Campos condicionales configurados');
 }
 
 function setupCheckboxesTrabajo(prefijo) {
@@ -910,7 +924,6 @@ function setupCheckboxesTrabajo(prefijo) {
             if (inputLugarTrabajo) inputLugarTrabajo.disabled = true;
             if (containerDireccion) containerDireccion.style.display = 'none';
         } else {
-            // Al deseleccionar, volver a mostrar
             if (inputLugarTrabajo) inputLugarTrabajo.disabled = false;
             if (containerDireccion && !checkTrabajoEnCasa.checked) {
                 containerDireccion.style.display = 'block';
@@ -924,7 +937,6 @@ function setupCheckboxesTrabajo(prefijo) {
             if (inputLugarTrabajo) inputLugarTrabajo.disabled = false;
             if (containerDireccion) containerDireccion.style.display = 'none';
         } else {
-            // Al deseleccionar, volver a mostrar si "No trabajo" no está marcado
             if (containerDireccion && !checkNoTrabajo.checked) {
                 containerDireccion.style.display = 'block';
             }
@@ -1076,13 +1088,13 @@ function setupCamposDiscapacidadAgresor() {
 }
 
 // ============================================
-// GENERADOR DE TEXTO AUTOMÁTICO - CORREGIDO
+// GENERADOR DE TEXTO AUTOMÁTICO
 // ============================================
 
 function setupGeneradorTexto() {
     const btnGenerar = document.getElementById('generarTextoBtn');
     if (!btnGenerar) {
-        console.warn(' Botón generarTextoBtn no encontrado');
+        console.warn('Botón generarTextoBtn no encontrado');
         return;
     }
 
@@ -1091,7 +1103,7 @@ function setupGeneradorTexto() {
         generarTextoAutomatico();
     });
 
-    console.log(' Generador de texto configurado');
+    console.log('✓ Generador de texto configurado');
 }
 
 function generarTextoAutomatico() {
@@ -1101,7 +1113,6 @@ function generarTextoAutomatico() {
     const documento = document.getElementById('denuncianteNumDocumento')?.value.trim();
     const esVictima = document.querySelector('input[name="denuncianteEsVictima"]:checked')?.value;
 
-    // Validar datos mínimos
     if (!nombreDenunciante || nombreDenunciante === '') {
         mostrarError('Por favor, ingrese el nombre del denunciante primero');
         return;
@@ -1120,37 +1131,32 @@ function generarTextoAutomatico() {
     let textoGenerado = '';
 
     if (esVictima === 'si') {
-        // Cuando la denuncia es interpuesta directamente por la víctima
         textoGenerado = `La señora/or ${nombreDenunciante}, en su calidad de víctima en este caso y de generales antes expresada en este documento, habiendo sido informado sobre los derechos y obligaciones que le asisten, de forma libre expresa que...\n\n`;
     } else {
-        // Cuando la denuncia es interpuesta por denunciante
         textoGenerado = `La señora/or ${nombreDenunciante}, en su calidad de denunciante y de generales antes expresada en este documento, habiendo sido informado sobre los derechos y obligaciones que le asisten, de forma libre expresa que...\n\n`;
     }
 
     console.log('Texto generado:', textoGenerado);
 
-    // 1. Intentar con CKEditor primero
     if (window.editor && typeof window.editor.setData === 'function') {
         try {
             window.editor.setData(textoGenerado);
-            console.log(' Texto insertado en CKEditor');
+            console.log('✓ Texto insertado en CKEditor');
         } catch (error) {
-            console.error(' Error con CKEditor:', error);
+            console.error('Error con CKEditor:', error);
         }
     }
 
-    // 2. Intentar con textarea
     const textarea = document.getElementById('relacionHechos');
     if (textarea) {
         textarea.value = textoGenerado;
-        console.log(' Texto insertado en textarea');
+        console.log('✓ Texto insertado en textarea');
     }
 
-    // 3. Actualizar previsualización
     const preview = document.getElementById('previewRelacion');
     if (preview) {
         preview.innerHTML = `<div class="whitespace-pre-line text-gray-800">${textoGenerado}</div>`;
-        console.log(' Previsualización actualizada');
+        console.log('✓ Previsualización actualizada');
     }
 
     mostrarExito('Texto generado automáticamente');
@@ -1158,12 +1164,16 @@ function generarTextoAutomatico() {
     return textoGenerado;
 }
 
+
+
+// JS/form.js - PARTE 3 de 3 (FINAL)
+// Continuación exacta de form_part2.js
 // ============================================
 // COPIAR DENUNCIANTE → VÍCTIMA
 // ============================================
 
 function copiarDatosDenuncianteAVictima() {
-    console.log('📋 Copiando datos del denunciante a la víctima...');
+    console.log('Copiando datos del denunciante a la víctima...');
 
     document.getElementById('victimaNombre').value = document.getElementById('denuncianteNombre')?.value || '';
     document.getElementById('victimaConocidoPor').value = document.getElementById('denuncianteConocidoPor')?.value || '';
@@ -1211,7 +1221,6 @@ function copiarDatosDenuncianteAVictima() {
 
     document.getElementById('victimaNumDocumento').value = document.getElementById('denuncianteNumDocumento')?.value || '';
 
-    // ⭐ CORRECCIÓN: Usar selects para profesión y ocupación
     const profesionDen = document.getElementById('denuncianteProfesion')?.value;
     if (profesionDen && document.getElementById('victimaProfesion')) {
         document.getElementById('victimaProfesion').value = profesionDen;
@@ -1234,7 +1243,6 @@ function copiarDatosDenuncianteAVictima() {
         document.getElementById('victimaTrabajoEnCasa').checked = trabajoCasaDen;
     }
 
-    // COPIAR COMPLEMENTO Y PUNTO DE REFERENCIA DEL TRABAJO
     document.getElementById('victimaComplementoTrabajo').value = document.getElementById('denuncianteComplementoTrabajo')?.value || '';
     document.getElementById('victimaReferenciaTrabajo').value = document.getElementById('denuncianteReferenciaTrabajo')?.value || '';
 
@@ -1245,7 +1253,7 @@ function copiarDatosDenuncianteAVictima() {
 
     copiarTelefonos('denunciante', 'victima');
 
-    console.log(' Datos copiados');
+    console.log('✓ Datos copiados');
     mostrarExito('Datos del denunciante copiados automáticamente');
 }
 
@@ -1307,7 +1315,7 @@ function copiarTelefonos(prefixOrigen, prefixDestino) {
 }
 
 // ============================================
-// RECOPILACIÓN DE DATOS
+// RECOPILACIÓN DE DATOS - ACTUALIZADO
 // ============================================
 
 function recopilarDatosDenunciante() {
@@ -1315,13 +1323,15 @@ function recopilarDatosDenunciante() {
     const telefonosLista = document.querySelectorAll('#denuncianteTelefonosLista .flex');
 
     telefonosLista.forEach(item => {
+        const codigoSelect = item.querySelector('.phone-code-select');
         const telefono = item.querySelector('input[type="tel"]')?.value;
-        const tipo = item.querySelector('select')?.value;
+        const tipoSelect = item.querySelector('.contact-type-select');
 
         if (telefono) {
             contactos.push({
+                codigo_pais: codigoSelect?.value || '+503', // ACTUALIZADO: ahora acepta hasta 128 caracteres
                 telefono_contacto: telefono,
-                id_tipo_contacto: parseInt(tipo) || 1
+                id_tipo_contacto: parseInt(tipoSelect?.value) || 1
             });
         }
     });
@@ -1331,7 +1341,6 @@ function recopilarDatosDenunciante() {
         conocido_por: document.getElementById('denuncianteConocidoPor')?.value || null,
         fecha_nacimiento: document.getElementById('denuncianteFechaNacimiento')?.value,
         edad: parseInt(document.getElementById('denuncianteEdad')?.value) || 0,
-        lugar_nacimiento: `${document.getElementById('denuncianteDeptoNac')?.selectedOptions[0]?.text || ''}, ${document.getElementById('denuncianteMuniNac')?.selectedOptions[0]?.text || ''}`,
         nacionalidad: document.getElementById('denuncianteNacionalidad')?.value || 'Salvadoreña',
         nivel_educativo: document.getElementById('denuncianteNivelEducativo')?.value || 'NINGUNO',
         sexo: document.getElementById('denuncianteSexo')?.value === 'Masculino' ? 'M' : 'F',
@@ -1340,7 +1349,10 @@ function recopilarDatosDenunciante() {
         tipo_documento: document.getElementById('denuncianteTipoDocumento')?.value || 'DUI',
         tipo_documento_opc_otro: null,
         documento: document.getElementById('denuncianteNumDocumento')?.value,
-        id_distrito: parseInt(document.getElementById('denuncianteDistRes')?.value) || null,
+        // ACTUALIZADO: Nuevos nombres de campos
+        ubicacion: parseInt(document.getElementById('denuncianteDistRes')?.value) || null, // Antes era id_distrito
+        lugar_nacimiento: parseInt(document.getElementById('denuncianteDistNac')?.value) || null, // NUEVO
+        direccion_trabajo: parseInt(document.getElementById('denuncianteDistritoTrabajo')?.value) || null, // NUEVO
         complemento_direccion: document.getElementById('denuncianteComplementoDir')?.value,
         punto_referencia: document.getElementById('denunciantePuntoReferencia')?.value || null,
         profesion: document.getElementById('denuncianteProfesion')?.value || 'N/A',
@@ -1348,7 +1360,6 @@ function recopilarDatosDenunciante() {
         lugar_trabajo: document.getElementById('denuncianteLugarTrabajo')?.value || null,
         trabaja: !document.getElementById('denuncianteNoTrabajo')?.checked,
         trabajo_en_casa: document.getElementById('denuncianteTrabajoEnCasa')?.checked || false,
-        direccion_trabajo: null,
         complemento_dir_trabajo: document.getElementById('denuncianteComplementoTrabajo')?.value || null,
         punto_ref_trabajo: document.getElementById('denuncianteReferenciaTrabajo')?.value || null,
         estado_familiar: document.getElementById('denuncianteEstadoFamiliar')?.value || 'SOLTERO/A',
@@ -1362,13 +1373,15 @@ function recopilarDatosVictima() {
     const telefonosLista = document.querySelectorAll('#victimaTelefonosLista .flex');
 
     telefonosLista.forEach(item => {
+        const codigoSelect = item.querySelector('.phone-code-select');
         const telefono = item.querySelector('input[type="tel"]')?.value;
-        const tipo = item.querySelector('select')?.value;
+        const tipoSelect = item.querySelector('.contact-type-select');
 
         if (telefono) {
             contactos.push({
+                codigo_pais: codigoSelect?.value || '+503', // ACTUALIZADO
                 telefono_contacto: telefono,
-                id_tipo_contacto: parseInt(tipo) || 1
+                id_tipo_contacto: parseInt(tipoSelect?.value) || 1
             });
         }
     });
@@ -1381,10 +1394,8 @@ function recopilarDatosVictima() {
         if (nombreHijo) {
             hijos.push({
                 nombre_completo: nombreHijo,
-                edad: parseInt(document.getElementById(`hijo${i}Edad`)?.value) || 0,
-                escolaridad: document.getElementById(`hijo${i}Escolaridad`)?.value || null,
-                nombre_padre: document.getElementById(`hijo${i}NombrePadre`)?.value || null,
-                nombre_madre: document.getElementById(`hijo${i}NombreMadre`)?.value || null
+                sexo: document.getElementById(`hijo${i}Sexo`)?.value || 'M',
+                edad: parseInt(document.getElementById(`hijo${i}Edad`)?.value) || 0
             });
         }
     }
@@ -1395,7 +1406,6 @@ function recopilarDatosVictima() {
             conocido_por: document.getElementById('victimaConocidoPor')?.value || null,
             fecha_nacimiento: document.getElementById('victimaFechaNacimiento')?.value,
             edad: parseInt(document.getElementById('victimaEdad')?.value) || 0,
-            lugar_nacimiento: `${document.getElementById('victimaDeptoNac')?.selectedOptions[0]?.text || ''}, ${document.getElementById('victimaMuniNac')?.selectedOptions[0]?.text || ''}`,
             nacionalidad: document.getElementById('victimaNacionalidad')?.value || 'Salvadoreña',
             nivel_educativo: document.getElementById('victimaNivelEducativo')?.value || 'NINGUNO',
             sexo: document.getElementById('victimaSexo')?.value === 'Masculino' ? 'M' : 'F',
@@ -1404,7 +1414,10 @@ function recopilarDatosVictima() {
             tipo_documento: document.getElementById('victimaTipoDocumento')?.value || 'DUI',
             tipo_documento_opc_otro: null,
             documento: document.getElementById('victimaNumDocumento')?.value,
-            id_distrito: parseInt(document.getElementById('victimaDistRes')?.value) || null,
+            // ACTUALIZADO: Nuevos nombres de campos
+            ubicacion: parseInt(document.getElementById('victimaDistRes')?.value) || null,
+            lugar_nacimiento: parseInt(document.getElementById('victimaDistNac')?.value) || null,
+            direccion_trabajo: parseInt(document.getElementById('victimaDistritoTrabajo')?.value) || null,
             complemento_direccion: document.getElementById('victimaComplementoDir')?.value,
             punto_referencia: document.getElementById('victimaPuntoReferencia')?.value || null,
             profesion: document.getElementById('victimaProfesion')?.value || 'N/A',
@@ -1412,7 +1425,6 @@ function recopilarDatosVictima() {
             lugar_trabajo: document.getElementById('victimaLugarTrabajo')?.value || null,
             trabaja: !document.getElementById('victimaNoTrabajo')?.checked,
             trabajo_en_casa: document.getElementById('victimaTrabajoEnCasa')?.checked || false,
-            direccion_trabajo: null,
             complemento_dir_trabajo: document.getElementById('victimaComplementoTrabajo')?.value || null,
             punto_ref_trabajo: document.getElementById('victimaReferenciaTrabajo')?.value || null,
             estado_familiar: document.getElementById('victimaEstadoFamiliar')?.value || 'SOLTERO/A',
@@ -1421,24 +1433,10 @@ function recopilarDatosVictima() {
         },
         cantidad_hijos: cantidadHijos,
         genera_ingreso_personal: document.querySelector('input[name="victimaGeneraIngreso"]:checked')?.value === 'si',
-        tipo_ingreso: document.getElementById('victimaTipoIngresos')?.value || null,
-        tipo_ingreso_opc_otros: null,
-        cantidad_aprox_ingresos_mensuales: document.getElementById('victimaRangoIngresos')?.value || null,
         dependencia_economica: document.getElementById('victimaDependenciaEconomica')?.value || 'DE SI MISMO/A',
-        dependencia_economica_opc_otros: null,
-        de_quien_depende_economicamente: document.getElementById('victimaDependeDe')?.value || null,
-        tipo_relacion_con_de: document.getElementById('victimaRelacionDependencia')?.value || null,
-        tipo_relacion_con_de_opc_otros: null,
-        frecuencia_ingreso: document.getElementById('victimaFrecuenciaIngreso')?.value || null,
         presencia_visible_lesiones: document.querySelector('input[name="victimaLesiones"]:checked')?.value === 'si',
-        tipo_lesion: document.getElementById('victimaTipoLesion')?.value || null,
-        nivel_lesion: document.getElementById('victimaNivelLesion')?.value || null,
         hospitalizaciones_previas: document.querySelector('input[name="victimaHospitalizaciones"]:checked')?.value === 'si',
-        tiempo_en_dias_de_hospitalizacion: document.getElementById('victimaDiasHospitalizacion')?.value || null,
-        fecha_hospitalizacion: document.getElementById('victimaFechaHospitalizacion')?.value || null,
-        detalles_fecha_hospitalizacion: null,
         atencion_medica_previa: document.querySelector('input[name="victimaAtencionesMedicas"]:checked')?.value === 'si',
-        numero_atenciones: parseInt(document.getElementById('victimaNumAtenciones')?.value) || null,
         hijos: hijos
     };
 }
@@ -1448,37 +1446,39 @@ function recopilarDatosAgresor() {
     const telefonosLista = document.querySelectorAll('#agresorTelefonosLista .flex');
 
     telefonosLista.forEach(item => {
+        const codigoSelect = item.querySelector('.phone-code-select');
         const telefono = item.querySelector('input[type="tel"]')?.value;
-        const tipo = item.querySelector('select')?.value;
+        const tipoSelect = item.querySelector('.contact-type-select');
 
         if (telefono) {
             contactos.push({
+                codigo_pais: codigoSelect?.value || '+503', // ACTUALIZADO
                 telefono_contacto: telefono,
-                id_tipo_contacto: parseInt(tipo) || 1
+                id_tipo_contacto: parseInt(tipoSelect?.value) || 1
             });
         }
     });
 
-    const tiposArma = [];
+    const armas = [];
     const armaSelect = document.getElementById('agresorTipoArmas');
     if (armaSelect && document.getElementById('agresorPoseeArmas')?.value === 'si') {
         Array.from(armaSelect.selectedOptions).forEach(option => {
-            tiposArma.push(parseInt(option.value));
+            armas.push({ id_tipo_arma: parseInt(option.value) });
         });
     }
 
-    const tiposFormacion = [];
+    const formaciones = [];
     const formacionSelect = document.getElementById('agresorTipoFormacion');
     if (formacionSelect && document.getElementById('agresorFormacionEspecial')?.value === 'si') {
         Array.from(formacionSelect.selectedOptions).forEach(option => {
-            tiposFormacion.push(parseInt(option.value));
+            formaciones.push({ id_tipo_formacion_especial: parseInt(option.value) });
         });
     }
 
     const discapacidades = [];
     if (document.getElementById('agresorPoseeDiscapacidad')?.value === 'si') {
         document.querySelectorAll('input[name="agresorDiscapacidadTipo"]:checked').forEach(check => {
-            discapacidades.push(parseInt(check.value));
+            discapacidades.push({ id_discapacidad: parseInt(check.value) });
         });
     }
 
@@ -1488,7 +1488,6 @@ function recopilarDatosAgresor() {
             conocido_por: document.getElementById('agresorConocidoPor')?.value || null,
             fecha_nacimiento: document.getElementById('agresorFechaNacimiento')?.value,
             edad: parseInt(document.getElementById('agresorEdad')?.value) || 0,
-            lugar_nacimiento: `${document.getElementById('agresorDeptoNac')?.selectedOptions[0]?.text || ''}, ${document.getElementById('agresorMuniNac')?.selectedOptions[0]?.text || ''}`,
             nacionalidad: document.getElementById('agresorNacionalidad')?.value || 'Salvadoreña',
             nivel_educativo: document.getElementById('agresorNivelEducativo')?.value || 'NINGUNO',
             sexo: document.getElementById('agresorSexo')?.value === 'Masculino' ? 'M' : 'F',
@@ -1497,7 +1496,10 @@ function recopilarDatosAgresor() {
             tipo_documento: document.getElementById('agresorTipoDocumento')?.value || 'DUI',
             tipo_documento_opc_otro: null,
             documento: document.getElementById('agresorNumDocumento')?.value,
-            id_distrito: parseInt(document.getElementById('agresorDistRes')?.value) || null,
+            // ACTUALIZADO: Nuevos nombres de campos
+            ubicacion: parseInt(document.getElementById('agresorDistRes')?.value) || null,
+            lugar_nacimiento: parseInt(document.getElementById('agresorDistNac')?.value) || null,
+            direccion_trabajo: parseInt(document.getElementById('agresorDistritoTrabajo')?.value) || null,
             complemento_direccion: document.getElementById('agresorComplementoDir')?.value,
             punto_referencia: document.getElementById('agresorPuntoReferencia')?.value || null,
             profesion: document.getElementById('agresorProfesion')?.value || 'N/A',
@@ -1505,75 +1507,68 @@ function recopilarDatosAgresor() {
             lugar_trabajo: document.getElementById('agresorLugarTrabajo')?.value || null,
             trabaja: !document.getElementById('agresorNoTrabajo')?.checked,
             trabajo_en_casa: document.getElementById('agresorTrabajoEnCasa')?.checked || false,
-            direccion_trabajo: null,
             complemento_dir_trabajo: document.getElementById('agresorComplementoTrabajo')?.value || null,
             punto_ref_trabajo: document.getElementById('agresorReferenciaTrabajo')?.value || null,
             estado_familiar: document.getElementById('agresorEstadoFamiliar')?.value || 'SOLTERO/A',
             nombre_acompanante: document.getElementById('agresorNombreConyuge')?.value || null,
             contactos: contactos
         },
-        consume_alcohol: document.getElementById('agresorConsumoAlcohol')?.value === 'si',
+        // ACTUALIZADO: Campos ENUM en lugar de boolean
+        consume_alcohol: convertirAEnum(document.getElementById('agresorConsumoAlcohol')?.value),
         frecuencia_consumo_alcohol: document.getElementById('agresorFrecuenciaAlcohol')?.value || null,
-        consume_drogas: document.getElementById('agresorConsumoDrogas')?.value === 'si',
+        consume_drogas: convertirAEnum(document.getElementById('agresorConsumoDrogas')?.value),
         frecuencia_consumo_drogas: document.getElementById('agresorFrecuenciaDrogas')?.value || null,
-        posee_armas: document.getElementById('agresorPoseeArmas')?.value === 'si',
-        formacion_especial: document.getElementById('agresorFormacionEspecial')?.value?.toUpperCase() || 'NO SABE',
-        posee_discapacidad: document.getElementById('agresorPoseeDiscapacidad')?.value?.toUpperCase() || 'NO SABE',
-        tipos_arma: tiposArma,
-        tipos_formacion: tiposFormacion,
+        posee_armas: convertirAEnum(document.getElementById('agresorPoseeArmas')?.value),
+        formacion_especial: convertirAEnum(document.getElementById('agresorFormacionEspecial')?.value),
+        posee_discapacidad: convertirAEnum(document.getElementById('agresorPoseeDiscapacidad')?.value),
+        discapacidad_desc_adicional: document.getElementById('agresorDescripcionDiscapacidad')?.value || null, // NUEVO CAMPO
+        armas: armas,
+        formaciones: formaciones,
         discapacidades: discapacidades
     };
 }
 
 function recopilarDatosHechos() {
-    const entornosViolencia = [];
+    const entornos = [];
     document.querySelectorAll('input[name="entornoViolencia"]:checked').forEach(check => {
-        entornosViolencia.push(parseInt(check.value));
+        entornos.push({ id_entorno_violencia: parseInt(check.value) });
     });
 
     const tiposViolencia = [];
-    document.querySelectorAll('input[name="tiposViolencia"]:checked').forEach(check => {
-        tiposViolencia.push({
-            id_tipo_violencia: parseInt(check.value),
-            descripcion: null
-        });
+    // Aquí deberías tener checkboxes para tipos de violencia
+    document.querySelectorAll('input[name="tipoViolencia"]:checked').forEach(check => {
+        tiposViolencia.push({ id_tipo_violencia: parseInt(check.value) });
     });
 
     return {
-        inicio_hechos: document.getElementById('inicioHechos')?.value || new Date().toISOString().split('T')[0],
-        ultima_accion_fecha: document.getElementById('ultimaAccionFecha')?.value || new Date().toISOString().split('T')[0],
-        ultima_accion_desc: document.getElementById('ultimaAccionTexto')?.value || null,
-        relacion_hecho: window.editor?.getData() || document.getElementById('relacionHechos')?.value || null,
-        hora_hecho: document.getElementById('horaHecho')?.value || '00:00:00',
-        hora_hecho_texto: document.getElementById('horaHechoTexto')?.value || null,
-        lugar_hecho: document.getElementById('lugarHecho')?.value || 'CASA',
-        lugar_hecho_opc_otro: document.getElementById('lugarHechoOtro')?.value || null,
+        inicio_hechos: document.getElementById('inicioHechos')?.value || null,
+        ultima_accion_fecha: document.getElementById('ultimaAccionFecha')?.value,
+        hora_hecho: document.getElementById('horaHecho')?.value || document.getElementById('horaHechoTexto')?.value || null,
+        relacion_hecho: datosTemporales.relacionHechos || '', // ACTUALIZADO: Desde datos temporales
+        lugar_hecho: document.getElementById('lugarHecho')?.value || 'OTRO',
         id_distrito: parseInt(document.getElementById('distritoHecho')?.value) || null,
-        complemento_direccion: document.getElementById('complementoDirHecho')?.value || null,
-        punto_referencia: document.getElementById('puntoReferenciaHecho')?.value || null,
-        agresor_alcoholizado: document.getElementById('agresorAlcoholizado')?.value === 'Sí',
-        agresor_drogado: document.getElementById('agresorDrogado')?.value === 'Sí',
-        frecuencia_agresiones: document.getElementById('frecuenciaAgresiones')?.value || 'OCASIONAL',
-        frecuencia_agresiones_opc_otra: document.getElementById('otraFrecuencia')?.value || null,
-        denuncia_anterior_vif: document.getElementById('denunciaAnteriorVIF')?.value === 'Sí',
-        detenciones_anteriores_vif: document.getElementById('detencionesAnterioresVIF')?.value === 'Sí',
-        entornos_violencia: entornosViolencia.length > 0 ? entornosViolencia : [1],
-        tipos_violencia: tiposViolencia.length > 0 ? tiposViolencia : [{ id_tipo_violencia: 1, descripcion: null }]
+        frecuencia_agresiones: document.getElementById('frecuenciaAgresiones')?.value || 'OTRA',
+        // ACTUALIZADO: Campos ENUM en lugar de boolean
+        agresor_alcoholizado: convertirAEnumNoSeSabe(document.getElementById('agresorAlcoholizado')?.value),
+        agresor_drogado: convertirAEnumNoSeSabe(document.getElementById('agresorDrogado')?.value),
+        denuncia_anterior_vif: convertirAEnumNoSeSabe(document.getElementById('denunciaAnteriorVIF')?.value),
+        detenciones_anteriores_vif: convertirAEnumNoSeSabe(document.getElementById('detencionesAnterioresVIF')?.value),
+        entornos: entornos,
+        tipos_violencia: tiposViolencia,
+        victimas_involucradas: [{ index: 0 }], // Primera víctima
+        agresores_involucrados: [{ index: 0 }] // Primer agresor
     };
 }
 
 function recopilarRespuestas() {
     const respuestas = [];
 
-    // Recopilar de TODAS las preguntas (no solo la página actual)
-    preguntasAPI.forEach(pregunta => {
-        const radioSeleccionado = document.querySelector(`input[name="pregunta_${pregunta.id_pregunta}"]:checked`);
-
-        if (radioSeleccionado) {
+    preguntas.forEach(pregunta => {
+        const radioChecked = document.querySelector(`input[name="pregunta_${pregunta.id_pregunta}"]:checked`);
+        if (radioChecked) {
             respuestas.push({
                 id_pregunta: pregunta.id_pregunta,
-                respuesta: radioSeleccionado.value,
-                comentario: null // Ya no hay comentarios
+                respuesta: radioChecked.value
             });
         }
     });
@@ -1581,469 +1576,311 @@ function recopilarRespuestas() {
     return respuestas;
 }
 
-function agregarEstilosPaginacion() {
-    const style = document.createElement('style');
-    style.textContent = `
-        /* Estilos compactos para radio buttons */
-        .radio-visual {
-            transition: all 0.15s ease;
+// ============================================
+// NAVEGACIÓN - ACTUALIZADO CON GUARDADO TEMPORAL
+// ============================================
+
+function showStep(step) {
+    steps.forEach((s, index) => {
+        if (index === step) {
+            s.classList.remove('hidden');
+        } else {
+            s.classList.add('hidden');
         }
-        
-        .radio-visual:hover {
-            border-color: #60a5fa;
-        }
-        
-        /* Hover suave en preguntas */
-        [class*="hover:bg-gray-50"]:hover {
-            background-color: #f9fafb;
-        }
-        
-        [class*="hover:bg-blue-50"]:hover {
-            background-color: #eff6ff;
-        }
-        
-        /* Contenedores sin bordes negros */
-        .border-gray-200 {
-            border-color: #e5e7eb !important;
-        }
-        
-        .border-gray-100 {
-            border-color: #f3f4f6 !important;
-        }
-        
-        .border-gray-300 {
-            border-color: #d1d5db !important;
-        }
-        
-        /* Botones compactos */
-        button.text-xs {
-            font-size: 0.75rem;
-            line-height: 1rem;
-        }
-        
-        /* Sombra sutil */
-        .shadow-sm {
-            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-        }
-        
-        .shadow-md {
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-        }
-    `;
-    document.head.appendChild(style);
+    });
+
+    const progress = ((step + 1) / totalSteps) * 100;
+    progressBar.style.width = `${progress}%`;
+
+    if (step === 0) {
+        prevBtn.classList.add('hidden');
+    } else {
+        prevBtn.classList.remove('hidden');
+    }
+
+    if (step === totalSteps - 1) {
+        nextBtn.textContent = 'Enviar';
+    } else {
+        nextBtn.textContent = 'Siguiente';
+    }
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-// ============================================
-// ENVÍO DEL FORMULARIO
-// ============================================
+function nextStep() {
+    // GUARDAR DATOS TEMPORALES SEGÚN EL PASO - NUEVO
+    if (currentStep === 0) {
+        datosTemporales.denunciante = recopilarDatosDenunciante();
+        console.log('Denunciante guardado temporalmente');
+    }
+
+    if (currentStep === 1) {
+        const victimaActual = recopilarDatosVictima();
+        datosTemporales.victimas = [victimaActual];
+        console.log('Víctima guardada temporalmente');
+    }
+
+    if (currentStep === 2) {
+        // PASO 3: Relación de Hechos - GUARDAR EL TEXTO
+        const relacionHechos = obtenerTextoRelacionHechos();
+        datosTemporales.relacionHechos = relacionHechos;
+        console.log('Relación de hechos guardada temporalmente:', relacionHechos.substring(0, 50) + '...');
+    }
+
+    if (currentStep === 4) {
+        const agresorActual = recopilarDatosAgresor();
+        datosTemporales.agresores = [agresorActual];
+        console.log('Agresor guardado temporalmente');
+    }
+
+    if (currentStep < totalSteps - 1) {
+        currentStep++;
+        showStep(currentStep);
+
+        // Copiar datos si es necesario
+        if (currentStep === 1) {
+            const esVictima = document.querySelector('input[name="denuncianteEsVictima"]:checked')?.value;
+            if (esVictima === 'si') {
+                copiarDatosDenuncianteAVictima();
+            }
+        }
+
+        // Restablecer paginación de preguntas
+        if (currentStep === 5) {
+            restablecerPaginacionPreguntas();
+        }
+    } else {
+        enviarFormulario();
+    }
+}
+
+function prevStep() {
+    if (currentStep > 0) {
+        currentStep--;
+        showStep(currentStep);
+    }
+}
 
 async function enviarFormulario() {
     try {
         mostrarLoading('Enviando formulario...');
 
-        const datosDenunciante = recopilarDatosDenunciante();
-        const datosVictima = recopilarDatosVictima();
-        const datosAgresor = recopilarDatosAgresor();
-        const datosHechos = recopilarDatosHechos();
+        const denunciante = datosTemporales.denunciante || recopilarDatosDenunciante();
+        const victimas = datosTemporales.victimas.length > 0 ? datosTemporales.victimas : [recopilarDatosVictima()];
+        const agresores = datosTemporales.agresores.length > 0 ? datosTemporales.agresores : [recopilarDatosAgresor()];
+        const hechos = recopilarDatosHechos();
         const respuestas = recopilarRespuestas();
 
-        const denuncianteEsVictima = document.querySelector('input[name="denuncianteEsVictima"]:checked')?.value === 'si';
-
         const payload = {
-            caso: {
-                id_usuario: usuarioActual?.id_usuario || 1,
-                descripcion_general: null
-            },
-            denunciante: {
-                ...datosDenunciante,
-                es_victima: denuncianteEsVictima
-            },
-            victimas: [datosVictima],
-            agresores: [datosAgresor],
-            hechos: [datosHechos],
-            evaluacion: {
-                id_juez: 1,
-                respuestas: respuestas,
-                observaciones: null
-            }
+            denunciante,
+            victimas,
+            agresores,
+            hechos: [hechos],
+            respuestas
         };
 
-        console.log('Enviando payload:', payload);
+        console.log('📤 Enviando payload:', payload);
 
         const response = await api.post('/casos', payload);
 
+        console.log('📥 Respuesta del servidor:', response.data);
+
         if (response.data.success) {
-            ocultarLoading();
-            mostrarExito('¡Caso registrado exitosamente!');
+            mostrarExito('Caso creado exitosamente');
 
-            const casoCreado = response.data.data;
-            actualizarComprobanteConDatosAPI(casoCreado);
+            // Limpiar datos temporales
+            datosTemporales = {
+                relacionHechos: '',
+                denunciante: null,
+                victimas: [],
+                agresores: []
+            };
 
+            // IMPORTANTE: El backend devuelve los datos en response.data.data.caso
+            const casoCreado = response.data.data.caso;
+            const evaluacionData = response.data.data.evaluacion;
+
+            console.log('Caso creado:', casoCreado);
+            console.log('Evaluación:', evaluacionData);
+
+            // Actualizar resumen con los datos correctos
+            actualizarResumen(casoCreado, evaluacionData);
+
+            // Mostrar el paso del comprobante (último paso)
             currentStep = totalSteps - 1;
-            updateForm();
-        } else {
-            throw new Error(response.data.message || 'Error al crear el caso');
+            showStep(currentStep);
         }
 
+        ocultarLoading();
     } catch (error) {
         console.error('Error al enviar formulario:', error);
+        console.error('Detalles del error:', error.response?.data);
+        mostrarError(error.response?.data?.message || 'Error al crear el caso');
         ocultarLoading();
-
-        let mensaje = 'Error al enviar el formulario. ';
-
-        if (error.response?.data?.errors) {
-            const errores = error.response.data.errors;
-            mensaje += Object.keys(errores).map(key => errores[key].join(', ')).join('; ');
-        } else if (error.response?.data?.message) {
-            mensaje += error.response.data.message;
-        } else {
-            mensaje += error.message;
-        }
-
-        mostrarError(mensaje);
     }
 }
 
-function actualizarComprobanteConDatosAPI(caso) {
-    document.getElementById('resumenCaso').textContent = caso.ref_caso || 'N/A';
-    document.getElementById('resumenFecha').textContent = formatearFecha(caso.fecha_inicio);
-    document.getElementById('resumenDenunciante').textContent = caso.denunciante?.persona?.nombre_completo || '-';
-    document.getElementById('resumenVictima').textContent = caso.victimas?.[0]?.persona?.nombre_completo || '-';
-    document.getElementById('resumenAgresor').textContent = caso.agresores?.[0]?.persona?.nombre_completo || '-';
-    document.getElementById('resumenPreguntas').textContent = `${caso.evaluacion?.respuestas?.length || 0} preguntas respondidas`;
+function actualizarResumen(caso, evaluacion) {
+    console.log('Actualizando resumen con:', { caso, evaluacion });
 
-    document.getElementById('printCaso').textContent = caso.ref_caso || 'N/A';
-    document.getElementById('printFecha').textContent = formatearFecha(caso.fecha_inicio);
-    document.getElementById('printDenunciante').textContent = caso.denunciante?.persona?.nombre_completo || '-';
-    document.getElementById('printVictima').textContent = caso.victimas?.[0]?.persona?.nombre_completo || '-';
-    document.getElementById('printAgresor').textContent = caso.agresores?.[0]?.persona?.nombre_completo || '-';
-    document.getElementById('printPreguntas').textContent = `Nivel de Riesgo: ${caso.evaluacion?.sentencia || 'Pendiente'}`;
+    // Extraer datos del denunciante
+    const nombreDenunciante = caso.denunciante?.persona?.nombre_completo ||
+        caso.denunciante?.nombre_completo ||
+        'No especificado';
+
+    // Extraer datos de la víctima (primera víctima del array)
+    let nombreVictima = 'No especificado';
+    if (caso.victimas && caso.victimas.length > 0) {
+        const primeraVictima = caso.victimas[0];
+        nombreVictima = primeraVictima.persona?.nombre_completo ||
+            primeraVictima.nombre_completo ||
+            'No especificado';
+    }
+
+    // Extraer datos del agresor (primer agresor del array)
+    let nombreAgresor = 'No especificado';
+    if (caso.agresores && caso.agresores.length > 0) {
+        const primerAgresor = caso.agresores[0];
+        nombreAgresor = primerAgresor.persona?.nombre_completo ||
+            primerAgresor.nombre_completo ||
+            'No especificado';
+    }
+
+    // Contar respuestas
+    let cantidadRespuestas = 0;
+    if (evaluacion && evaluacion.respuestas) {
+        cantidadRespuestas = evaluacion.respuestas.length;
+    } else if (caso.evaluacion && caso.evaluacion.respuestas) {
+        cantidadRespuestas = caso.evaluacion.respuestas.length;
+    }
+
+    // Referencia del caso
+    const referenciaCaso = caso.ref_caso || caso.referencia || 'Sin referencia';
+
+    // Fecha actual formateada
+    const fechaActual = new Date().toLocaleDateString('es-SV', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+    });
+
+    // Nivel de riesgo
+    const nivelRiesgo = evaluacion?.nivel_riesgo ||
+        caso.evaluacion?.sentencia ||
+        'No evaluado';
+
+    const puntajeRiesgo = evaluacion?.puntaje ||
+        caso.evaluacion?.observaciones?.match(/\d+/)?.[0] ||
+        '0';
+
+    console.log('Datos extraídos:', {
+        nombreDenunciante,
+        nombreVictima,
+        nombreAgresor,
+        cantidadRespuestas,
+        referenciaCaso,
+        nivelRiesgo,
+        puntajeRiesgo
+    });
+
+    // Actualizar elementos del resumen (paso antes del comprobante)
+    const elementosResumen = {
+        'resumenDenunciante': nombreDenunciante,
+        'resumenVictima': nombreVictima,
+        'resumenAgresor': nombreAgresor,
+        'resumenPreguntas': cantidadRespuestas.toString(),
+        'resumenFecha': fechaActual,
+        'resumenCaso': referenciaCaso,
+        'resumenNivelRiesgo': nivelRiesgo,
+        'resumenPuntaje': puntajeRiesgo
+    };
+
+    Object.entries(elementosResumen).forEach(([id, valor]) => {
+        const elemento = document.getElementById(id);
+        if (elemento) {
+            elemento.textContent = valor;
+            console.log(`✓ Actualizado ${id}: ${valor}`);
+        } else {
+            console.warn(`Elemento ${id} no encontrado en el DOM`);
+        }
+    });
+
+    // Actualizar elementos del comprobante (para imprimir)
+    const elementosComprobante = {
+        'printCaso': referenciaCaso,
+        'printFecha': fechaActual,
+        'printDenunciante': nombreDenunciante,
+        'printVictima': nombreVictima,
+        'printAgresor': nombreAgresor,
+        'printPreguntas': `${cantidadRespuestas} preguntas respondidas`,
+        'printNivelRiesgo': nivelRiesgo,
+        'printPuntaje': `${puntajeRiesgo} puntos`
+    };
+
+    Object.entries(elementosComprobante).forEach(([id, valor]) => {
+        const elemento = document.getElementById(id);
+        if (elemento) {
+            elemento.textContent = valor;
+            console.log(`✓ Actualizado ${id}: ${valor}`);
+        } else {
+            console.warn(`Elemento ${id} no encontrado en el DOM`);
+        }
+    });
+
+    console.log('Resumen y comprobante actualizados correctamente');
 }
 
 // ============================================
-// FUNCIONES AUXILIARES UI
+// FUNCIONES DE UI
 // ============================================
 
 function mostrarLoading(mensaje = 'Cargando...') {
-    let overlay = document.getElementById('loadingOverlay');
-
-    if (!overlay) {
-        overlay = document.createElement('div');
-        overlay.id = 'loadingOverlay';
-        overlay.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
-        overlay.innerHTML = `
-            <div class="bg-white rounded-lg p-6 shadow-xl">
-                <div class="flex items-center space-x-3">
-                    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-                    <span class="text-gray-700" id="loadingMessage">${mensaje}</span>
-                </div>
-            </div>
-        `;
-        document.body.appendChild(overlay);
-    } else {
-        document.getElementById('loadingMessage').textContent = mensaje;
-        overlay.classList.remove('hidden');
-    }
+    console.log('', mensaje);
 }
 
 function ocultarLoading() {
-    const overlay = document.getElementById('loadingOverlay');
-    if (overlay) {
-        overlay.classList.add('hidden');
-    }
+    console.log('✓ Loading ocultado');
 }
 
 function mostrarExito(mensaje) {
-    mostrarNotificacion(mensaje, 'success');
+    console.log('Exito', mensaje);
+    alert(mensaje);
 }
 
 function mostrarError(mensaje) {
-    mostrarNotificacion(mensaje, 'error');
-}
-
-function mostrarNotificacion(mensaje, tipo = 'info') {
-    const colores = {
-        success: 'bg-green-500',
-        error: 'bg-red-500',
-        warning: 'bg-yellow-500',
-        info: 'bg-blue-500'
-    };
-
-    const iconos = {
-        success: '✓',
-        error: '✕',
-        warning: '⚠',
-        info: 'ℹ'
-    };
-
-    const notif = document.createElement('div');
-    notif.className = `fixed top-4 right-4 ${colores[tipo]} text-white px-6 py-4 rounded-lg shadow-lg z-50 flex items-center space-x-3`;
-    notif.innerHTML = `
-        <span class="text-2xl">${iconos[tipo]}</span>
-        <span>${mensaje}</span>
-    `;
-
-    document.body.appendChild(notif);
-
-    setTimeout(() => {
-        notif.remove();
-    }, 5000);
-}
-
-function formatearFecha(fecha) {
-    if (!fecha) return '-';
-
-    return new Date(fecha).toLocaleDateString('es-ES', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
-    });
+    console.error('Error', mensaje);
+    alert('Error: ' + mensaje);
 }
 
 // ============================================
-// NAVEGACIÓN DEL FORMULARIO
-// ============================================
-
-function updateForm() {
-    steps.forEach((step, index) => {
-        step.classList.toggle('hidden', index !== currentStep);
-    });
-
-    progressBar.style.width = `${((currentStep + 1) / totalSteps) * 100}%`;
-
-    if (currentStep === 5) {
-        if (preguntasAPI.length === 0) {
-            mostrarError('No se pudieron cargar las preguntas.');
-        }
-        // Renderizar preguntas con paginación
-        setTimeout(() => renderizarPreguntasEnFormulario(), 100);
-    } else {
-        // Restablecer paginación cuando salimos del paso de preguntas
-        paginaActual = 0;
-    }
-
-    setTimeout(setupConditionalFields, 100);
-
-    prevBtn.classList.toggle('hidden', currentStep === 0);
-
-    if (currentStep === totalSteps - 1) {
-        nextBtn.textContent = 'Finalizar';
-        nextBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
-        nextBtn.classList.add('bg-green-600', 'hover:bg-green-700');
-    } else if (currentStep === 5) {
-        nextBtn.textContent = 'Enviar Evaluación';
-        nextBtn.classList.remove('bg-green-600', 'hover:bg-green-700');
-        nextBtn.classList.add('bg-blue-600', 'hover:bg-blue-700');
-    } else {
-        nextBtn.textContent = 'Siguiente';
-        nextBtn.classList.remove('bg-green-600', 'hover:bg-green-700');
-        nextBtn.classList.add('bg-blue-600', 'hover:bg-blue-700');
-    }
-}
-
-nextBtn.addEventListener('click', async () => {
-    if (currentStep === 0) {
-        const esVictima = document.querySelector('input[name="denuncianteEsVictima"]:checked')?.value;
-        if (esVictima === 'si') {
-            currentStep++;
-            updateForm();
-            setTimeout(() => copiarDatosDenuncianteAVictima(), 300);
-            return;
-        }
-    }
-
-    if (currentStep === 5) {
-        await enviarFormulario();
-        return;
-    }
-
-    if (currentStep === totalSteps - 1) {
-        mostrarExito('¡Gracias por completar el formulario!');
-        return;
-    }
-
-    if (currentStep < totalSteps - 1) {
-        currentStep++;
-        updateForm();
-    }
-});
-
-prevBtn.addEventListener('click', () => {
-    if (currentStep > 0) {
-        currentStep--;
-        updateForm();
-    }
-});
-
-document.getElementById('imprimirBtn')?.addEventListener('click', function () {
-    window.print();
-});
-
-// ============================================
-// INICIALIZACIÓN CKEDITOR MEJORADA
-// ============================================
-
-function inicializarCKEditor() {
-    // Verificar si CKEditor está disponible
-    if (typeof ClassicEditor === 'undefined') {
-        console.warn(' CKEditor no está disponible. Usando textarea simple.');
-
-        // Hacer visible el textarea como fallback
-        const textarea = document.getElementById('relacionHechos');
-        if (textarea) {
-            textarea.style.display = 'block';
-            textarea.className = 'border border-gray-300 rounded-lg p-4 w-full h-64 focus:border-blue-500 focus:ring-1 focus:ring-blue-500';
-        }
-
-        return;
-    }
-
-    // Si CKEditor está disponible, inicializarlo
-    const editorContainer = document.querySelector('#editor-container');
-    if (!editorContainer) {
-        console.error(' No se encontró el contenedor del editor (#editor-container)');
-        return;
-    }
-
-    // Verificar si ya hay un editor inicializado
-    if (window.editor) {
-        console.log(' CKEditor ya está inicializado');
-        return;
-    }
-
-    ClassicEditor
-        .create(editorContainer, {
-            toolbar: {
-                items: [
-                    'heading', '|',
-                    'bold', 'italic', 'underline', '|',
-                    'alignment', '|',
-                    'numberedList', 'bulletedList', '|',
-                    'fontFamily', 'fontSize', 'fontColor', 'fontBackgroundColor', '|',
-                    'link', 'insertTable', '|',
-                    'undo', 'redo'
-                ]
-            },
-            language: 'es',
-            placeholder: 'Describa detalladamente los hechos ocurridos...',
-            licenseKey: '',
-            removePlugins: ['Markdown']
-        })
-        .then(editor => {
-            window.editor = editor;
-            console.log(' CKEditor inicializado correctamente');
-
-            // Configurar el botón para usar CKEditor
-            const btnGenerar = document.getElementById('generarTextoBtn');
-            if (btnGenerar) {
-                btnGenerar.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    generarTextoAutomatico();
-                });
-            }
-
-            // Actualizar previsualización en tiempo real
-            editor.model.document.on('change:data', () => {
-                const data = editor.getData();
-                const preview = document.getElementById('previewRelacion');
-                if (preview) {
-                    preview.innerHTML = `<div class="whitespace-pre-line">${data || '<p class="text-gray-600 italic">Texto vacío</p>'}</div>`;
-                }
-            });
-        })
-        .catch(error => {
-            console.error(' Error al inicializar CKEditor:', error);
-            console.error('Detalles del error:', error.message);
-
-            // Fallback a textarea
-            const textarea = document.getElementById('relacionHechos');
-            if (textarea) {
-                textarea.style.display = 'block';
-                textarea.className = 'border border-gray-300 rounded-lg p-4 w-full h-64 focus:border-blue-500 focus:ring-1 focus:ring-blue-500';
-            }
-        });
-}
-
-// ============================================
-// INICIALIZACIÓN PRINCIPAL
+// INICIALIZACIÓN
 // ============================================
 
 document.addEventListener('DOMContentLoaded', async function () {
-    console.log('🚀 Inicializando formulario...');
+    console.log('Inicializando formulario...');
 
-    try {
-        // Agregar estilos adicionales
-        agregarEstilosPaginacion();
+    await cargarCatalogos();
+    await cargarPreguntas();
+    await cargarUsuarioActual();
+    await cargarTribunales();
 
-        // Cargar datos iniciales
-        await Promise.all([
-            cargarCatalogos(),
-            cargarPreguntas(),
-            cargarUsuarioActual(),
-            cargarTribunales()
-        ]);
+    inicializarCalculadoresEdad();
+    inicializarTelefonos();
+    inicializarHijos();
+    setupConditionalFields();
 
-        console.log(' Datos iniciales cargados');
+    nextBtn.addEventListener('click', nextStep);
+    prevBtn.addEventListener('click', prevStep);
 
-        // Inicializar CKEditor
-        inicializarCKEditor();
-
-        // Configurar el resto del formulario
-        updateForm();
-        inicializarCalculadoresEdad();
-        inicializarTelefonos();
-        inicializarHijos();
-        setupConditionalFields();
-
-        // Configurar botón de generar texto
-        const btnGenerar = document.getElementById('generarTextoBtn');
-        if (btnGenerar) {
-            btnGenerar.addEventListener('click', function (e) {
-                e.preventDefault();
-                console.log('Botón presionado - Generando texto...');
-                generarTextoAutomatico();
-            });
-        }
-
-        // Configurar el botón de imprimir
-        const btnImprimir = document.getElementById('imprimirBtn');
-        if (btnImprimir) {
-            btnImprimir.addEventListener('click', function () {
-                console.log('🖨️ Imprimiendo comprobante...');
-                window.print();
-            });
-        }
-
-        // Botón compacto para ir a la primera página
-        const btnPrimeraPagina = document.createElement('button');
-        btnPrimeraPagina.id = 'irPrimeraPagina';
-        btnPrimeraPagina.className = 'mt-2 text-xs text-blue-500 hover:text-blue-700 hover:underline';
-        btnPrimeraPagina.textContent = '↻ Volver al inicio';
-        btnPrimeraPagina.addEventListener('click', function (e) {
-            e.preventDefault();
-            paginaActual = 0;
-            renderizarPreguntasEnFormulario();
-            mostrarExito('Volviendo a la primera página');
+    const imprimirBtn = document.getElementById('imprimirBtn');
+    if (imprimirBtn) {
+        imprimirBtn.addEventListener('click', function () {
+            window.print();
         });
-
-        // Insertar botón en el DOM después de cargar
-        setTimeout(() => {
-            const preguntasContainer = document.getElementById('preguntasForm');
-            if (preguntasContainer) {
-                // Crear contenedor pequeño para el botón
-                const botonContainer = document.createElement('div');
-                botonContainer.className = 'text-center mt-2';
-                botonContainer.appendChild(btnPrimeraPagina);
-                preguntasContainer.parentNode.insertBefore(botonContainer, preguntasContainer.nextSibling);
-            }
-        }, 1000);
-
-    } catch (error) {
-        console.error(' Error en inicialización:', error);
-        mostrarError('Error al inicializar el formulario.');
     }
+
+    showStep(currentStep);
+
+    console.log('✓ Formulario inicializado correctamente');
 });
 
-console.log(' form.js cargado y listo');
