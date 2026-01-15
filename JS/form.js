@@ -63,7 +63,8 @@ let datosTemporales = {
     relacionHechos: '', // Se captura en Paso 3, se envía en Paso 4
     denunciante: null,
     victimas: [],
-    agresores: []
+    agresores: [],
+    respuestas: []
 };
 
 // ============================================
@@ -286,6 +287,11 @@ function renderizarPreguntasEnFormulario() {
     agregarControlesPaginacion(container, inicio, fin);
 
     console.log('✓ Preguntas renderizadas (página', paginaActual + 1, ')');
+
+    // Restaurar respuestas después de renderizar
+    setTimeout(() => {
+        restaurarRespuestas();
+    }, 100);
 }
 
 function agregarControlesPaginacion(container, inicio, fin) {
@@ -352,6 +358,8 @@ function agregarControlesPaginacion(container, inicio, fin) {
             }
         });
     }
+
+    restaurarRespuestas();
 }
 
 function restablecerPaginacionPreguntas() {
@@ -377,6 +385,7 @@ async function cargarCatalogos() {
             await cargarGeografia();
             poblarTodosLosSelects();
             poblarEntornosViolencia();
+            poblarTiposViolencia();
 
             ocultarLoading();
         }
@@ -402,39 +411,117 @@ function poblarEntornosViolencia() {
     container.innerHTML = '';
 
     catalogos.entornos_violencia.forEach(entorno => {
+        const itemContainer = document.createElement('div');
+        itemContainer.className = 'flex items-center';
+
         const label = document.createElement('label');
-        label.className = 'flex items-center space-x-2 mb-2';
+        label.className = 'flex items-center space-x-2 cursor-pointer hover:bg-gray-50 p-2 rounded transition-colors';
 
         const checkbox = document.createElement('input');
         checkbox.type = 'checkbox';
         checkbox.name = 'entornoViolencia';
         checkbox.value = entorno.id;
-        checkbox.className = 'text-blue-600';
+        checkbox.className = 'text-blue-600 cursor-pointer';
 
         const span = document.createElement('span');
         span.textContent = entorno.nombre;
+        span.className = 'text-sm text-gray-700';
 
         label.appendChild(checkbox);
         label.appendChild(span);
-        container.appendChild(label);
+        itemContainer.appendChild(label);
+        container.appendChild(itemContainer);
 
         if (entorno.nombre && entorno.nombre.toUpperCase().includes('OTRO')) {
+            // Crear un contenedor separado para el input que ocupe todo el ancho
+            const inputContainer = document.createElement('div');
+            inputContainer.className = 'col-span-2 md:col-span-3 lg:col-span-4'; // Ocupa todas las columnas
+            inputContainer.style.display = 'none';
+
             const inputOtro = document.createElement('input');
             inputOtro.type = 'text';
             inputOtro.id = 'entornoOtraTexto';
-            inputOtro.placeholder = 'Especifique';
-            inputOtro.className = 'border border-gray-300 rounded-lg p-2 ml-6 mt-1 w-full focus:border-blue-500';
-            inputOtro.style.display = 'none';
+            inputOtro.placeholder = 'Especifique el otro entorno de violencia';
+            inputOtro.className = 'border border-gray-300 rounded-lg p-3 w-full focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all';
+
+            inputContainer.appendChild(inputOtro);
 
             checkbox.addEventListener('change', function () {
-                inputOtro.style.display = this.checked ? 'block' : 'none';
+                inputContainer.style.display = this.checked ? 'block' : 'none';
+                if (this.checked) {
+                    inputOtro.focus();
+                }
             });
 
-            container.appendChild(inputOtro);
+            container.appendChild(inputContainer);
         }
     });
 
     console.log('✓ Entornos de violencia poblados desde BD');
+}
+
+function poblarTiposViolencia() {
+    const container = document.getElementById('tipoViolenciaContainer');
+    if (!container) {
+        console.warn('Contenedor tipoViolenciaContainer no encontrado');
+        return;
+    }
+
+    if (!catalogos.tipos_violencia) {
+        console.warn('No hay datos de tipos_violencia');
+        return;
+    }
+
+    container.innerHTML = '';
+
+    catalogos.tipos_violencia.forEach(tipo => {
+        const itemContainer = document.createElement('div');
+        itemContainer.className = 'flex items-center';
+
+        const label = document.createElement('label');
+        label.className = 'flex items-center space-x-2 cursor-pointer hover:bg-gray-50 p-2 rounded transition-colors';
+
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.name = 'tipoViolencia';
+        checkbox.value = tipo.id;
+        checkbox.className = 'text-blue-600 cursor-pointer';
+
+        const span = document.createElement('span');
+        span.textContent = tipo.nombre;
+        span.className = 'text-sm text-gray-700';
+
+        label.appendChild(checkbox);
+        label.appendChild(span);
+        itemContainer.appendChild(label);
+        container.appendChild(itemContainer);
+
+        if (tipo.nombre && tipo.nombre.toUpperCase().includes('OTRA')) {
+            // Crear un contenedor separado para el input que ocupe todo el ancho
+            const inputContainer = document.createElement('div');
+            inputContainer.className = 'col-span-2 md:col-span-3 lg:col-span-4'; // Ocupa todas las columnas
+            inputContainer.style.display = 'none';
+
+            const inputOtro = document.createElement('input');
+            inputOtro.type = 'text';
+            inputOtro.id = 'tipoOtraTexto';
+            inputOtro.placeholder = 'Especifique el otro tipo de violencia';
+            inputOtro.className = 'border border-gray-300 rounded-lg p-3 w-full focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all';
+
+            inputContainer.appendChild(inputOtro);
+
+            checkbox.addEventListener('change', function () {
+                inputContainer.style.display = this.checked ? 'block' : 'none';
+                if (this.checked) {
+                    inputOtro.focus();
+                }
+            });
+
+            container.appendChild(inputContainer);
+        }
+    });
+
+    console.log('✓ Tipos de violencia poblados desde BD');
 }
 
 async function cargarGeografia() {
@@ -1130,7 +1217,7 @@ function generarTextoAutomatico() {
 
     let textoGenerado = '';
 
-    if (esVictima === 'si') {
+    if (esVictima === 'true') {
         textoGenerado = `La señora/or ${nombreDenunciante}, en su calidad de víctima en este caso y de generales antes expresada en este documento, habiendo sido informado sobre los derechos y obligaciones que le asisten, de forma libre expresa que...\n\n`;
     } else {
         textoGenerado = `La señora/or ${nombreDenunciante}, en su calidad de denunciante y de generales antes expresada en este documento, habiendo sido informado sobre los derechos y obligaciones que le asisten, de forma libre expresa que...\n\n`;
@@ -1164,10 +1251,6 @@ function generarTextoAutomatico() {
     return textoGenerado;
 }
 
-
-
-// JS/form.js - PARTE 3 de 3 (FINAL)
-// Continuación exacta de form_part2.js
 // ============================================
 // COPIAR DENUNCIANTE → VÍCTIMA
 // ============================================
@@ -1329,7 +1412,7 @@ function recopilarDatosDenunciante() {
 
         if (telefono) {
             contactos.push({
-                codigo_pais: codigoSelect?.value || '+503', // ACTUALIZADO: ahora acepta hasta 128 caracteres
+                codigo_pais: codigoSelect?.value || '+503',
                 telefono_contacto: telefono,
                 id_tipo_contacto: parseInt(tipoSelect?.value) || 1
             });
@@ -1349,14 +1432,13 @@ function recopilarDatosDenunciante() {
         tipo_documento: document.getElementById('denuncianteTipoDocumento')?.value || 'DUI',
         tipo_documento_opc_otro: null,
         documento: document.getElementById('denuncianteNumDocumento')?.value,
-        // ACTUALIZADO: Nuevos nombres de campos
-        ubicacion: parseInt(document.getElementById('denuncianteDistRes')?.value) || null, // Antes era id_distrito
-        lugar_nacimiento: parseInt(document.getElementById('denuncianteDistNac')?.value) || null, // NUEVO
-        direccion_trabajo: parseInt(document.getElementById('denuncianteDistritoTrabajo')?.value) || null, // NUEVO
+        ubicacion: parseInt(document.getElementById('denuncianteDistRes')?.value) || null,
+        lugar_nacimiento: parseInt(document.getElementById('denuncianteDistNac')?.value) || null,
+        direccion_trabajo: parseInt(document.getElementById('denuncianteDistritoTrabajo')?.value) || null,
         complemento_direccion: document.getElementById('denuncianteComplementoDir')?.value,
         punto_referencia: document.getElementById('denunciantePuntoReferencia')?.value || null,
-        profesion: document.getElementById('denuncianteProfesion')?.value || 'N/A',
-        ocupacion: document.getElementById('denuncianteOcupacion')?.value || 'Desempleado/a',
+        profesion: document.getElementById('denuncianteProfesion')?.value,
+        ocupacion: document.getElementById('denuncianteOcupacion')?.value,
         lugar_trabajo: document.getElementById('denuncianteLugarTrabajo')?.value || null,
         trabaja: !document.getElementById('denuncianteNoTrabajo')?.checked,
         trabajo_en_casa: document.getElementById('denuncianteTrabajoEnCasa')?.checked || false,
@@ -1364,7 +1446,9 @@ function recopilarDatosDenunciante() {
         punto_ref_trabajo: document.getElementById('denuncianteReferenciaTrabajo')?.value || null,
         estado_familiar: document.getElementById('denuncianteEstadoFamiliar')?.value || 'SOLTERO/A',
         nombre_acompanante: document.getElementById('denuncianteNombreConyuge')?.value || null,
-        contactos: contactos
+        contactos: contactos,
+
+        es_victima: document.querySelector('input[name="denuncianteEsVictima"]:checked')?.value === "true",
     };
 }
 
@@ -1414,7 +1498,6 @@ function recopilarDatosVictima() {
             tipo_documento: document.getElementById('victimaTipoDocumento')?.value || 'DUI',
             tipo_documento_opc_otro: null,
             documento: document.getElementById('victimaNumDocumento')?.value,
-            // ACTUALIZADO: Nuevos nombres de campos
             ubicacion: parseInt(document.getElementById('victimaDistRes')?.value) || null,
             lugar_nacimiento: parseInt(document.getElementById('victimaDistNac')?.value) || null,
             direccion_trabajo: parseInt(document.getElementById('victimaDistritoTrabajo')?.value) || null,
@@ -1535,7 +1618,6 @@ function recopilarDatosHechos() {
     });
 
     const tiposViolencia = [];
-    // Aquí deberías tener checkboxes para tipos de violencia
     document.querySelectorAll('input[name="tipoViolencia"]:checked').forEach(check => {
         tiposViolencia.push({ id_tipo_violencia: parseInt(check.value) });
     });
@@ -1561,6 +1643,7 @@ function recopilarDatosHechos() {
 }
 
 function recopilarRespuestas() {
+    guardarRespuestasActuales();
     const respuestas = [];
 
     preguntas.forEach(pregunta => {
@@ -1573,7 +1656,7 @@ function recopilarRespuestas() {
         }
     });
 
-    return respuestas;
+    return datosTemporales.respuestas;
 }
 
 // ============================================
@@ -1608,7 +1691,7 @@ function showStep(step) {
 }
 
 function nextStep() {
-    // GUARDAR DATOS TEMPORALES SEGÚN EL PASO - NUEVO
+    // GUARDAR DATOS TEMPORALES SEGÚN EL PASO
     if (currentStep === 0) {
         datosTemporales.denunciante = recopilarDatosDenunciante();
         console.log('Denunciante guardado temporalmente');
@@ -1633,6 +1716,10 @@ function nextStep() {
         console.log('Agresor guardado temporalmente');
     }
 
+    if (currentStep === 5) {
+        guardarRespuestasActuales();
+    }
+
     if (currentStep < totalSteps - 1) {
         currentStep++;
         showStep(currentStep);
@@ -1640,7 +1727,7 @@ function nextStep() {
         // Copiar datos si es necesario
         if (currentStep === 1) {
             const esVictima = document.querySelector('input[name="denuncianteEsVictima"]:checked')?.value;
-            if (esVictima === 'si') {
+            if (esVictima === 'true') {
                 copiarDatosDenuncianteAVictima();
             }
         }
@@ -1655,10 +1742,64 @@ function nextStep() {
 }
 
 function prevStep() {
+    if (currentStep === 5) {
+        guardarRespuestasActuales();
+    }
+
     if (currentStep > 0) {
         currentStep--;
         showStep(currentStep);
     }
+}
+
+// ============================================
+// GUARDAR Y RESTAURAR RESPUESTAS DEL CUESTIONARIO - NUEVO
+// ============================================
+
+function guardarRespuestasActuales() {
+    console.log('Guardando respuestas del cuestionario...');
+
+    const respuestas = [];
+
+    preguntas.forEach(pregunta => {
+        const radioChecked = document.querySelector(`input[name="pregunta_${pregunta.id_pregunta}"]:checked`);
+        if (radioChecked) {
+            respuestas.push({
+                id_pregunta: pregunta.id_pregunta,
+                respuesta: radioChecked.value
+            });
+        }
+    });
+
+    datosTemporales.respuestas = respuestas;
+    console.log(`✓ ${respuestas.length} respuestas guardadas temporalmente`);
+
+    return respuestas;
+}
+
+function restaurarRespuestas() {
+    if (!datosTemporales.respuestas || datosTemporales.respuestas.length === 0) {
+        console.log('No hay respuestas guardadas para restaurar');
+        return;
+    }
+
+    console.log('Restaurando respuestas del cuestionario...');
+    let respuestasRestauradas = 0;
+
+    datosTemporales.respuestas.forEach(respuesta => {
+        const radio = document.querySelector(
+            `input[name="pregunta_${respuesta.id_pregunta}"][value="${respuesta.respuesta}"]`
+        );
+
+        if (radio) {
+            radio.checked = true;
+            // Disparar el evento change para actualizar la visual
+            radio.dispatchEvent(new Event('change'));
+            respuestasRestauradas++;
+        }
+    });
+
+    console.log(`✓ ${respuestasRestauradas} respuestas restauradas`);
 }
 
 async function enviarFormulario() {
@@ -1666,6 +1807,7 @@ async function enviarFormulario() {
         mostrarLoading('Enviando formulario...');
 
         const denunciante = datosTemporales.denunciante || recopilarDatosDenunciante();
+
         const victimas = datosTemporales.victimas.length > 0 ? datosTemporales.victimas : [recopilarDatosVictima()];
         const agresores = datosTemporales.agresores.length > 0 ? datosTemporales.agresores : [recopilarDatosAgresor()];
         const hechos = recopilarDatosHechos();
@@ -1679,11 +1821,11 @@ async function enviarFormulario() {
             respuestas
         };
 
-        console.log('📤 Enviando payload:', payload);
+        console.log('Enviando payload:', payload);
 
         const response = await api.post('/casos', payload);
 
-        console.log('📥 Respuesta del servidor:', response.data);
+        console.log('Respuesta del servidor:', response.data);
 
         if (response.data.success) {
             mostrarExito('Caso creado exitosamente');
@@ -1693,7 +1835,8 @@ async function enviarFormulario() {
                 relacionHechos: '',
                 denunciante: null,
                 victimas: [],
-                agresores: []
+                agresores: [],
+                respuestas: []
             };
 
             // IMPORTANTE: El backend devuelve los datos en response.data.data.caso
@@ -1727,6 +1870,8 @@ function actualizarResumen(caso, evaluacion) {
     const nombreDenunciante = caso.denunciante?.persona?.nombre_completo ||
         caso.denunciante?.nombre_completo ||
         'No especificado';
+
+    console.log('Nombre del denunciante:', nombreDenunciante);
 
     // Extraer datos de la víctima (primera víctima del array)
     let nombreVictima = 'No especificado';

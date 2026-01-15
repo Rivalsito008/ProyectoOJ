@@ -333,11 +333,11 @@
                 <label class="block text-gray-700 text-sm font-medium mb-2">¿Es la víctima del hecho?</label>
                 <div class="flex space-x-4 mb-3">
                   <label class="flex items-center space-x-2">
-                    <input type="radio" name="denuncianteEsVictima" value="si" class="text-blue-600">
+                    <input type="radio" name="denuncianteEsVictima" value="true" class="text-blue-600">
                     <span>Sí</span>
                   </label>
                   <label class="flex items-center space-x-2">
-                    <input type="radio" name="denuncianteEsVictima" value="no" class="text-blue-600">
+                    <input type="radio" name="denuncianteEsVictima" value="false" class="text-blue-600">
                     <span>No</span>
                   </label>
                 </div>
@@ -973,7 +973,7 @@
           <div class="mb-6">
             <label class="block text-gray-700 text-sm font-medium mb-2">Entorno en que se da la violencia (puede
               seleccionar varias opciones)</label>
-            <div class="space-y-2" id="entornoViolenciaContainer">
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3" id="entornoViolenciaContainer">
               <!-- Se poblará dinámicamente desde la API -->
             </div>
           </div>
@@ -1025,6 +1025,15 @@
             <label class="block text-gray-700 text-sm font-medium mb-2">Lugar exacto o dirección del hecho</label>
             <input type="text" placeholder="Descripción detallada del lugar" id="lugarExactoHecho"
               class="border border-gray-300 rounded-lg p-3 w-full focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
+          </div>
+
+          <!-- Tipo de violencia del hecho -->
+          <div class="mb-6">
+            <label class="block text-gray-700 text-sm font-medium mb-2">Tipo de violencia del hecho (puede
+              seleccionar varias opciones)</label>
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3" id="tipoViolenciaContainer">
+              <!-- Se poblará dinámicamente desde la API -->
+            </div>
           </div>
 
           <!-- Dirección del lugar del hecho -->
