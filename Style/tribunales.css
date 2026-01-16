@@ -295,6 +295,7 @@ NAV ITEMS - MODO OSCURO
         opacity: 0;
         transform: translateY(10px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -314,6 +315,7 @@ NAV ITEMS - MODO OSCURO
     from {
         opacity: 0;
     }
+
     to {
         opacity: 1;
     }
@@ -331,6 +333,7 @@ table {
         opacity: 0;
         transform: translateY(20px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -355,6 +358,7 @@ tbody tr {
         opacity: 0;
         transform: translateX(-30px);
     }
+
     to {
         opacity: 1;
         transform: translateX(0);
@@ -362,16 +366,45 @@ tbody tr {
 }
 
 /* Retrasos escalonados para cada fila */
-tbody tr:nth-child(1) { animation-delay: 0.1s; }
-tbody tr:nth-child(2) { animation-delay: 0.2s; }
-tbody tr:nth-child(3) { animation-delay: 0.3s; }
-tbody tr:nth-child(4) { animation-delay: 0.4s; }
-tbody tr:nth-child(5) { animation-delay: 0.5s; }
-tbody tr:nth-child(6) { animation-delay: 0.6s; }
-tbody tr:nth-child(7) { animation-delay: 0.7s; }
-tbody tr:nth-child(8) { animation-delay: 0.8s; }
-tbody tr:nth-child(9) { animation-delay: 0.9s; }
-tbody tr:nth-child(10) { animation-delay: 1.0s; }
+tbody tr:nth-child(1) {
+    animation-delay: 0.1s;
+}
+
+tbody tr:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+tbody tr:nth-child(3) {
+    animation-delay: 0.3s;
+}
+
+tbody tr:nth-child(4) {
+    animation-delay: 0.4s;
+}
+
+tbody tr:nth-child(5) {
+    animation-delay: 0.5s;
+}
+
+tbody tr:nth-child(6) {
+    animation-delay: 0.6s;
+}
+
+tbody tr:nth-child(7) {
+    animation-delay: 0.7s;
+}
+
+tbody tr:nth-child(8) {
+    animation-delay: 0.8s;
+}
+
+tbody tr:nth-child(9) {
+    animation-delay: 0.9s;
+}
+
+tbody tr:nth-child(10) {
+    animation-delay: 1.0s;
+}
 
 /* Efecto hover mejorado para filas */
 tbody tr:hover {
@@ -392,6 +425,7 @@ tbody tr:hover {
         opacity: 0;
         transform: translateY(-30px) scale(0.95);
     }
+
     to {
         opacity: 1;
         transform: translateY(0) scale(1);
@@ -417,6 +451,7 @@ tbody tr:hover {
         opacity: 0;
         transform: translateY(-20px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -445,6 +480,7 @@ textarea {
         opacity: 0;
         transform: translateY(5px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -473,9 +509,11 @@ textarea:focus {
     0% {
         transform: translateY(0);
     }
+
     50% {
         transform: translateY(-3px);
     }
+
     100% {
         transform: translateY(-2px);
     }
@@ -508,6 +546,7 @@ DROPDOWN DE PERFIL
         opacity: 0;
         transform: translateY(-10px) scale(0.95);
     }
+
     to {
         opacity: 1;
         transform: translateY(0) scale(1);
@@ -616,6 +655,7 @@ DROPDOWN DE PERFIL
         opacity: 0;
         transform: translateY(20px) scale(0.9);
     }
+
     to {
         opacity: 1;
         transform: translateY(0) scale(1);
@@ -717,6 +757,7 @@ DROPDOWN DE PERFIL
         opacity: 0;
         transform: scale(0.8);
     }
+
     to {
         opacity: 1;
         transform: scale(1);
@@ -808,6 +849,7 @@ DROPDOWN DE PERFIL
         opacity: 0;
         transform: translateY(15px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -843,9 +885,12 @@ DROPDOWN DE PERFIL
 }
 
 @keyframes pulseRed {
-    0%, 100% {
+
+    0%,
+    100% {
         box-shadow: 0 3px 8px rgba(239, 68, 68, 0.3);
     }
+
     50% {
         box-shadow: 0 3px 15px rgba(239, 68, 68, 0.5);
     }
@@ -862,9 +907,12 @@ DROPDOWN DE PERFIL
 }
 
 @keyframes pulseGreen {
-    0%, 100% {
+
+    0%,
+    100% {
         box-shadow: 0 3px 8px rgba(16, 185, 129, 0.3);
     }
+
     50% {
         box-shadow: 0 3px 15px rgba(16, 185, 129, 0.5);
     }
@@ -902,9 +950,11 @@ DROPDOWN DE PERFIL
         opacity: 0;
         transform: scale(0.5);
     }
+
     50% {
         opacity: 0.3;
     }
+
     100% {
         opacity: 0;
         transform: scale(1.5);
@@ -949,10 +999,12 @@ DROPDOWN DE PERFIL
         transform: scale(1);
         opacity: 1;
     }
+
     50% {
         transform: scale(0.9);
         opacity: 0.7;
     }
+
     100% {
         transform: scale(1);
         opacity: 1;
@@ -995,6 +1047,7 @@ DROPDOWN DE PERFIL
     0% {
         left: -100%;
     }
+
     100% {
         left: 400%;
     }
@@ -1004,9 +1057,11 @@ DROPDOWN DE PERFIL
     0% {
         transform: scale(1);
     }
+
     50% {
         transform: scale(0.9);
     }
+
     100% {
         transform: scale(1);
     }
@@ -1025,28 +1080,30 @@ DROPDOWN DE PERFIL
 
 /* ===== RESPONSIVE ===== */
 @media (max-width: 768px) {
+
     .action-btn-view,
     .action-btn-toggle-estado {
         padding: 6px 10px !important;
         font-size: 11px !important;
         width: 70px !important;
     }
-    
+
     .state-badge-shimmer {
         font-size: 11px;
         padding: 2px 8px !important;
     }
-    
+
     /* Ajustar animaciones para mobile */
     tbody tr {
         animation: slideInRowMobile 0.5s ease backwards;
     }
-    
+
     @keyframes slideInRowMobile {
         from {
             opacity: 0;
             transform: translateY(10px);
         }
+
         to {
             opacity: 1;
             transform: translateY(0);

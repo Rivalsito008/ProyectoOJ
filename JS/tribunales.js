@@ -212,32 +212,71 @@ async function cargarTablaPorEstado(estado) {
             const textoBoton = esActivo ? 'Desactivar' : 'Activar';
             const colorBoton = esActivo ? 'bg-red-500 hover:bg-red-600' : 'bg-green-500 hover:bg-green-600';
 
+            // Preparar textos completos para tooltips
+            const nombreCompleto = t.tribunal || 'Sin nombre';
+            const direccionCompleta = t.direccion || 'No especificada';
+            const tipoCompleto = getTipo();
+            const materiaCompleta = getMateria();
+            const departamentoCompleto = getDepartamento();
+            const municipioCompleto = getMunicipio();
+            const distritoCompleto = getDistrito();
+
             tr.innerHTML = `
-                <td class="px-6 py-4 font-medium">${t.tribunal || 'Sin nombre'}</td>
-                <td class="px-6 py-4 text-center">${getTipo()}</td>
-                <td class="px-6 py-4">${getNumeracion()}</td>
-                <td class="px-6 py-4">${getMateria()}</td>
-                <td class="px-6 py-4">${getDepartamento()}</td>
-                <td class="px-6 py-4">${getMunicipio()}</td>
-                <td class="px-6 py-4">${getDistrito()}</td>
-                <td class="px-6 py-4">${t.direccion || 'No especificada'}</td>
-                <td class="px-6 py-4">
-                    <div class="flex space-x-2 justify-center">
-                        <button class="action-btn-view px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition">
-                            Editar
-                        </button>
-                        <button class="action-btn-toggle-estado px-3 py-1 rounded transition text-white ${colorBoton}"
-                                data-id="${t.id_tribunal}"
-                                data-estado="${estadoTribunal}"
-                                data-nombre="${t.tribunal}">
-                            ${textoBoton}
-                        </button>
-                    </div>
-                </td>
-            `;
+        <td class="px-6 py-4">
+            <div class="truncate-cell font-medium" data-full-text="${nombreCompleto}">
+                ${nombreCompleto}
+            </div>
+        </td>
+        <td class="px-6 py-4 text-center">
+            <div class="truncate-cell" data-full-text="${tipoCompleto}">
+                ${tipoCompleto}
+            </div>
+        </td>
+        <td class="px-6 py-4 text-center">
+            ${getNumeracion()}
+        </td>
+        <td class="px-6 py-4">
+            <div class="truncate-cell" data-full-text="${materiaCompleta}">
+                ${materiaCompleta}
+            </div>
+        </td>
+        <td class="px-6 py-4">
+            <div class="truncate-cell" data-full-text="${departamentoCompleto}">
+                ${departamentoCompleto}
+            </div>
+        </td>
+        <td class="px-6 py-4">
+            <div class="truncate-cell" data-full-text="${municipioCompleto}">
+                ${municipioCompleto}
+            </div>
+        </td>
+        <td class="px-6 py-4">
+            <div class="truncate-cell" data-full-text="${distritoCompleto}">
+                ${distritoCompleto}
+            </div>
+        </td>
+        <td class="px-6 py-4">
+            <div class="truncate-cell" data-full-text="${direccionCompleta}">
+                ${direccionCompleta}
+            </div>
+        </td>
+        <td class="px-6 py-4">
+            <div class="action-buttons-container">
+                <button class="action-btn-view px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition">
+                    Editar
+                </button>
+                <button class="action-btn-toggle-estado px-3 py-1 rounded transition text-white ${colorBoton}"
+                        data-id="${t.id_tribunal}"
+                        data-estado="${estadoTribunal}"
+                        data-nombre="${nombreCompleto}">
+                    ${textoBoton}
+                </button>
+            </div>
+        </td>
+    `;
+
             tbody.appendChild(tr);
         });
-
         agregarEventListenersABotones();
 
     } catch (error) {

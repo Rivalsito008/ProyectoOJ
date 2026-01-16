@@ -1614,23 +1614,35 @@ function recopilarDatosAgresor() {
 function recopilarDatosHechos() {
     const entornos = [];
     document.querySelectorAll('input[name="entornoViolencia"]:checked').forEach(check => {
-        entornos.push({ id_entorno_violencia: parseInt(check.value) });
+        entornos.push(parseInt(check.value));
     });
 
     const tiposViolencia = [];
     document.querySelectorAll('input[name="tipoViolencia"]:checked').forEach(check => {
-        tiposViolencia.push({ id_tipo_violencia: parseInt(check.value) });
+        const tipoViolenciaObj = {
+            id_tipo_violencia: parseInt(check.value)
+        };
+
+        // Si existe un campo de descripción adicional (como "otra violencia")
+        const descripcionInput = document.getElementById('tipoOtraTexto');
+        if (descripcionInput && descripcionInput.value &&
+            check.parentElement.textContent.toUpperCase().includes('OTRA')) {
+            tipoViolenciaObj.descripcion = descripcionInput.value;
+        } else {
+            tipoViolenciaObj.descripcion = null;
+        }
+
+        tiposViolencia.push(tipoViolenciaObj);
     });
 
     return {
         inicio_hechos: document.getElementById('inicioHechos')?.value || null,
         ultima_accion_fecha: document.getElementById('ultimaAccionFecha')?.value,
         hora_hecho: document.getElementById('horaHecho')?.value || document.getElementById('horaHechoTexto')?.value || null,
-        relacion_hecho: datosTemporales.relacionHechos || '', // ACTUALIZADO: Desde datos temporales
+        relacion_hecho: datosTemporales.relacionHechos || '',
         lugar_hecho: document.getElementById('lugarHecho')?.value || 'OTRO',
         id_distrito: parseInt(document.getElementById('distritoHecho')?.value) || null,
         frecuencia_agresiones: document.getElementById('frecuenciaAgresiones')?.value || 'OTRA',
-        // ACTUALIZADO: Campos ENUM en lugar de boolean
         agresor_alcoholizado: convertirAEnumNoSeSabe(document.getElementById('agresorAlcoholizado')?.value),
         agresor_drogado: convertirAEnumNoSeSabe(document.getElementById('agresorDrogado')?.value),
         denuncia_anterior_vif: convertirAEnumNoSeSabe(document.getElementById('denunciaAnteriorVIF')?.value),

@@ -17,6 +17,218 @@
     <script src="services/auth.js"></script>
 </head>
 
+<style>
+    /* Contenedor de tabla responsivo */
+    .table-container {
+        overflow-x: auto;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Tabla optimizada */
+    .tribunales-table {
+        width: 100%;
+        min-width: 1200px;
+        border-collapse: separate;
+        border-spacing: 0;
+        table-layout: fixed !important;
+    }
+
+    /* Columnas con ancho específico para optimizar espacio */
+    .tribunales-table th:nth-child(1),
+    .tribunales-table td:nth-child(1) {
+        min-width: 150px !important;
+        max-width: 150px !important;
+        width: 150px !important;
+        overflow: hidden !important;
+    }
+
+    .tribunales-table th:nth-child(2),
+    .tribunales-table td:nth-child(2) {
+        min-width: 120px !important;
+        max-width: 120px !important;
+        width: 120px !important;
+        text-align: center;
+        overflow: hidden !important;
+    }
+
+    .tribunales-table th:nth-child(3),
+    .tribunales-table td:nth-child(3) {
+        min-width: 120px !important;
+        max-width: 120px !important;
+        width: 120px !important;
+        text-align: center;
+        overflow: hidden !important;
+    }
+
+    .tribunales-table th:nth-child(4),
+    .tribunales-table td:nth-child(4) {
+        min-width: 100px !important;
+        max-width: 100px !important;
+        width: 100px !important;
+        overflow: hidden !important;
+    }
+
+    .tribunales-table th:nth-child(5),
+    .tribunales-table td:nth-child(5) {
+        min-width: 110px !important;
+        max-width: 110px !important;
+        width: 110px !important;
+        overflow: hidden !important;
+    }
+
+    .tribunales-table th:nth-child(6),
+    .tribunales-table td:nth-child(6) {
+        min-width: 110px !important;
+        max-width: 110px !important;
+        width: 110px !important;
+        overflow: hidden !important;
+    }
+
+    .tribunales-table th:nth-child(7),
+    .tribunales-table td:nth-child(7) {
+        min-width: 120px !important;
+        max-width: 120px !important;
+        width: 120px !important;
+        overflow: hidden !important;
+    }
+
+    .tribunales-table th:nth-child(8),
+    .tribunales-table td:nth-child(8) {
+        min-width: 180px !important;
+        max-width: 180px !important;
+        width: 180px !important;
+        overflow: hidden !important;
+    }
+
+    /* COLUMNA DE ACCIONES STICKY - LA MAGIA ESTÁ AQUÍ */
+    .tribunales-table th:nth-child(9) {
+        min-width: 200px;
+        width: 200px;
+        position: sticky;
+        right: 0;
+        z-index: 1;
+    }
+
+    .tribunales-table td:nth-child(9) {
+        min-width: 200px;
+        width: 200px;
+        position: sticky;
+        right: 0;
+        background: var(--card-bg);
+        z-index: 1;
+    }
+
+    .tribunales-table th:nth-child(9) {
+        z-index: 2;
+    }
+
+    /* Texto truncado con tooltip */
+    .truncate-cell {
+        max-width: 100%;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        white-space: nowrap !important;
+        cursor: help;
+        position: relative;
+        display: block !important;
+        line-height: 1.4 !important;
+        max-height: 22px !important;
+    }
+
+    /* Tooltip que aparece al hacer hover */
+    .truncate-cell:hover::after {
+        content: attr(data-full-text);
+        position: absolute;
+        left: 0;
+        top: 100%;
+        background: rgba(0, 0, 0, 0.95);
+        color: white;
+        padding: 10px 14px;
+        border-radius: 8px;
+        white-space: normal;
+        max-width: 350px;
+        min-width: 200px;
+        z-index: 1000;
+        font-size: 13px;
+        line-height: 1.5;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+        margin-top: 6px;
+        pointer-events: none;
+        animation: tooltipFadeIn 0.2s ease;
+    }
+
+    @keyframes tooltipFadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(-5px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    [data-theme="dark"] .truncate-cell:hover::after {
+        background: rgba(42, 34, 64, 0.98);
+        border: 1px solid var(--border-color);
+    }
+
+    /* Asegurar que todas las celdas tengan altura uniforme */
+    .tribunales-table tbody td {
+        height: 50px !important;
+        max-height: 50px !important;
+        vertical-align: middle;
+        padding: 12px 8px !important;
+        overflow: hidden;
+    }
+
+    /* Forzar altura máxima para evitar que las filas crezcan */
+    .tribunales-table tbody tr {
+        height: 50px !important;
+        max-height: 60px !important;
+    }
+
+    /* Headers también con altura fija */
+    .tribunales-table thead th {
+        height: 50px !important;
+        vertical-align: middle;
+    }
+
+    /* Contenedor de botones de acción */
+    .action-buttons-container {
+        display: flex;
+        gap: 8px;
+        justify-content: center;
+        flex-wrap: nowrap;
+    }
+
+    /* Indicador de scroll */
+    .scroll-indicator {
+        text-align: center;
+        padding: 8px;
+        background: linear-gradient(90deg, transparent, var(--bg-color), transparent);
+        color: #6b7280;
+        font-size: 12px;
+        display: none;
+    }
+
+    [data-theme="dark"] .scroll-indicator {
+        color: #9ca3af;
+    }
+
+    @media (max-width: 1400px) {
+        .scroll-indicator {
+            display: block;
+        }
+
+        .tribunales-table {
+            min-width: 1100px;
+        }
+    }
+</style>
+
 <body>
     <!-- Sidebar Component -->
     <?php include 'components/sidebar.php'; ?>
@@ -38,8 +250,8 @@
 
                 <div class="tab-content-wrapper">
                     <div class="tab-content active" id="Todo">
-                        <div class="relative overflow-x-auto">
-                            <table class="w-full text-sm text-left">
+                        <div class="table-container">
+                            <table class="tribunales-table w-full text-sm text-left">
                                 <thead class="text-xs uppercase">
                                     <tr>
                                         <th class="px-6 py-3">Nombre</th>
@@ -54,6 +266,7 @@
                                     </tr>
                                 </thead>
                                 <tbody id="tablaTodo">
+                                    <!-- Los datos se cargarán dinámicamente aquí -->
                                 </tbody>
                             </table>
                         </div>
