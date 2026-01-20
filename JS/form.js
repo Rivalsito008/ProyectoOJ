@@ -350,6 +350,7 @@ function agregarControlesPaginacion(container, inicio, fin) {
 
         btnAnterior.addEventListener('click', () => {
             if (paginaActual > 0) {
+                guardarRespuestasActuales();
                 paginaActual--;
                 renderizarPreguntasEnFormulario();
             }
@@ -357,6 +358,7 @@ function agregarControlesPaginacion(container, inicio, fin) {
 
         btnSiguiente.addEventListener('click', () => {
             if (paginaActual < totalPaginas - 1) {
+                guardarRespuestasActuales();
                 paginaActual++;
                 renderizarPreguntasEnFormulario();
             }
@@ -1659,17 +1661,6 @@ function recopilarDatosHechos() {
 
 function recopilarRespuestas() {
     guardarRespuestasActuales();
-    const respuestas = [];
-
-    preguntas.forEach(pregunta => {
-        const radioChecked = document.querySelector(`input[name="pregunta_${pregunta.id_pregunta}"]:checked`);
-        if (radioChecked) {
-            respuestas.push({
-                id_pregunta: pregunta.id_pregunta,
-                respuesta: radioChecked.value
-            });
-        }
-    });
 
     return datosTemporales.respuestas;
 }
@@ -1774,22 +1765,34 @@ function prevStep() {
 function guardarRespuestasActuales() {
     console.log('Guardando respuestas del cuestionario...');
 
-    const respuestas = [];
+    const inicio = paginaActual * preguntasPorPagina;
+    const fin = Math.min(inicio + preguntasPorPagina, preguntas.length);
+    const preguntasPaginaActual = preguntas.slice(inicio, fin);
 
-    preguntas.forEach(pregunta => {
+    preguntasPaginaActual.forEach(pregunta => {
         const radioChecked = document.querySelector(`input[name="pregunta_${pregunta.id_pregunta}"]:checked`);
         if (radioChecked) {
-            respuestas.push({
+            // Buscamos si ya existe una respuesta para esta pregunta
+            const indiceExistente = datosTemporales.respuestas.findIndex(
+                r => r.id_pregunta === pregunta.id_pregunta
+            );
+
+            const nuevaRespuesta = {
                 id_pregunta: pregunta.id_pregunta,
                 respuesta: radioChecked.value
-            });
+            }
+
+            if (indiceExistente !== -1) {
+                // Actualizamos la respuesta existente
+                datosTemporales.respuestas[indiceExistente] = nuevaRespuesta;
+            } else {
+                // Agregamos la nueva respuesta
+                datosTemporales.respuestas.push(nuevaRespuesta);
+            }
         }
     });
 
-    datosTemporales.respuestas = respuestas;
-    console.log(`✓ ${respuestas.length} respuestas guardadas temporalmente`);
-
-    return respuestas;
+    return datosTemporales.respuestas;
 }
 
 function restaurarRespuestas() {
