@@ -182,7 +182,7 @@ function switchTab(tabName) {
 async function fetchUsuariosSinModal() {
     try {
         const response = await axios.get('/usuarios');
-        
+
         if (response.data.success) {
             usuarios = response.data.data;
             console.log(`✓ ${usuarios.length} usuarios cargados`);
@@ -206,10 +206,10 @@ async function fetchUsuariosSinModal() {
 async function fetchUsuarios() {
     try {
         const response = await axios.get('/usuarios');
-        
+
         // No cerrar ningún modal aquí para evitar interferir con toasts
         // El modal de carga ya debería estar cerrado antes de llamar a esta función
-        
+
         if (response.data.success) {
             usuarios = response.data.data;
             console.log(`✓ ${usuarios.length} usuarios cargados`);
@@ -219,7 +219,7 @@ async function fetchUsuarios() {
         }
     } catch (error) {
         console.error('Error al cargar usuarios:', error);
-        
+
         if (error.response?.status === 403) {
             mostrarError('No tienes permisos para ver los usuarios');
         } else {
@@ -243,30 +243,30 @@ async function guardarNuevoUsuario() {
             mostrarError('Por favor selecciona un rol');
             return;
         }
-        
+
         // Mostrar modal de carga antes de crear usuario
         mostrarCargandoDatos('Creando usuario...');
-        
+
         // Obtener datos del formulario
         const formData = new FormData(elementos.addForm);
         const datos = Object.fromEntries(formData.entries());
         console.log('Creando usuario:', datos);
-        
+
         const response = await axios.post('/usuarios', datos);
-        
+
         // Cerrar modal de carga inmediatamente
         cerrarCargando();
-        
+
         if (response.data.success) {
             // Esperar un momento para que el modal se cierre completamente antes de mostrar el toast
             await new Promise(resolve => setTimeout(resolve, 200));
-            
+
             // Mostrar notificación de éxito CON TOAST
             mostrarExitoToast('Usuario creado exitosamente');
-            
+
             ModalManager.cerrar(elementos.addModal);
             ModalManager.limpiarFormulario(elementos.addForm);
-            
+
             // Esperar un momento antes de recargar usuarios para no interferir con el toast
             await new Promise(resolve => setTimeout(resolve, 500));
             await fetchUsuarios();
@@ -275,7 +275,7 @@ async function guardarNuevoUsuario() {
         console.error('Error al crear usuario:', error);
         // Cerrar modal de carga en caso de error
         cerrarCargando();
-        
+
         if (error.response?.status === 422) {
             const errors = error.response.data.errors;
             const firstError = Object.values(errors)[0][0];
@@ -373,10 +373,10 @@ async function guardarEdicionUsuario() {
             mostrarError('Por favor selecciona un rol');
             return;
         }
-        
+
         // Mostrar modal de carga antes de actualizar
         mostrarCargandoDatos('Actualizando usuario...');
-        
+
         // Obtener datos del formulario
         const formData = new FormData(elementos.editForm);
         const datos = Object.fromEntries(formData.entries());
@@ -385,21 +385,21 @@ async function guardarEdicionUsuario() {
             delete datos.password;
         }
         console.log('Actualizando usuario:', idUsuario, datos);
-        
+
         const response = await axios.put(`/usuarios/${idUsuario}`, datos);
-        
+
         // Cerrar modal de carga
         cerrarCargando();
-        
+
         if (response.data.success) {
             // Esperar un momento para que el modal se cierre completamente antes de mostrar el toast
             await new Promise(resolve => setTimeout(resolve, 200));
-            
+
             // Mostrar notificación de éxito CON TOAST
             mostrarExitoToast('Usuario actualizado exitosamente');
-            
+
             cerrarModalEditar();
-            
+
             // Esperar un momento antes de recargar usuarios para no interferir con el toast
             await new Promise(resolve => setTimeout(resolve, 500));
             await fetchUsuarios();
@@ -408,7 +408,7 @@ async function guardarEdicionUsuario() {
         console.error('Error al actualizar usuario:', error);
         // Cerrar modal de carga en caso de error
         cerrarCargando();
-        
+
         if (error.response?.status === 422) {
             const errors = error.response.data.errors;
             const firstError = Object.values(errors)[0][0];
@@ -457,22 +457,22 @@ async function toggleEstado(idUsuario, estadoActual) {
     try {
         // Mostrar modal de carga antes de cambiar estado
         mostrarCargandoDatos(`${nuevoEstado === 'Activo' ? 'Activando' : 'Desactivando'} usuario...`);
-        
+
         // Usar PATCH en lugar de POST
         const response = await axios.patch(`/usuarios/${idUsuario}/estado`, {
             estado: nuevoEstado
         });
-        
+
         // Cerrar modal de carga
         cerrarCargando();
-        
+
         if (response.data.success) {
             // Esperar un momento para que el modal se cierre completamente antes de mostrar el toast
             await new Promise(resolve => setTimeout(resolve, 200));
-            
+
             // Mostrar notificación de éxito CON TOAST
             mostrarExitoToast(`Usuario ${nuevoEstado === 'Activo' ? 'activado' : 'desactivado'} exitosamente`);
-            
+
             // Esperar un momento antes de recargar usuarios para no interferir con el toast
             await new Promise(resolve => setTimeout(resolve, 500));
             await fetchUsuarios();
@@ -481,7 +481,7 @@ async function toggleEstado(idUsuario, estadoActual) {
         console.error('Error al cambiar estado:', error);
         // Cerrar modal de carga en caso de error
         cerrarCargando();
-        
+
         if (error.response?.status === 403) {
             mostrarError('No tienes permisos para cambiar el estado de usuarios');
         } else {
@@ -771,13 +771,13 @@ function cerrarCargando() {
 // INICIALIZACIÓN
 // ======================================
 document.addEventListener('DOMContentLoaded', async () => {
-    
+
     // Inicializar observer para eliminar padding de SweetAlert2
     inicializarObserverPadding();
-    
+
     // 🔧 CAMBIO CRÍTICO: Mostrar modal de carga ANTES de cualquier operación asíncrona
     mostrarCargandoDatos();
-    
+
     try {
         // Verificar permisos de administrador
         const isAdmin = await auth.isAdmin();
@@ -800,13 +800,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // Cargar roles disponibles
         await cargarRoles();
-        
+
         // Cargar usuarios (NO mostrar otro modal aquí)
         await fetchUsuariosSinModal();
-        
+
         // Cerrar modal una vez cargado todo
         cerrarCargando();
-        
+
         console.log('✓ Módulo de usuarios cargado correctamente');
         console.log('✓ Sistema de modals optimizado inicializado');
         console.log('✓ Carga dinámica de roles habilitada');

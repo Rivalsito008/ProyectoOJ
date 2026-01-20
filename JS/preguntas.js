@@ -1,3 +1,8 @@
+import { inicializarObserverPadding } from './utils/ManageToastSW2.js';
+import { eliminarPaddingSweetAlert } from './utils/ManageToastSW2.js';
+import { mostrarExito } from './utils/ManageToastSW2.js';
+import { mostrarError } from './utils/ManageToastSW2.js';
+
 // PROTECCION DE RUTA - SOLO ADMINS Y COLABORADORES
 (async function () {
     const t = localStorage.getItem('theme-preference') || 'auto';
@@ -118,25 +123,6 @@ function escapeHtml(text) {
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
-}
-
-function mostrarExito(mensaje) {
-    Swal.fire({
-        icon: 'success',
-        title: '¡Éxito!',
-        text: mensaje,
-        timer: 2000,
-        showConfirmButton: false
-    });
-}
-
-function mostrarError(mensaje) {
-    Swal.fire({
-        icon: 'error',
-        title: 'Error',
-        text: mensaje,
-        confirmButtonColor: '#3B82F6'
-    });
 }
 
 function mostrarCargando(mensaje = 'Cargando...') {
@@ -463,8 +449,15 @@ async function actualizarEstadoPregunta(id, nuevoEstado) {
             preguntas[index].estado = nuevoEstado;
         }
 
+        function capitalizeLetter(texto) {
+            let firstLetter = texto.charAt(0).toUpperCase();
+            let restOfLetters = texto.slice(1).toLowerCase();
+
+            return `${firstLetter}${restOfLetters}`;
+        }
+
         cerrarCargando();
-        mostrarExito(`Pregunta ${nuevoEstado.toLowerCase()} exitosamente`);
+        mostrarExito(`Pregunta actualizada a estado "${capitalizeLetter(nuevoEstado)}" exitosamente`);
 
         // Recargar tabla actual
         const tabActivo = document.querySelector('.browser-tab.active');
@@ -750,8 +743,14 @@ function agregarEventListenersABotones() {
                 cancelButtonColor: '#6B7280',
                 confirmButtonText: esActivo ? 'Sí, desactivar' : 'Sí, activar',
                 cancelButtonText: 'Cancelar',
-                reverseButtons: true
+                reverseButtons: true,
+                didClose: () => {
+                    // Eliminar padding después de cerrar el modal de confirmación
+                    eliminarPaddingSweetAlert();
+                }
             });
+
+            eliminarPaddingSweetAlert();
 
             if (result.isConfirmed) {
                 await actualizarEstadoPregunta(idPregunta, nuevoEstado);
@@ -867,6 +866,8 @@ function limpiarFormulario() {
 // -------------------------------
 document.addEventListener("DOMContentLoaded", async function () {
     console.log("DOM cargado, inicializando aplicacion...");
+
+    inicializarObserverPadding();
 
     // Inicializar event listeners
     inicializarEventListeners();

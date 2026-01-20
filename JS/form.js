@@ -1,4 +1,8 @@
-
+import { inicializarObserverPadding } from './utils/ManageToastSW2.js';
+import { eliminarPaddingSweetAlert } from './utils/ManageToastSW2.js';
+import { mostrarExito } from './utils/ManageToastSW2.js';
+import { mostrarExitoToast } from './utils/ManageToastSW2.js';
+import { mostrarError } from './utils/ManageToastSW2.js';
 // ============================================
 // CONFIGURACIÓN Y CONSTANTES
 // ============================================
@@ -1194,7 +1198,7 @@ function setupGeneradorTexto() {
 }
 
 function generarTextoAutomatico() {
-    console.log('🔤 Generando texto automático...');
+    console.log('Generando texto automático...');
 
     const nombreDenunciante = document.getElementById('denuncianteNombre')?.value.trim();
     const documento = document.getElementById('denuncianteNumDocumento')?.value.trim();
@@ -1246,7 +1250,7 @@ function generarTextoAutomatico() {
         console.log('✓ Previsualización actualizada');
     }
 
-    mostrarExito('Texto generado automáticamente');
+    mostrarExitoToast('Texto generado automáticamente');
 
     return textoGenerado;
 }
@@ -1337,7 +1341,7 @@ function copiarDatosDenuncianteAVictima() {
     copiarTelefonos('denunciante', 'victima');
 
     console.log('✓ Datos copiados');
-    mostrarExito('Datos del denunciante copiados automáticamente');
+    mostrarExitoToast('Datos del denunciante copiados automáticamente');
 }
 
 async function copiarCascadaGeograficaCompleta() {
@@ -1579,7 +1583,6 @@ function recopilarDatosAgresor() {
             tipo_documento: document.getElementById('agresorTipoDocumento')?.value || 'DUI',
             tipo_documento_opc_otro: null,
             documento: document.getElementById('agresorNumDocumento')?.value,
-            // ACTUALIZADO: Nuevos nombres de campos
             ubicacion: parseInt(document.getElementById('agresorDistRes')?.value) || null,
             lugar_nacimiento: parseInt(document.getElementById('agresorDistNac')?.value) || null,
             direccion_trabajo: parseInt(document.getElementById('agresorDistritoTrabajo')?.value) || null,
@@ -1596,7 +1599,7 @@ function recopilarDatosAgresor() {
             nombre_acompanante: document.getElementById('agresorNombreConyuge')?.value || null,
             contactos: contactos
         },
-        // ACTUALIZADO: Campos ENUM en lugar de boolean
+
         consume_alcohol: convertirAEnum(document.getElementById('agresorConsumoAlcohol')?.value),
         frecuencia_consumo_alcohol: document.getElementById('agresorFrecuenciaAlcohol')?.value || null,
         consume_drogas: convertirAEnum(document.getElementById('agresorConsumoDrogas')?.value),
@@ -1604,7 +1607,7 @@ function recopilarDatosAgresor() {
         posee_armas: convertirAEnum(document.getElementById('agresorPoseeArmas')?.value),
         formacion_especial: convertirAEnum(document.getElementById('agresorFormacionEspecial')?.value),
         posee_discapacidad: convertirAEnum(document.getElementById('agresorPoseeDiscapacidad')?.value),
-        discapacidad_desc_adicional: document.getElementById('agresorDescripcionDiscapacidad')?.value || null, // NUEVO CAMPO
+        discapacidad_desc_adicional: document.getElementById('agresorDescripcionDiscapacidad')?.value || null,
         armas: armas,
         formaciones: formaciones,
         discapacidades: discapacidades
@@ -1999,22 +2002,14 @@ function ocultarLoading() {
     console.log('✓ Loading ocultado');
 }
 
-function mostrarExito(mensaje) {
-    console.log('Exito', mensaje);
-    alert(mensaje);
-}
-
-function mostrarError(mensaje) {
-    console.error('Error', mensaje);
-    alert('Error: ' + mensaje);
-}
-
 // ============================================
 // INICIALIZACIÓN
 // ============================================
 
 document.addEventListener('DOMContentLoaded', async function () {
     console.log('Inicializando formulario...');
+
+    inicializarObserverPadding();
 
     await cargarCatalogos();
     await cargarPreguntas();

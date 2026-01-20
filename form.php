@@ -8,8 +8,12 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="Style/form.css">
 
+  <!-- SweetAlert -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
   <!-- Axios -->
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
   <script src="services/auth.js"></script>
 </head>
 
@@ -359,6 +363,9 @@
                   <option value="5">5 víctimas</option>
                   <option value="mas">Más de 5 víctimas</option>
                 </select>
+                <input type="number"
+                  class="border border-gray-300 rounded-lg p-3 w-full focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                  placeholder="1">
               </div>
 
               <!-- Contenedor para múltiples víctimas -->
@@ -1711,7 +1718,7 @@
     </main>
   </div>
 
-  <script src="JS/form.js"></script>
+  <script src="JS/form.js" type="module"></script>
 
 </body>
 

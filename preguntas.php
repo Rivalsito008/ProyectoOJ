@@ -292,7 +292,7 @@
         </main>
     </div>
 
-    <script src="JS/preguntas.js"></script>
+    <script src="JS/preguntas.js" type="module"></script>
 </body>
 
 </html>
