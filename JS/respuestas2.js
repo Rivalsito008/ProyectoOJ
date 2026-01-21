@@ -116,14 +116,17 @@ function transformarDatosAPI(data) {
         // Calcular el nivel de riesgo segun los datos obtenidos
         let nivelRiesgo = item.nivel_riesgo_evaluacion;
 
-        const respuestas = generarRespuestasDesdeAPI(
-            item.total_respuestas_si,
-            item.total_preguntas,
-            item.puntaje_total,
-            nivelRiesgo
-        );
+        const respuestas = item.respuestas_detalladas.map(respuestaAPI => {
+            return {
+                pregunta: `Pregunta ${respuestaAPI.pregunta.id_pregunta}: ${respuestaAPI.pregunta.texto_pregunta}`,
+                respuesta: respuestaAPI.respuesta,
+                nivel: respuestaAPI.pregunta.nivel_riesgo.nivel,
+                puntaje: respuestaAPI.pregunta.nivel_riesgo.puntaje
+            }
+        });
 
         return {
+            id_caso: item.id_caso,
             nombre: item.nombre_denunciante,
             riesgo: nivelRiesgo,
             estado: item.estado_caso === 'ABIERTO' ? "Abierto" : "Cerrado",
@@ -134,26 +137,6 @@ function transformarDatosAPI(data) {
             totalPreguntas: item.total_preguntas
         };
     });
-}
-
-function generarRespuestasDesdeAPI(totalSi, totalPreguntas, puntajeTotal, nivelRiesgo) {
-    // Generar respuestas basadas en el total de preguntas de la API
-    const respuestas = [];
-
-    for (let i = 0; i < totalPreguntas; i++) {
-        // Si existe una pregunta en preguntasBase, usarla; si no, generar una genérica
-        const preguntaBase = preguntasBase[i];
-
-        respuestas.push({
-            pregunta: preguntaBase
-                ? `Pregunta ${preguntaBase.id}: ${preguntaBase.texto}`
-                : `Pregunta ${i + 1}: Pregunta adicional ${i + 1}`,
-            respuesta: i < totalSi ? "Sí" : "No",
-            nivel: preguntaBase ? preguntaBase.nivel : "bajo"
-        });
-    }
-
-    return respuestas;
 }
 
 // ===================================================================
@@ -416,16 +399,25 @@ function abrirModal(victima) {
     const modal = document.getElementById('modalRespuestas');
     const modalContent = document.getElementById('modalContent');
 
-    const calculoRiesgo = calcularRiesgo(victima.respuestas);
+    const nivelRiesgo = victima.riesgo;
+    const puntajeTotal = victima.puntajeTotal;
+    const respuestasSi = victima.totalRespuestaSi;
+    const totalPreguntas = victima.totalPreguntas;
+    const porcentaje = Math.min(100, (puntajeTotal / 80) * 100);
+
+    // Verificamos si hay preguntas activadoras respondidas con "Si"
+    const activadorExtremo = victima.respuestas.some(r =>
+        r.puntaje === 100 && r.respuesta === 'Si'
+    );
 
     const colorRiesgo = {
         "Bajo": "bg-green-500",
         "Moderado": "bg-yellow-500",
         "Alto": "bg-orange-500",
         "Extremo": "bg-red-600"
-    }[calculoRiesgo.nivelRiesgo] || "bg-gray-500";
+    }[nivelRiesgo] || "bg-gray-500";
 
-    const medidasProteccion = obtenerMedidasProteccion(calculoRiesgo.nivelRiesgo);
+    const medidasProteccion = obtenerMedidasProteccion(nivelRiesgo);
 
     let contenido = `
         <div class="mb-6">
@@ -436,23 +428,23 @@ function abrirModal(victima) {
                         <div class="flex items-center gap-2">
                             <span class="text-sm font-medium text-gray-600 dark:text-gray-400">Nivel de Riesgo:</span>
                             <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-white text-sm font-medium ${colorRiesgo}">
-                                ${calculoRiesgo.nivelRiesgo}
-                                ${calculoRiesgo.activadorExtremo ?
+                                ${nivelRiesgo}
+                                ${activadorExtremo ?
             '<span class="text-xs opacity-90">(Activador)</span>' :
-            `<span class="text-xs opacity-90">(${calculoRiesgo.puntos} pts)</span>`
+            `<span class="text-xs opacity-90">(${puntajeTotal} pts)</span>`
         }
                             </span>
                         </div>
                         <div class="flex items-center gap-2">
                             <span class="text-sm font-medium text-gray-600 dark:text-gray-400">Respuestas Sí:</span>
-                            <span class="px-2 py-1 rounded text-sm bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">${calculoRiesgo.respuestasSi}/37</span>
+                            <span class="px-2 py-1 rounded text-sm bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">${respuestasSi}/${totalPreguntas}</span>
                         </div>
                         <div class="flex items-center gap-2">
                             <span class="text-sm font-medium text-gray-600 dark:text-gray-400">Estado:</span>
-                            <span class="px-2 py-1 rounded text-sm ${victima.estado === 'Activo' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200'}">${victima.estado}</span>
+                            <span class="px-2 py-1 rounded text-sm ${victima.estado === 'Abierto' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200'}">${victima.estado}</span>
                         </div>
                     </div>
-                    ${calculoRiesgo.activadorExtremo ?
+                    ${activadorExtremo ?
             `<div class="mt-2 p-2 bg-red-100 dark:bg-red-900 border border-red-300 dark:border-red-700 rounded-lg">
                             <div class="flex items-center gap-2 text-red-700 dark:text-red-300">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -476,7 +468,7 @@ function abrirModal(victima) {
                     <svg class="w-5 h-5 text-blue-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
                     </svg>
-                    <h4 class="text-lg font-semibold text-blue-800 dark:text-purple-300 sentencia-title">Medidas de Protección - Nivel ${calculoRiesgo.nivelRiesgo}</h4>
+                    <h4 class="text-lg font-semibold text-blue-800 dark:text-purple-300 sentencia-title">Medidas de Protección - Nivel ${nivelRiesgo}</h4>
                 </div>
                 
                 <div class="mb-3">
@@ -509,41 +501,59 @@ function abrirModal(victima) {
     `;
 
     victima.respuestas.forEach((respuesta) => {
-        const colorNivel = {
-            "bajo": "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
-            "moderado": "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200",
-            "alto": "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200",
-            "extremo": "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200",
-            "activador": "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200 border-2 border-purple-300 dark:border-purple-600"
-        }[respuesta.nivel] || "bg-gray-100 text-gray-800";
+        // Determinar el nivel basado en el puntaje de la API
+        let nivelTexto = "";
+        if (respuesta.puntaje === 1) {
+            nivelTexto = "BAJO";
+        } else if (respuesta.puntaje === 2) {
+            nivelTexto = "MODERADO";
+        } else if (respuesta.puntaje === 3) {
+            nivelTexto = "ALTO";
+        } else if (respuesta.puntaje === 4) {
+            nivelTexto = "EXTREMO";
+        } else if (respuesta.puntaje === 100) {
+            nivelTexto = "ACTIVADOR";
+        }
 
-        const colorRespuesta = respuesta.respuesta === 'Sí'
+        const colorNivel = {
+            1: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
+            2: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200",
+            3: "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200",
+            4: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200",
+            100: "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200 border-2 border-purple-300 dark:border-purple-600"
+        }[respuesta.puntaje] || "bg-gray-100 text-gray-800";
+
+        const colorRespuesta = respuesta.respuesta === 'Si'
             ? 'text-green-600 dark:text-green-400 font-bold'
             : 'text-red-600 dark:text-red-400 font-bold';
 
-        const textoNivel = respuesta.nivel === "activador" ? "ACTIVADOR" : respuesta.nivel.toUpperCase();
-
-        const puntosTexto = respuesta.nivel === "activador" ?
-            (respuesta.respuesta === 'Sí' ? '(Nivel Extremo)' : '(Sin efecto)') :
-            (respuesta.respuesta === 'Sí' ? '(+' + (puntosPorNivel[respuesta.nivel] || 1) + ' pts)' : '(0 pts)');
+        const puntosTexto = respuesta.puntaje === 100 ?
+            (respuesta.respuesta === 'Si' ? '(Nivel Extremo)' : '(Sin efecto)') :
+            (respuesta.respuesta === 'Si' ? '(+' + respuesta.puntaje + ' pts)' : '(0 pts)');
 
         contenido += `
-            <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 ${respuesta.nivel === "activador" && respuesta.respuesta === 'Sí' ? 'ring-2 ring-purple-500 dark:ring-purple-400' : ''}">
+            <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 ${respuesta.puntaje === 100 && respuesta.respuesta === 'Si' ? 'ring-2 ring-purple-500 dark:ring-purple-400' : ''}">
                 <div class="flex justify-between items-start gap-4">
                     <div class="flex-1">
                         <div class="flex items-center gap-2 mb-2">
                             <span class="inline-block px-2 py-1 rounded text-xs font-medium ${colorNivel}">
-                                ${textoNivel}
+                                ${nivelTexto}
                             </span>
                             <span class="text-xs text-gray-500 dark:text-gray-400">
                                 ${puntosTexto}
                             </span>
-                            ${respuesta.nivel === "activador" && respuesta.respuesta === 'Sí' ?
+                            ${respuesta.puntaje === 100 && respuesta.respuesta === 'Si' ?
                 '<span class="inline-block px-2 py-1 rounded text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200 animate-pulse">¡ACTIVADO!</span>' :
                 ''
             }
                         </div>
                         <span class="text-sm text-gray-700 dark:text-gray-300">${respuesta.pregunta}</span>
+                        ${respuesta.comentario ? `
+                            <div class="mt-2 p-2 bg-blue-50 dark:bg-blue-900/20 rounded border-l-2 border-blue-400 dark:border-blue-600">
+                                <p class="text-xs font-medium text-blue-700 dark:text-blue-300 mb-1">Comentario:</p>
+                                <p class="text-xs text-blue-600 dark:text-blue-400">${respuesta.comentario}</p>
+                            </div>
+                        ` : ''}
                     </div>
                     <span class="${colorRespuesta} ml-4 min-w-12 text-center text-sm font-medium">${respuesta.respuesta}</span>
                 </div>
@@ -715,16 +725,21 @@ function renderTablaFiltrada() {
         const tr = document.createElement("tr");
         tr.classList.add("border-b", "hover:bg-gray-50", "dark:border-gray-50", "dark:hover:bg-gray-340");
 
-        const calculoRiesgo = calcularRiesgo(v.respuestas);
+        // Usar directamente los datos de la API
+        const nivelRiesgo = v.riesgo;
+        const puntajeTotal = v.puntajeTotal;
+        const respuestasSi = v.totalRespuestaSi;
+        const totalPreguntas = v.totalPreguntas;
+
+        // CAMBIO: Calcular porcentaje basado en respuestas "Sí" sobre total de preguntas
+        const porcentaje = totalPreguntas > 0 ? Math.round((respuestasSi / totalPreguntas) * 100) : 0;
 
         const colorBarra = {
             "Bajo": "bg-green-500",
             "Moderado": "bg-yellow-500",
             "Alto": "bg-orange-500",
             "Extremo": "bg-red-600"
-        }[calculoRiesgo.nivelRiesgo] || "bg-gray-500";
-
-        const porcentajeVisual = calculoRiesgo.porcentaje;
+        }[nivelRiesgo] || "bg-gray-500";
 
         tr.innerHTML = `
             <td class="px-6 py-4">${v.nombre}</td>
@@ -732,15 +747,15 @@ function renderTablaFiltrada() {
                 <div class="flex items-center gap-3">
                     <div class="flex-1 max-w-40">
                         <div class="flex justify-between items-center mb-1">
-                            <span class="text-xs font-medium text-gray-700 dark:text-gray-300">${v.totalRespuestaSi || calculoRiesgo.respuestasSi}/${v.totalPreguntas || 37} Sí</span>
-                            <span class="text-xs text-gray-500 dark:text-gray-400">${calculoRiesgo.nivelRiesgo}</span>
+                            <span class="text-xs font-medium text-gray-700 dark:text-gray-300">${respuestasSi}/${totalPreguntas} Sí</span>
+                            <span class="text-xs text-gray-500 dark:text-gray-400">${nivelRiesgo}</span>
                         </div>
                         <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3 relative">
-                            <div class="risk-bar-table ${colorBarra} h-3 rounded-full transition-all duration-1000" style="width: ${porcentajeVisual}%"></div>
+                            <div class="risk-bar-table ${colorBarra} h-3 rounded-full transition-all duration-1000" style="width: ${porcentaje}%"></div>
                         </div>
                         <div class="flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-1">
-                            <span>${v.puntajeTotal || calculoRiesgo.puntos} pts</span>
-                            <span>${Math.round(porcentajeVisual)}%</span>
+                            <span>${puntajeTotal} pts</span>
+                            <span>${porcentaje}%</span>
                         </div>
                     </div>
                 </div>
@@ -763,8 +778,8 @@ function renderTablaFiltrada() {
                         Detalles
                     </button>                  
                     <button onclick="toggleEstadoVictima('${v.nombre}', '${v.estado}')" 
-                            class="action-btn-toggle-estado w-24 px-3 py-1 rounded-lg text-sm font-medium transition-all duration-200 shadow-sm relative overflow-hidden ${v.estado === 'Activo' ? 'bg-red-500 hover:bg-red-600' : 'bg-green-500 hover:bg-green-600'} text-white">
-                        ${v.estado === 'Activo' ? 'Desactivar' : 'Activar'}
+                            class="action-btn-toggle-estado w-24 px-3 py-1 rounded-lg text-sm font-medium transition-all duration-200 shadow-sm relative overflow-hidden ${v.estado === 'Abierto' ? 'bg-red-500 hover:bg-red-600' : 'bg-green-500 hover:bg-green-600'} text-white">
+                        ${v.estado === 'Abierto' ? 'Desactivar' : 'Activar'}
                     </button>
                 </div>
             </td>
@@ -929,13 +944,17 @@ function abrirModalAcciones(victima) {
     const modal = document.getElementById('modalAcciones');
     const modalContent = document.getElementById('modalAccionesContent');
 
-    const calculoRiesgo = calcularRiesgo(victima.respuestas);
+    // Usar directamente los datos de la API
+    const nivelRiesgo = victima.riesgo;
+    const puntajeTotal = victima.puntajeTotal;
+    const respuestasSi = victima.totalRespuestaSi;
+    const totalPreguntas = victima.totalPreguntas;
 
     // Definir los mensajes según el nivel de riesgo
     let mensajeRiesgo = "";
     let colorClase = "";
 
-    switch (calculoRiesgo.nivelRiesgo) {
+    switch (nivelRiesgo) {
         case "Bajo":
             mensajeRiesgo = "Riesgo mínimo, situación controlada que requiere seguimiento básico";
             colorClase = "bg-green-100 border-green-400 text-green-800 dark:bg-green-900 dark:text-green-300";
@@ -957,6 +976,13 @@ function abrirModalAcciones(victima) {
             colorClase = "bg-gray-100 border-gray-400 text-gray-800 dark:bg-gray-900 dark:text-gray-300";
     }
 
+    const colorNivel = {
+        "Bajo": "bg-green-500",
+        "Moderado": "bg-yellow-500",
+        "Alto": "bg-orange-500",
+        "Extremo": "bg-red-600"
+    }[nivelRiesgo] || "bg-gray-500";
+
     const contenido = `
         <div class="space-y-4">
             <!-- Header -->
@@ -975,15 +1001,12 @@ function abrirModalAcciones(victima) {
             <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
                 <div class="flex items-center gap-3">
                     <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Nivel:</span>
-                    <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-white text-sm font-bold ${calculoRiesgo.nivelRiesgo === "Bajo" ? "bg-green-500" :
-            calculoRiesgo.nivelRiesgo === "Moderado" ? "bg-yellow-500" :
-                calculoRiesgo.nivelRiesgo === "Alto" ? "bg-orange-500" : "bg-red-600"
-        }">
-                        ${calculoRiesgo.nivelRiesgo}
+                    <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-white text-sm font-bold ${colorNivel}">
+                        ${nivelRiesgo}
                     </span>
                 </div>
                 <div class="text-sm text-gray-600 dark:text-gray-400">
-                    ${calculoRiesgo.respuestasSi}/37 Sí • ${calculoRiesgo.puntos} pts
+                    ${respuestasSi}/${totalPreguntas} Sí • ${puntajeTotal} pts
                 </div>
             </div>
             
@@ -1010,7 +1033,7 @@ function abrirModalAcciones(victima) {
             <!-- Footer -->
             <div class="pt-3 border-t border-gray-200 dark:border-gray-600">
                 <p class="text-xs text-gray-500 dark:text-gray-400 text-center">
-                    Estado: <span class="font-medium ${victima.estado === 'Activo' ? 'text-green-600' : 'text-red-600'}">${victima.estado}</span>
+                    Estado: <span class="font-medium ${victima.estado === 'Abierto' ? 'text-green-600' : 'text-red-600'}">${victima.estado}</span>
                     • Fecha: ${victima.fecha}
                 </p>
             </div>
@@ -1021,17 +1044,69 @@ function abrirModalAcciones(victima) {
     modal.classList.remove('hidden');
 }
 
+// Funcion para obtener los detalles de un caso
+async function obtenerDetallesCaso(idCaso) {
+    try {
+        const response = await axios.get(`/respuestas/${idCaso}`);
+
+        if (response.data.success && response.data.data) {
+            return response.data.data;
+        } else {
+            return null;
+        }
+    } catch (error) {
+        return null;
+    }
+}
+
 // ===================================================================
-// FUNCIÓN DE MODAL DE DETALLES - VERSIÓN CORREGIDA
+// FUNCIÓN DE MODAL DE DETALLES CON DATOS REALES
 // ===================================================================
-function abrirModalDetalles(victima) {
+async function abrirModalDetalles(victima) {
     const modal = document.getElementById('modalDetalles');
     if (!modal) {
         console.error('Modal de detalles no encontrado');
         return;
     }
 
-    const calculoRiesgo = calcularRiesgo(victima.respuestas);
+    const modalDialog = modal.querySelector('.modal-dialog');
+
+    // Mostrar loading mientras se cargan los datos
+    modalDialog.innerHTML = `
+        <div class="flex items-center justify-center p-12">
+            <div class="text-center">
+                <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                <p class="text-gray-600 dark:text-gray-400">Cargando detalles del caso...</p>
+            </div>
+        </div>
+    `;
+
+    modal.classList.remove('hidden');
+
+    // Obtener detalles completos del caso
+    const detallesCaso = await obtenerDetallesCaso(victima.id_caso);
+
+    if (!detallesCaso) {
+        modalDialog.innerHTML = `
+            <div class="p-6">
+                <div class="text-center text-red-600">
+                    <p>Error al cargar los detalles del caso</p>
+                    <button onclick="cerrarModalDetalles()" class="mt-4 px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg">
+                        Cerrar
+                    </button>
+                </div>
+            </div>
+        `;
+        return;
+    }
+
+    // Extraer datos del caso
+    const infoAdmin = detallesCaso.informacion_administrativa;
+    const denunciante = detallesCaso.datos_denunciante;
+    const victimas = detallesCaso.datos_victimas || [];
+    const agresores = detallesCaso.datos_agresores || [];
+    const tiposViolencia = detallesCaso.tipos_violencia || [];
+    const nivelRiesgo = detallesCaso.nivel_riesgo_cuestionario;
 
     const colorClases = {
         "Bajo": "bg-green-500",
@@ -1040,9 +1115,9 @@ function abrirModalDetalles(victima) {
         "Extremo": "bg-red-600"
     };
 
-    // GENERAR TODO EL CONTENIDO DEL MODAL DE UNA VEZ
-    const modalDialog = modal.querySelector('.modal-dialog');
+    const porcentaje = nivelRiesgo.porcentaje_riesgo || 0;
 
+    // Generar contenido del modal
     const contenidoCompleto = `
         <!-- Header del Modal -->
         <div class="sticky top-0 bg-white dark:bg-gray-800 z-10 px-6 pt-6 pb-4 border-b border-gray-200 dark:border-gray-600 flex-shrink-0">
@@ -1054,16 +1129,16 @@ function abrirModalDetalles(victima) {
                     <div class="flex flex-wrap items-center gap-3">
                         <div class="flex items-center gap-2">
                             <span class="text-sm font-medium text-gray-600 dark:text-gray-400">Víctima:</span>
-                            <span class="font-semibold text-gray-800 dark:text-white">${victima.nombre}</span>
+                            <span class="font-semibold text-gray-800 dark:text-white">${victimas[0]?.nombre_completo || 'N/A'}</span>
                         </div>
                         <div class="flex items-center gap-2">
                             <span class="text-sm font-medium text-gray-600 dark:text-gray-400">Caso:</span>
-                            <span class="font-mono text-sm bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">VIF-2025-${String(Math.floor(Math.random() * 10000)).padStart(5, '0')}</span>
+                            <span class="font-mono text-sm bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">${infoAdmin.numero_caso}</span>
                         </div>
                         <div class="flex items-center gap-2">
                             <span class="text-sm font-medium text-gray-600 dark:text-gray-400">Nivel:</span>
-                            <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-white text-sm font-bold ${colorClases[calculoRiesgo.nivelRiesgo]}">
-                                ${calculoRiesgo.nivelRiesgo}
+                            <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-white text-sm font-bold ${colorClases[nivelRiesgo.nivel_riesgo]}">
+                                ${nivelRiesgo.nivel_riesgo}
                             </span>
                         </div>
                     </div>
@@ -1079,6 +1154,7 @@ function abrirModalDetalles(victima) {
         <!-- Contenido del Modal -->
         <div class="flex-1 overflow-y-auto px-6 py-4">
             <div class="space-y-4">
+                
                 <!-- Sección 1: Información Administrativa -->
                 <div class="accordion-section">
                     <button class="accordion-header flex justify-between items-center w-full p-4 bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 rounded-lg hover:from-blue-100 hover:to-blue-200 dark:hover:from-blue-800/30 dark:hover:to-blue-700/30 transition-all" data-target="seccionAdmin">
@@ -1097,23 +1173,27 @@ function abrirModalDetalles(victima) {
                             <tbody>
                                 <tr class="border-b border-gray-200 dark:border-gray-700">
                                     <td class="py-3 px-4 font-medium text-gray-700 dark:text-gray-300 w-1/3">Número de Caso:</td>
-                                    <td class="py-3 px-4 text-gray-600 dark:text-gray-400">VIF-2025-${String(Math.floor(Math.random() * 10000)).padStart(5, '0')}</td>
+                                    <td class="py-3 px-4 text-gray-600 dark:text-gray-400">${infoAdmin.numero_caso}</td>
                                 </tr>
                                 <tr class="border-b border-gray-200 dark:border-gray-700">
                                     <td class="py-3 px-4 font-medium text-gray-700 dark:text-gray-300">Fecha de Denuncia:</td>
-                                    <td class="py-3 px-4 text-gray-600 dark:text-gray-400">${victima.fecha}</td>
+                                    <td class="py-3 px-4 text-gray-600 dark:text-gray-400">${infoAdmin.fecha_denuncia}</td>
                                 </tr>
                                 <tr class="border-b border-gray-200 dark:border-gray-700">
                                     <td class="py-3 px-4 font-medium text-gray-700 dark:text-gray-300">Estado del Proceso:</td>
-                                    <td class="py-3 px-4"><span class="px-2 py-1 rounded text-xs font-medium bg-green-100 text-green-800">${victima.estado}</span></td>
+                                    <td class="py-3 px-4"><span class="px-2 py-1 rounded text-xs font-medium ${infoAdmin.estado_proceso === 'ABIERTO' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}">${infoAdmin.estado_proceso}</span></td>
                                 </tr>
                                 <tr class="border-b border-gray-200 dark:border-gray-700">
-                                    <td class="py-3 px-4 font-medium text-gray-700 dark:text-gray-300">Funcionario Asignado:</td>
-                                    <td class="py-3 px-4 text-gray-600 dark:text-gray-400">Lic. Ana Rodríguez</td>
+                                    <td class="py-3 px-4 font-medium text-gray-700 dark:text-gray-300">Juez Asignado:</td>
+                                    <td class="py-3 px-4 text-gray-600 dark:text-gray-400">${infoAdmin.juez_asignado.nombre_completo}</td>
+                                </tr>
+                                <tr class="border-b border-gray-200 dark:border-gray-700">
+                                    <td class="py-3 px-4 font-medium text-gray-700 dark:text-gray-300">Tribunal Asignado:</td>
+                                    <td class="py-3 px-4 text-gray-600 dark:text-gray-400">${infoAdmin.tribunal_asignado.nombre}</td>
                                 </tr>
                                 <tr>
-                                    <td class="py-3 px-4 font-medium text-gray-700 dark:text-gray-300">Unidad Asignada:</td>
-                                    <td class="py-3 px-4 text-gray-600 dark:text-gray-400">Unidad de Violencia Intrafamiliar</td>
+                                    <td class="py-3 px-4 font-medium text-gray-700 dark:text-gray-300">Ubicación Tribunal:</td>
+                                    <td class="py-3 px-4 text-gray-600 dark:text-gray-400">${infoAdmin.tribunal_asignado.ubicacion.distrito}, ${infoAdmin.tribunal_asignado.ubicacion.municipio}</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -1138,243 +1218,251 @@ function abrirModalDetalles(victima) {
                             <tbody>
                                 <tr class="border-b border-gray-200 dark:border-gray-700">
                                     <td class="py-3 px-4 font-medium text-gray-700 dark:text-gray-300 w-1/3">Nombre Completo:</td>
-                                    <td class="py-3 px-4 text-gray-600 dark:text-gray-400">${victima.nombre}</td>
+                                    <td class="py-3 px-4 text-gray-600 dark:text-gray-400">${denunciante.nombre_completo}</td>
                                 </tr>
                                 <tr class="border-b border-gray-200 dark:border-gray-700">
                                     <td class="py-3 px-4 font-medium text-gray-700 dark:text-gray-300">Edad:</td>
-                                    <td class="py-3 px-4 text-gray-600 dark:text-gray-400">${Math.floor(Math.random() * 30 + 25)} años</td>
+                                    <td class="py-3 px-4 text-gray-600 dark:text-gray-400">${denunciante.edad} años</td>
                                 </tr>
                                 <tr class="border-b border-gray-200 dark:border-gray-700">
                                     <td class="py-3 px-4 font-medium text-gray-700 dark:text-gray-300">Sexo:</td>
-                                    <td class="py-3 px-4 text-gray-600 dark:text-gray-400">${victima.nombre.split(' ')[0].endsWith('a') ? 'Mujer' : 'Hombre'}</td>
+                                    <td class="py-3 px-4 text-gray-600 dark:text-gray-400">${denunciante.sexo}</td>
                                 </tr>
                                 <tr class="border-b border-gray-200 dark:border-gray-700">
                                     <td class="py-3 px-4 font-medium text-gray-700 dark:text-gray-300">Estado Familiar:</td>
-                                    <td class="py-3 px-4 text-gray-600 dark:text-gray-400">Casado/a</td>
+                                    <td class="py-3 px-4 text-gray-600 dark:text-gray-400">${denunciante.estado_familiar}</td>
                                 </tr>
                                 <tr class="border-b border-gray-200 dark:border-gray-700">
                                     <td class="py-3 px-4 font-medium text-gray-700 dark:text-gray-300">Documento:</td>
-                                    <td class="py-3 px-4 text-gray-600 dark:text-gray-400">DUI ${Math.floor(Math.random() * 90000000 + 10000000)}-${Math.floor(Math.random() * 9)}</td>
+                                    <td class="py-3 px-4 text-gray-600 dark:text-gray-400">${denunciante.documento}</td>
                                 </tr>
                                 <tr class="border-b border-gray-200 dark:border-gray-700">
                                     <td class="py-3 px-4 font-medium text-gray-700 dark:text-gray-300">Fecha de Nacimiento:</td>
-                                    <td class="py-3 px-4 text-gray-600 dark:text-gray-400">1985-05-15</td>
+                                    <td class="py-3 px-4 text-gray-600 dark:text-gray-400">${denunciante.fecha_nacimiento}</td>
                                 </tr>
                                 <tr class="border-b border-gray-200 dark:border-gray-700">
                                     <td class="py-3 px-4 font-medium text-gray-700 dark:text-gray-300">Profesión:</td>
-                                    <td class="py-3 px-4 text-gray-600 dark:text-gray-400">Empleado/a</td>
+                                    <td class="py-3 px-4 text-gray-600 dark:text-gray-400">${denunciante.profesion}</td>
                                 </tr>
                                 <tr class="border-b border-gray-200 dark:border-gray-700">
-                                    <td class="py-3 px-4 font-medium text-gray-700 dark:text-gray-300">Teléfono:</td>
-                                    <td class="py-3 px-4 text-gray-600 dark:text-gray-400">555-${Math.floor(Math.random() * 9000 + 1000)}</td>
+                                    <td class="py-3 px-4 font-medium text-gray-700 dark:text-gray-300">Ocupación:</td>
+                                    <td class="py-3 px-4 text-gray-600 dark:text-gray-400">${denunciante.ocupacion}</td>
                                 </tr>
                                 <tr class="border-b border-gray-200 dark:border-gray-700">
-                                    <td class="py-3 px-4 font-medium text-gray-700 dark:text-gray-300">Domicilio:</td>
-                                    <td class="py-3 px-4 text-gray-600 dark:text-gray-400">Colonia Escalón #${Math.floor(Math.random() * 500 + 1)}</td>
+                                    <td class="py-3 px-4 font-medium text-gray-700 dark:text-gray-300">Teléfonos:</td>
+                                    <td class="py-3 px-4 text-gray-600 dark:text-gray-400">
+                                        ${denunciante.contactos.map(c => `${c.telefono} (${c.tipo})`).join('<br>')}
+                                    </td>
+                                </tr>
+                                <tr class="border-b border-gray-200 dark:border-gray-700">
+                                    <td class="py-3 px-4 font-medium text-gray-700 dark:text-gray-300">Nivel Educativo:</td>
+                                    <td class="py-3 px-4 text-gray-600 dark:text-gray-400">${denunciante.nivel_educativo}</td>
                                 </tr>
                                 <tr>
-                                    <td class="py-3 px-4 font-medium text-gray-700 dark:text-gray-300">Nivel Educativo:</td>
-                                    <td class="py-3 px-4 text-gray-600 dark:text-gray-400">Universitario completo</td>
+                                    <td class="py-3 px-4 font-medium text-gray-700 dark:text-gray-300">¿Es víctima?:</td>
+                                    <td class="py-3 px-4 text-gray-600 dark:text-gray-400">${denunciante.es_victima ? 'Sí' : 'No'}</td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
 
-                <!-- Sección 3: Datos de la Víctima -->
-                <div class="accordion-section">
-                    <button class="accordion-header flex justify-between items-center w-full p-4 bg-gradient-to-r from-red-50 to-red-100 dark:from-red-900/20 dark:to-red-800/20 rounded-lg hover:from-red-100 hover:to-red-200 dark:hover:from-red-800/30 dark:hover:to-red-700/30 transition-all" data-target="seccionVictima">
-                        <div class="flex items-center gap-3">
-                            <svg class="w-5 h-5 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                <!-- Sección 3: Datos de la(s) Víctima(s) -->
+                ${victimas.map((victima, index) => `
+                    <div class="accordion-section">
+                        <button class="accordion-header flex justify-between items-center w-full p-4 bg-gradient-to-r from-red-50 to-red-100 dark:from-red-900/20 dark:to-red-800/20 rounded-lg hover:from-red-100 hover:to-red-200 dark:hover:from-red-800/30 dark:hover:to-red-700/30 transition-all" data-target="seccionVictima${index}">
+                            <div class="flex items-center gap-3">
+                                <svg class="w-5 h-5 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                                </svg>
+                                <h4 class="text-lg font-semibold text-red-800 dark:text-red-300">Datos de la Víctima ${victimas.length > 1 ? (index + 1) : ''}</h4>
+                            </div>
+                            <svg class="w-5 h-5 transform transition-transform accordion-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                             </svg>
-                            <h4 class="text-lg font-semibold text-red-800 dark:text-red-300">Datos de la Víctima</h4>
-                        </div>
-                        <svg class="w-5 h-5 transform transition-transform accordion-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                        </svg>
-                    </button>
-                    <div id="seccionVictima" class="accordion-content hidden bg-white dark:bg-gray-800 rounded-b-lg border border-t-0 border-gray-200 dark:border-gray-700">
-                        <div class="overflow-x-auto">
+                        </button>
+                        <div id="seccionVictima${index}" class="accordion-content hidden bg-white dark:bg-gray-800 rounded-b-lg border border-t-0 border-gray-200 dark:border-gray-700">
                             <table class="w-full text-sm">
                                 <tbody>
                                     <tr class="border-b border-gray-200 dark:border-gray-700">
                                         <td class="py-3 px-4 font-medium text-gray-700 dark:text-gray-300 w-1/3">Nombre Completo:</td>
-                                        <td class="py-3 px-4 text-gray-600 dark:text-gray-400">${victima.nombre}</td>
+                                        <td class="py-3 px-4 text-gray-600 dark:text-gray-400">${victima.nombre_completo}</td>
                                     </tr>
                                     <tr class="border-b border-gray-200 dark:border-gray-700">
                                         <td class="py-3 px-4 font-medium text-gray-700 dark:text-gray-300">Edad:</td>
-                                        <td class="py-3 px-4 text-gray-600 dark:text-gray-400">${Math.floor(Math.random() * 30 + 20)} años</td>
+                                        <td class="py-3 px-4 text-gray-600 dark:text-gray-400">${victima.edad} años</td>
                                     </tr>
                                     <tr class="border-b border-gray-200 dark:border-gray-700">
                                         <td class="py-3 px-4 font-medium text-gray-700 dark:text-gray-300">Sexo:</td>
-                                        <td class="py-3 px-4 text-gray-600 dark:text-gray-400">${victima.nombre.split(' ')[0].endsWith('a') ? 'Mujer' : 'Hombre'}</td>
+                                        <td class="py-3 px-4 text-gray-600 dark:text-gray-400">${victima.sexo}</td>
                                     </tr>
                                     <tr class="border-b border-gray-200 dark:border-gray-700">
                                         <td class="py-3 px-4 font-medium text-gray-700 dark:text-gray-300">Estado Familiar:</td>
-                                        <td class="py-3 px-4 text-gray-600 dark:text-gray-400">Casada</td>
+                                        <td class="py-3 px-4 text-gray-600 dark:text-gray-400">${victima.estado_familiar}</td>
                                     </tr>
                                     <tr class="border-b border-gray-200 dark:border-gray-700">
                                         <td class="py-3 px-4 font-medium text-gray-700 dark:text-gray-300">Documento:</td>
-                                        <td class="py-3 px-4 text-gray-600 dark:text-gray-400">DUI ${Math.floor(Math.random() * 90000000 + 10000000)}-${Math.floor(Math.random() * 9)}</td>
+                                        <td class="py-3 px-4 text-gray-600 dark:text-gray-400">${victima.documento}</td>
                                     </tr>
                                     <tr class="border-b border-gray-200 dark:border-gray-700">
                                         <td class="py-3 px-4 font-medium text-gray-700 dark:text-gray-300">N° de Hijos:</td>
-                                        <td class="py-3 px-4 text-gray-600 dark:text-gray-400">${Math.floor(Math.random() * 4)}</td>
+                                        <td class="py-3 px-4 text-gray-600 dark:text-gray-400">${victima.numero_hijos}</td>
                                     </tr>
                                     <tr class="border-b border-gray-200 dark:border-gray-700">
                                         <td class="py-3 px-4 font-medium text-gray-700 dark:text-gray-300">Domicilio:</td>
-                                        <td class="py-3 px-4 text-gray-600 dark:text-gray-400">Colonia Las Flores #${Math.floor(Math.random() * 200 + 1)}</td>
+                                        <td class="py-3 px-4 text-gray-600 dark:text-gray-400">${victima.domicilio}</td>
                                     </tr>
                                     <tr class="border-b border-gray-200 dark:border-gray-700">
-                                        <td class="py-3 px-4 font-medium text-gray-700 dark:text-gray-300">Zona:</td>
-                                        <td class="py-3 px-4 text-gray-600 dark:text-gray-400">Urbana</td>
-                                    </tr>
-                                    <tr class="border-b border-gray-200 dark:border-gray-700">
-                                        <td class="py-3 px-4 font-medium text-gray-700 dark:text-gray-300">Teléfono:</td>
-                                        <td class="py-3 px-4 text-gray-600 dark:text-gray-400">555-${Math.floor(Math.random() * 9000 + 1000)}</td>
+                                        <td class="py-3 px-4 font-medium text-gray-700 dark:text-gray-300">Ubicación:</td>
+                                        <td class="py-3 px-4 text-gray-600 dark:text-gray-400">${victima.ubicacion.distrito}, ${victima.ubicacion.municipio} (${victima.ubicacion.zona})</td>
                                     </tr>
                                     <tr class="border-b border-gray-200 dark:border-gray-700">
                                         <td class="py-3 px-4 font-medium text-gray-700 dark:text-gray-300">Profesión:</td>
-                                        <td class="py-3 px-4 text-gray-600 dark:text-gray-400">Ama de casa</td>
+                                        <td class="py-3 px-4 text-gray-600 dark:text-gray-400">${victima.profesion}</td>
                                     </tr>
                                     <tr class="border-b border-gray-200 dark:border-gray-700">
-                                        <td class="py-3 px-4 font-medium text-gray-700 dark:text-gray-300">Nivel Educativo:</td>
-                                        <td class="py-3 px-4 text-gray-600 dark:text-gray-400">Secundaria completa</td>
+                                        <td class="py-3 px-4 font-medium text-gray-700 dark:text-gray-300">Genera Ingresos:</td>
+                                        <td class="py-3 px-4 text-gray-600 dark:text-gray-400">${victima.genera_ingreso ? 'Sí' : 'No'}</td>
                                     </tr>
                                     <tr class="border-b border-gray-200 dark:border-gray-700">
-                                        <td class="py-3 px-4 font-medium text-gray-700 dark:text-gray-300">Embarazo:</td>
-                                        <td class="py-3 px-4 text-gray-600 dark:text-gray-400">No</td>
-                                    </tr>
-                                    <tr class="border-b border-gray-200 dark:border-gray-700">
-                                        <td class="py-3 px-4 font-medium text-gray-700 dark:text-gray-300">Enfermedad:</td>
-                                        <td class="py-3 px-4 text-gray-600 dark:text-gray-400">No</td>
-                                    </tr>
-                                    <tr class="border-b border-gray-200 dark:border-gray-700">
-                                        <td class="py-3 px-4 font-medium text-gray-700 dark:text-gray-300">Discapacidad:</td>
-                                        <td class="py-3 px-4 text-gray-600 dark:text-gray-400">Ninguna</td>
+                                        <td class="py-3 px-4 font-medium text-gray-700 dark:text-gray-300">Dependencia Económica:</td>
+                                        <td class="py-3 px-4 text-gray-600 dark:text-gray-400">${victima.dependencia_economica}</td>
                                     </tr>
                                     <tr>
-                                        <td class="py-3 px-4 font-medium text-gray-700 dark:text-gray-300">Descripción Física:</td>
-                                        <td class="py-3 px-4 text-gray-600 dark:text-gray-400">Estatura media, complexión normal</td>
+                                        <td class="py-3 px-4 font-medium text-gray-700 dark:text-gray-300">Teléfonos:</td>
+                                        <td class="py-3 px-4 text-gray-600 dark:text-gray-400">
+                                            ${victima.contactos.map(c => `${c.telefono} (${c.tipo})`).join('<br>')}
+                                        </td>
                                     </tr>
                                 </tbody>
                             </table>
+                            ${victima.hijos && victima.hijos.length > 0 ? `
+                                <div class="mt-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                                    <h5 class="font-semibold text-gray-800 dark:text-gray-200 mb-3">Hijos de la víctima:</h5>
+                                    ${victima.hijos.map((hijo, idx) => `
+                                        <div class="mb-2 pb-2 ${idx < victima.hijos.length - 1 ? 'border-b border-gray-300 dark:border-gray-600' : ''}">
+                                            <p class="text-sm"><strong>${hijo.nombre_completo}</strong> - ${hijo.edad} años (${hijo.sexo})</p>
+                                            ${hijo.escolaridad ? `<p class="text-xs text-gray-600 dark:text-gray-400">Escolaridad: ${hijo.escolaridad}</p>` : ''}
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            ` : ''}
                         </div>
                     </div>
-                </div>
+                `).join('')}
 
-                <!-- Sección 4: Datos del Agresor -->
-                <div class="accordion-section">
-                    <button class="accordion-header flex justify-between items-center w-full p-4 bg-gradient-to-r from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20 rounded-lg hover:from-purple-100 hover:to-purple-200 dark:hover:from-purple-800/30 dark:hover:to-purple-700/30 transition-all" data-target="seccionAgresor">
-                        <div class="flex items-center gap-3">
-                            <svg class="w-5 h-5 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                <!-- Sección 4: Datos del/los Agresor(es) -->
+                ${agresores.map((agresor, index) => `
+                    <div class="accordion-section">
+                        <button class="accordion-header flex justify-between items-center w-full p-4 bg-gradient-to-r from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20 rounded-lg hover:from-purple-100 hover:to-purple-200 dark:hover:from-purple-800/30 dark:hover:to-purple-700/30 transition-all" data-target="seccionAgresor${index}">
+                            <div class="flex items-center gap-3">
+                                <svg class="w-5 h-5 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                                </svg>
+                                <h4 class="text-lg font-semibold text-purple-800 dark:text-purple-300">Datos del Agresor ${agresores.length > 1 ? (index + 1) : ''}</h4>
+                            </div>
+                            <svg class="w-5 h-5 transform transition-transform accordion-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                             </svg>
-                            <h4 class="text-lg font-semibold text-purple-800 dark:text-purple-300">Datos del Agresor</h4>
-                        </div>
-                        <svg class="w-5 h-5 transform transition-transform accordion-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                        </svg>
-                    </button>
-                    <div id="seccionAgresor" class="accordion-content hidden bg-white dark:bg-gray-800 rounded-b-lg border border-t-0 border-gray-200 dark:border-gray-700">
-                        <table class="w-full text-sm">
-                            <tbody>
-                                <tr class="border-b border-gray-200 dark:border-gray-700">
-                                    <td class="py-3 px-4 font-medium text-gray-700 dark:text-gray-300 w-1/3">Nombre Completo:</td>
-                                    <td class="py-3 px-4 text-gray-600 dark:text-gray-400">Carlos Alberto Martínez Hernández</td>
-                                </tr>
-                                <tr class="border-b border-gray-200 dark:border-gray-700">
-                                    <td class="py-3 px-4 font-medium text-gray-700 dark:text-gray-300">Edad:</td>
-                                    <td class="py-3 px-4 text-gray-600 dark:text-gray-400">${Math.floor(Math.random() * 30 + 25)} años</td>
-                                </tr>
-                                <tr class="border-b border-gray-200 dark:border-gray-700">
-                                    <td class="py-3 px-4 font-medium text-gray-700 dark:text-gray-300">Sexo:</td>
-                                    <td class="py-3 px-4 text-gray-600 dark:text-gray-400">Hombre</td>
-                                </tr>
-                                <tr class="border-b border-gray-200 dark:border-gray-700">
-                                    <td class="py-3 px-4 font-medium text-gray-700 dark:text-gray-300">Estado Familiar:</td>
-                                    <td class="py-3 px-4 text-gray-600 dark:text-gray-400">Casado</td>
-                                </tr>
-                                <tr class="border-b border-gray-200 dark:border-gray-700">
-                                    <td class="py-3 px-4 font-medium text-gray-700 dark:text-gray-300">Profesión:</td>
-                                    <td class="py-3 px-4 text-gray-600 dark:text-gray-400">Comerciante</td>
-                                </tr>
-                                <tr class="border-b border-gray-200 dark:border-gray-700">
-                                    <td class="py-3 px-4 font-medium text-gray-700 dark:text-gray-300">Vínculo con víctima:</td>
-                                    <td class="py-3 px-4 text-gray-600 dark:text-gray-400">Pareja/Esposo/a</td>
-                                </tr>
-                                <tr class="border-b border-gray-200 dark:border-gray-700">
-                                    <td class="py-3 px-4 font-medium text-gray-700 dark:text-gray-300">Teléfono:</td>
-                                    <td class="py-3 px-4 text-gray-600 dark:text-gray-400">555-${Math.floor(Math.random() * 9000 + 1000)}</td>
-                                </tr>
-                                <tr class="border-b border-gray-200 dark:border-gray-700">
-                                    <td class="py-3 px-4 font-medium text-gray-700 dark:text-gray-300">Domicilio:</td>
-                                    <td class="py-3 px-4 text-gray-600 dark:text-gray-400">Colonia Las Flores #45</td>
-                                </tr>
-                                <tr class="border-b border-gray-200 dark:border-gray-700">
-                                    <td class="py-3 px-4 font-medium text-gray-700 dark:text-gray-300">Zona:</td>
-                                    <td class="py-3 px-4 text-gray-600 dark:text-gray-400">Urbana</td>
-                                </tr>
-                                <tr class="border-b border-gray-200 dark:border-gray-700">
-                                    <td class="py-3 px-4 font-medium text-gray-700 dark:text-gray-300">¿Cohabita con víctima?</td>
-                                    <td class="py-3 px-4 text-gray-600 dark:text-gray-400">Sí</td>
-                                </tr>
-                                <tr>
-                                    <td class="py-3 px-4 font-medium text-gray-700 dark:text-gray-300">¿Mismo barrio?</td>
-                                    <td class="py-3 px-4 text-gray-600 dark:text-gray-400">Sí</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- Sección 5: Tipos de Violencia -->
-                <div class="accordion-section">
-                    <button class="accordion-header flex justify-between items-center w-full p-4 bg-gradient-to-r from-orange-50 to-orange-100 dark:from-orange-900/20 dark:to-orange-800/20 rounded-lg hover:from-orange-100 hover:to-orange-200 dark:hover:from-orange-800/30 dark:hover:to-orange-700/30 transition-all" data-target="seccionViolencia">
-<div class="flex items-center gap-3">
-<svg class="w-5 h-5 text-orange-600 dark:text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
-</svg>
-<h4 class="text-lg font-semibold text-orange-800 dark:text-orange-300">Tipos de Violencia</h4>
-</div>
-<svg class="w-5 h-5 transform transition-transform accordion-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-</svg>
-</button>
-<div id="seccionViolencia" class="accordion-content hidden bg-white dark:bg-gray-800 rounded-b-lg border border-t-0 border-gray-200 dark:border-gray-700">
-<div class="space-y-4 p-4">
-<div class="mb-4">
-<p class="font-medium text-gray-700 dark:text-gray-300 mb-3 text-base">Tipos identificados:</p>
-<div class="flex flex-wrap gap-2 mb-4">
-<span class="inline-block px-3 py-1 rounded-lg text-sm font-medium bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200">Psicológica</span>
-<span class="inline-block px-3 py-1 rounded-lg text-sm font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">Económica</span>
-</div>
-</div>
-<table class="w-full text-sm">
-<tbody>
-<tr class="border-b border-gray-200 dark:border-gray-700">
-<td class="py-3 px-4 font-medium text-gray-700 dark:text-gray-300 w-1/3">Frecuencia:</td>
-<td class="py-3 px-4 text-gray-600 dark:text-gray-400">Semanal</td>
+                        </button>
+                        <div id="seccionAgresor${index}" class="accordion-content hidden bg-white dark:bg-gray-800 rounded-b-lg border border-t-0 border-gray-200 dark:border-gray-700">
+                            <table class="w-full text-sm">
+                                <tbody>
+                                    <tr class="border-b border-gray-200 dark:border-gray-700">
+                                        <td class="py-3 px-4 font-medium text-gray-700 dark:text-gray-300 w-1/3">Nombre Completo:</td>
+                                        <td class="py-3 px-4 text-gray-600 dark:text-gray-400">${agresor.nombre_completo}</td>
+                                    </tr>
+                                    <tr class="border-b border-gray-200 dark:border-gray-700">
+                                        <td class="py-3 px-4 font-medium text-gray-700 dark:text-gray-300">Edad:</td>
+                                        <td class="py-3 px-4 text-gray-600 dark:text-gray-400">${agresor.edad} años</td>
+                                    </tr>
+                                    <tr class="border-b border-gray-200 dark:border-gray-700">
+                                        <td class="py-3 px-4 font-medium text-gray-700 dark:text-gray-300">Sexo:</td>
+                                        <td class="py-3 px-4 text-gray-600 dark:text-gray-400">${agresor.sexo}</td>
+                                    </tr>
+                                    <tr class="border-b border-gray-200 dark:border-gray-700">
+                                        <td class="py-3 px-4 font-medium text-gray-700 dark:text-gray-300">Estado Familiar:</td>
+<td class="py-3 px-4 text-gray-600 dark:text-gray-400">${agresor.estado_familiar}</td>
 </tr>
 <tr class="border-b border-gray-200 dark:border-gray-700">
-<td class="py-3 px-4 font-medium text-gray-700 dark:text-gray-300">Lugar principal:</td>
-<td class="py-3 px-4 text-gray-600 dark:text-gray-400">Domicilio</td>
+<td class="py-3 px-4 font-medium text-gray-700 dark:text-gray-300">Profesión:</td>
+<td class="py-3 px-4 text-gray-600 dark:text-gray-400">${agresor.profesion}</td>
 </tr>
 <tr class="border-b border-gray-200 dark:border-gray-700">
-<td class="py-3 px-4 font-medium text-gray-700 dark:text-gray-300">¿Hay testigos?</td>
-<td class="py-3 px-4 text-gray-600 dark:text-gray-400">Hijos menores</td>
+<td class="py-3 px-4 font-medium text-gray-700 dark:text-gray-300">Ocupación:</td>
+<td class="py-3 px-4 text-gray-600 dark:text-gray-400">${agresor.ocupacion}</td>
+</tr>
+<tr class="border-b border-gray-200 dark:border-gray-700">
+<td class="py-3 px-4 font-medium text-gray-700 dark:text-gray-300">Domicilio:</td>
+<td class="py-3 px-4 text-gray-600 dark:text-gray-400">${agresor.domicilio}</td>
+</tr>
+<tr class="border-b border-gray-200 dark:border-gray-700">
+<td class="py-3 px-4 font-medium text-gray-700 dark:text-gray-300">Consume Alcohol:</td>
+<td class="py-3 px-4 text-gray-600 dark:text-gray-400">${agresor.consume_alcohol} ${agresor.frecuencia_alcohol ? '(' + agresor.frecuencia_alcohol + ')' : ''}</td>
+</tr>
+<tr class="border-b border-gray-200 dark:border-gray-700">
+<td class="py-3 px-4 font-medium text-gray-700 dark:text-gray-300">Consume Drogas:</td>
+<td class="py-3 px-4 text-gray-600 dark:text-gray-400">${agresor.consume_drogas} ${agresor.frecuencia_drogas ? '(' + agresor.frecuencia_drogas + ')' : ''}</td>
+</tr>
+<tr class="border-b border-gray-200 dark:border-gray-700">
+<td class="py-3 px-4 font-medium text-gray-700 dark:text-gray-300">Posee Armas:</td>
+<td class="py-3 px-4 text-gray-600 dark:text-gray-400">
+${agresor.posee_armas}
+${agresor.tipos_arma && agresor.tipos_arma.length > 0 ? `<br><span class="text-xs">(${agresor.tipos_arma.join(', ')})</span>` : ''}
+</td>
+</tr>
+<tr class="border-b border-gray-200 dark:border-gray-700">
+<td class="py-3 px-4 font-medium text-gray-700 dark:text-gray-300">Formación Especial:</td>
+<td class="py-3 px-4 text-gray-600 dark:text-gray-400">
+${agresor.formacion_especial}
+${agresor.tipos_formacion && agresor.tipos_formacion.length > 0 ? `<br><span class="text-xs">(${agresor.tipos_formacion.join(', ')})</span>` : ''}
+</td>
 </tr>
 <tr>
-<td class="py-3 px-4 font-medium text-gray-700 dark:text-gray-300">Denuncias previas:</td>
-<td class="py-3 px-4 text-gray-600 dark:text-gray-400">0</td>
+<td class="py-3 px-4 font-medium text-gray-700 dark:text-gray-300">Teléfonos:</td>
+<td class="py-3 px-4 text-gray-600 dark:text-gray-400">
+${agresor.contactos.map(c => `${c.telefono}(${c.tipo})`).join('<br>')}
+</td>
 </tr>
 </tbody>
 </table>
 </div>
 </div>
-</div>
-<!-- Sección 6: Nivel de Riesgo -->
+        `).join('')}
+<!-- Sección 5: Tipos de Violencia -->
+            <div class="accordion-section">
+                <button class="accordion-header flex justify-between items-center w-full p-4 bg-gradient-to-r from-orange-50 to-orange-100 dark:from-orange-900/20 dark:to-orange-800/20 rounded-lg hover:from-orange-100 hover:to-orange-200 dark:hover:from-orange-800/30 dark:hover:to-orange-700/30 transition-all" data-target="seccionViolencia">
+                    <div class="flex items-center gap-3">
+                        <svg class="w-5 h-5 text-orange-600 dark:text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                        </svg>
+                        <h4 class="text-lg font-semibold text-orange-800 dark:text-orange-300">Tipos de Violencia</h4>
+                    </div>
+                    <svg class="w-5 h-5 transform transition-transform accordion-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                </button>
+                <div id="seccionViolencia" class="accordion-content hidden bg-white dark:bg-gray-800 rounded-b-lg border border-t-0 border-gray-200 dark:border-gray-700">
+                    <div class="p-4">
+                        <p class="font-medium text-gray-700 dark:text-gray-300 mb-3">Tipos identificados:</p>
+                        <div class="flex flex-wrap gap-2">
+                            ${tiposViolencia.map(tipo => {
+        const colores = {
+            'FÍSICA': 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200',
+            'PSICOLÓGICA': 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200',
+            'SEXUAL': 'bg-pink-100 text-pink-800 dark:bg-pink-900 dark:text-pink-200',
+            'ECONÓMICA': 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
+            'PATRIMONIAL': 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200',
+            'SIMBÓLICA': 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200'
+        };
+        return `<span class="inline-block px-3 py-1 rounded-lg text-sm font-medium ${colores[tipo] || 'bg-gray-100 text-gray-800'}">${tipo}</span>`;
+    }).join('')}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sección 6: Nivel de Riesgo -->
             <div class="accordion-section">
                 <button class="accordion-header flex justify-between items-center w-full p-4 bg-gradient-to-r from-indigo-50 to-indigo-100 dark:from-indigo-900/20 dark:to-indigo-800/20 rounded-lg hover:from-indigo-100 hover:to-indigo-200 dark:hover:from-indigo-800/30 dark:hover:to-indigo-700/30 transition-all" data-target="seccionRiesgo">
                     <div class="flex items-center gap-3">
@@ -1392,20 +1480,20 @@ function abrirModalDetalles(victima) {
                         <div class="p-4 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700 rounded-lg">
                             <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
                                 <div>
-                                    <h5 class="font-bold text-gray-800 dark:text-white text-lg">Nivel de Riesgo: ${calculoRiesgo.nivelRiesgo}</h5>
+                                    <h5 class="font-bold text-gray-800 dark:text-white text-lg">Nivel de Riesgo: ${nivelRiesgo.nivel_riesgo}</h5>
                                     <p class="text-sm text-gray-600 dark:text-gray-300 mt-1">Puntuación obtenida en el cuestionario</p>
                                 </div>
                                 <div class="flex items-center gap-6">
                                     <div class="text-center">
-                                        <div class="text-3xl font-bold text-${colorClases[calculoRiesgo.nivelRiesgo].replace('bg-', '').split('-')[0]}-600">${calculoRiesgo.puntos}</div>
+                                        <div class="text-3xl font-bold text-indigo-600">${nivelRiesgo.puntaje_total}</div>
                                         <div class="text-xs text-gray-600 dark:text-gray-400">Puntos</div>
                                     </div>
                                     <div class="text-center">
-                                        <div class="text-3xl font-bold text-blue-600">${calculoRiesgo.respuestasSi}/37</div>
+                                        <div class="text-3xl font-bold text-blue-600">${nivelRiesgo.total_respuestas_si}/${nivelRiesgo.total_preguntas}</div>
                                         <div class="text-xs text-gray-600 dark:text-gray-400">Respuestas Sí</div>
                                     </div>
                                     <div class="text-center">
-                                        <div class="text-3xl font-bold text-purple-600">${Math.round(calculoRiesgo.porcentaje)}%</div>
+                                        <div class="text-3xl font-bold text-purple-600">${porcentaje}%</div>
                                         <div class="text-xs text-gray-600 dark:text-gray-400">Riesgo</div>
                                     </div>
                                 </div>
@@ -1414,17 +1502,15 @@ function abrirModalDetalles(victima) {
                             <div class="mt-4">
                                 <div class="flex justify-between text-sm text-gray-600 dark:text-gray-300 mb-1">
                                     <span>0%</span>
-                                    <span>Nivel de Riesgo</span>
+                                    <span>Respuestas Afirmativas</span>
                                     <span>100%</span>
                                 </div>
                                 <div class="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-3">
-                                    <div class="h-3 rounded-full transition-all duration-1000 ${colorClases[calculoRiesgo.nivelRiesgo]}" style="width: ${calculoRiesgo.porcentaje}%"></div>
+                                    <div class="h-3 rounded-full transition-all duration-1000 ${colorClases[nivelRiesgo.nivel_riesgo]}" style="width: ${porcentaje}%"></div>
                                 </div>
                                 <div class="flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                    <span>Bajo (0-20)</span>
-                                    <span>Moderado (21-40)</span>
-                                    <span>Alto (41-60)</span>
-                                    <span>Extremo (61+)</span>
+                                    <span>${nivelRiesgo.total_respuestas_si} de ${nivelRiesgo.total_preguntas} preguntas</span>
+                                    <span>${porcentaje}% respondidas con "Sí"</span>
                                 </div>
                             </div>
                         </div>
@@ -1433,67 +1519,38 @@ function abrirModalDetalles(victima) {
                             <h5 class="font-semibold text-gray-800 dark:text-gray-200 mb-3">Distribución de respuestas por nivel:</h5>
                             <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
                                 <div class="text-center p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
-                                    <div class="text-2xl font-bold text-green-700 dark:text-green-300">3/8</div>
+                                    <div class="text-2xl font-bold text-green-700 dark:text-green-300">${nivelRiesgo.distribucion_niveles.Bajo.respondidas_si}/${nivelRiesgo.distribucion_niveles.Bajo.total}</div>
                                     <div class="text-xs text-green-600 dark:text-green-400 mt-1">Nivel Bajo</div>
                                 </div>
                                 <div class="text-center p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg">
-                                    <div class="text-2xl font-bold text-yellow-700 dark:text-yellow-300">2/8</div>
+                                    <div class="text-2xl font-bold text-yellow-700 dark:text-yellow-300">${nivelRiesgo.distribucion_niveles.Moderado.respondidas_si}/${nivelRiesgo.distribucion_niveles.Moderado.total}</div>
                                     <div class="text-xs text-yellow-600 dark:text-yellow-400 mt-1">Moderado</div>
                                 </div>
                                 <div class="text-center p-3 bg-orange-50 dark:bg-orange-900/20 rounded-lg">
-                                    <div class="text-2xl font-bold text-orange-700 dark:text-orange-300">1/8</div>
+                                    <div class="text-2xl font-bold text-orange-700 dark:text-orange-300">${nivelRiesgo.distribucion_niveles.Alto.respondidas_si}/${nivelRiesgo.distribucion_niveles.Alto.total}</div>
                                     <div class="text-xs text-orange-600 dark:text-orange-400 mt-1">Alto</div>
                                 </div>
                                 <div class="text-center p-3 bg-red-50 dark:bg-red-900/20 rounded-lg">
-                                    <div class="text-2xl font-bold text-red-700 dark:text-red-300">1/8</div>
+                                    <div class="text-2xl font-bold text-red-700 dark:text-red-300">${nivelRiesgo.distribucion_niveles.Extremo.respondidas_si}/${nivelRiesgo.distribucion_niveles.Extremo.total}</div>
                                     <div class="text-xs text-red-600 dark:text-red-400 mt-1">Extremo</div>
                                 </div>
                                 <div class="text-center p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
-                                    <div class="text-2xl font-bold text-purple-700 dark:text-purple-300">0/5</div>
+                                    <div class="text-2xl font-bold text-purple-700 dark:text-purple-300">${nivelRiesgo.distribucion_niveles.Activadora.respondidas_si}/${nivelRiesgo.distribucion_niveles.Activadora.total}</div>
                                     <div class="text-xs text-purple-600 dark:text-purple-400 mt-1">Activador</div>
                                 </div>
                             </div>
                         </div>
+                        
+                        ${nivelRiesgo.observaciones ? `
+                            <div class="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border-l-4 border-blue-400">
+                                <p class="font-medium text-blue-800 dark:text-blue-300 mb-1">Observaciones:</p>
+                                <p class="text-sm text-blue-700 dark:text-blue-400">${nivelRiesgo.observaciones}</p>
+                            </div>
+                        ` : ''}
                     </div>
                 </div>
             </div>
 
-            <!-- Sección 7: Contexto y Observaciones -->
-            <div class="accordion-section">
-                <button class="accordion-header flex justify-between items-center w-full p-4 bg-gradient-to-r from-teal-50 to-teal-100 dark:from-teal-900/20 dark:to-teal-800/20 rounded-lg hover:from-teal-100 hover:to-teal-200 dark:hover:from-teal-800/30 dark:hover:to-teal-700/30 transition-all" data-target="seccionContexto">
-                    <div class="flex items-center gap-3">
-                        <svg class="w-5 h-5 text-teal-600 dark:text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-                        </svg>
-                        <h4 class="text-lg font-semibold text-teal-800 dark:text-teal-300">Contexto y Observaciones</h4>
-                    </div>
-                    <svg class="w-5 h-5 transform transition-transform accordion-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                    </svg>
-                </button>
-                <div id="seccionContexto" class="accordion-content hidden bg-white dark:bg-gray-800 rounded-b-lg border border-t-0 border-gray-200 dark:border-gray-700">
-                    <table class="w-full text-sm">
-                        <tbody>
-                            <tr class="border-b border-gray-200 dark:border-gray-700">
-                                <td class="py-3 px-4 font-medium text-gray-700 dark:text-gray-300 align-top w-1/4">Descripción de los hechos:</td>
-                                <td class="py-3 px-4 text-gray-600 dark:text-gray-400">
-                                    <div class="p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                                        El agresor realiza constantes comentarios descalificadores y controla aspectos de la vida diaria de la víctima. Se han identificado patrones de violencia ${calculoRiesgo.nivelRiesgo.toLowerCase()}.
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="py-3 px-4 font-medium text-gray-700 dark:text-gray-300 align-top">Observaciones adicionales:</td>
-                                <td class="py-3 px-4 text-gray-600 dark:text-gray-400">
-                                    <div class="p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg border-l-4 border-yellow-400">
-                                        La víctima muestra signos de afectación emocional. Se recomienda seguimiento psicológico y asesoría legal inmediata dado el nivel de riesgo ${calculoRiesgo.nivelRiesgo.toLowerCase()}.
-                                    </div>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
         </div>
     </div>
 
@@ -1512,36 +1569,32 @@ function abrirModalDetalles(victima) {
         </div>
     </div>
 `;
-
-    // INSERTAR TODO EL CONTENIDO DE UNA VEZ
-    modalDialog.innerHTML = contenidoCompleto;
-
-    // Mostrar el modal
-    modal.classList.remove('hidden');
-
-    // Inicializar acordeones Y botones DESPUÉS de insertar el HTML
-    setTimeout(() => {
-        inicializarAcordeones();
-
-        // Configurar botones del modal de detalles
-        const btnVerDetalles = document.getElementById('btnVerDetalles');
-        const btnAcciones = document.getElementById('btnAcciones');
-
-        if (btnVerDetalles) {
-            btnVerDetalles.addEventListener('click', function () {
-                abrirModal(victima);
-                cerrarModalDetalles();
-            });
-        }
-
-        if (btnAcciones) {
-            btnAcciones.addEventListener('click', function () {
-                abrirModalAcciones(victima);
-                cerrarModalDetalles();
-            });
-        }
-    }, 100);
 }
+
+// Insertar contenido
+modalDialog.innerHTML = contenidoCompleto;
+
+// Inicializar acordeones y botones
+setTimeout(() => {
+    inicializarAcordeones();
+
+    const btnVerDetalles = document.getElementById('btnVerDetalles');
+    const btnAcciones = document.getElementById('btnAcciones');
+
+    if (btnVerDetalles) {
+        btnVerDetalles.addEventListener('click', function () {
+            abrirModal(victima);
+            cerrarModalDetalles();
+        });
+    }
+
+    if (btnAcciones) {
+        btnAcciones.addEventListener('click', function () {
+            abrirModalAcciones(victima);
+            cerrarModalDetalles();
+        });
+    }
+}, 100);
 
 function cerrarModalDetalles() {
     const modal = document.getElementById('modalDetalles');
