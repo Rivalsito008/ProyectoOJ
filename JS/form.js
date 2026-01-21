@@ -1929,12 +1929,12 @@ function actualizarResumen(caso, evaluacion) {
 
     // Nivel de riesgo
     const nivelRiesgo = evaluacion?.nivel_riesgo ||
-        caso.evaluacion?.sentencia ||
+        caso.evaluacion?.nivel_riesgo ||
         'No evaluado';
 
     const puntajeRiesgo = evaluacion?.puntaje ||
-        caso.evaluacion?.observaciones?.match(/\d+/)?.[0] ||
-        '0';
+        caso.evaluacion?.puntaje_total?.match(/\d+/)?.[0] ||
+        0;
 
     console.log('Datos extraídos:', {
         nombreDenunciante,

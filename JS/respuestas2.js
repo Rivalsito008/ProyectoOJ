@@ -1,7 +1,17 @@
-// ===================================================================
-// INICIALIZACIÓN Y CONFIGURACIÓN DE TEMA
-// ===================================================================
-(function () {
+
+
+// ======================================
+// PROTECCIÓN DE RUTA - SOLO ADMINISTRADORES
+// ======================================
+(async function () {
+    console.log('Verificando permisos de administrador...');
+    const hasPermission = await auth.requireRole(['admin', 'colaborador'], 'inicio.php');
+    if (!hasPermission) {
+        console.error('Acceso denegado: No tienes permisos');
+        return;
+    }
+    console.log('✓ Acceso autorizado');
+
     const t = localStorage.getItem('theme-preference') || 'auto';
     let f = t;
     if (t === 'auto') {
@@ -79,6 +89,72 @@ const puntosPorNivel = {
 let victimasFiltradas = [];
 let filtroActual = "Todo";
 let terminoBusqueda = "";
+
+// ===================================================================
+// FUNCIONES DE CONSUMIR RESPUESTAS DESDE API
+// ===================================================================
+async function obtenerDatosAPI() {
+    try {
+        const response = await axios.get('/respuestas');
+
+        // axios automáticamente parsea el JSON y lo pone en response.data
+        if (response.data.success && response.data.data) {
+            return response.data.data;
+        } else {
+            console.warn('La API no devolvió datos válidos');
+            return [];
+        }
+    } catch (error) {
+        console.error('Error al obtener datos de la API:', error);
+        return [];
+    }
+}
+
+function transformarDatosAPI(data) {
+    return data.map(item => {
+
+        // Calcular el nivel de riesgo segun los datos obtenidos
+        let nivelRiesgo = item.nivel_riesgo_evaluacion;
+
+        const respuestas = generarRespuestasDesdeAPI(
+            item.total_respuestas_si,
+            item.total_preguntas,
+            item.puntaje_total,
+            nivelRiesgo
+        );
+
+        return {
+            nombre: item.nombre_denunciante,
+            riesgo: nivelRiesgo,
+            estado: item.estado_caso === 'ABIERTO' ? "Abierto" : "Cerrado",
+            fecha: item.fecha_caso.split(' ')[0], // obtenemos solo la fecha sin la hora
+            respuestas: respuestas,
+            puntajeTotal: item.puntaje_total,
+            totalRespuestaSi: item.total_respuestas_si,
+            totalPreguntas: item.total_preguntas
+        };
+    });
+}
+
+function generarRespuestasDesdeAPI(totalSi, totalPreguntas, puntajeTotal, nivelRiesgo) {
+    // Generar respuestas basadas en el total de preguntas de la API
+    const respuestas = [];
+
+    for (let i = 0; i < totalPreguntas; i++) {
+        // Si existe una pregunta en preguntasBase, usarla; si no, generar una genérica
+        const preguntaBase = preguntasBase[i];
+
+        respuestas.push({
+            pregunta: preguntaBase
+                ? `Pregunta ${preguntaBase.id}: ${preguntaBase.texto}`
+                : `Pregunta ${i + 1}: Pregunta adicional ${i + 1}`,
+            respuesta: i < totalSi ? "Sí" : "No",
+            nivel: preguntaBase ? preguntaBase.nivel : "bajo"
+        });
+    }
+
+    return respuestas;
+}
 
 // ===================================================================
 // FUNCIONES DE GENERACIÓN DE DATOS
@@ -557,10 +633,8 @@ document.addEventListener('DOMContentLoaded', function () {
     // Inicializar búsqueda
     inicializarBusqueda();
 
-    // Cargar datos iniciales
-    victimasFiltradas = [...victimas];
-    filtroActual = "Todo";
-    aplicarFiltros();
+    // Cargar datos desde la API
+    cargarDatosIniciales();
 
     // Inicializar tooltips
     setTimeout(agregarTooltipsTablasFiltradas, 500);
@@ -658,21 +732,21 @@ function renderTablaFiltrada() {
                 <div class="flex items-center gap-3">
                     <div class="flex-1 max-w-40">
                         <div class="flex justify-between items-center mb-1">
-                            <span class="text-xs font-medium text-gray-700 dark:text-gray-300">${calculoRiesgo.respuestasSi}/37 Sí</span>
+                            <span class="text-xs font-medium text-gray-700 dark:text-gray-300">${v.totalRespuestaSi || calculoRiesgo.respuestasSi}/${v.totalPreguntas || 37} Sí</span>
                             <span class="text-xs text-gray-500 dark:text-gray-400">${calculoRiesgo.nivelRiesgo}</span>
                         </div>
                         <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3 relative">
                             <div class="risk-bar-table ${colorBarra} h-3 rounded-full transition-all duration-1000" style="width: ${porcentajeVisual}%"></div>
                         </div>
                         <div class="flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-1">
-                            <span>${calculoRiesgo.puntos} pts</span>
+                            <span>${v.puntajeTotal || calculoRiesgo.puntos} pts</span>
                             <span>${Math.round(porcentajeVisual)}%</span>
                         </div>
                     </div>
                 </div>
             </td>
             <td class="px-6 py-4">
-                <span class="state-badge-shimmer inline-flex items-center justify-center w-20 px-3 py-1 rounded-full text-xs font-semibold relative overflow-hidden ${v.estado === 'Activo' ? 'bg-green-600 text-white' : 'bg-red-600 text-white'} border-0 shadow-sm">
+                <span class="state-badge-shimmer inline-flex items-center justify-center w-20 px-3 py-1 rounded-full text-xs font-semibold relative overflow-hidden ${v.estado === 'Abierto' ? 'bg-green-600 text-white' : 'bg-red-600 text-white'} border-0 shadow-sm">
                     ${v.estado}
                 </span>
             </td>
@@ -757,6 +831,42 @@ function aplicarFiltros() {
 
     renderTablaFiltrada();
 }
+
+// ===================================================================
+// FUNCIÓN PARA CARGAR DATOS DESDE LA API
+// ===================================================================
+async function cargarDatosIniciales() {
+    try {
+        console.log('Cargando datos desde la API...');
+        const datosAPI = await obtenerDatosAPI();
+
+        if (datosAPI && datosAPI.length > 0) {
+            // Transformar datos de la API al formato de la aplicación
+            const victimasAPI = transformarDatosAPI(datosAPI);
+
+            // Reemplazar las víctimas con los datos de la API
+            victimas.length = 0; // Limpiar array
+            victimas.push(...victimasAPI);
+
+            console.log(`✓ Se cargaron ${victimasAPI.length} casos desde la API`);
+        } else {
+            console.log('No hay datos de la API, usando datos de prueba');
+        }
+
+        // Aplicar filtros iniciales
+        victimasFiltradas = [...victimas];
+        filtroActual = "Todo";
+        aplicarFiltros();
+
+    } catch (error) {
+        console.error('Error al cargar datos iniciales:', error);
+        // En caso de error, usar datos de prueba existentes
+        victimasFiltradas = [...victimas];
+        filtroActual = "Todo";
+        aplicarFiltros();
+    }
+}
+
 
 // ===================================================================
 // FUNCIONES DE TOOLTIPS
@@ -1535,19 +1645,19 @@ document.addEventListener('keydown', function (e) {
 // ===================================================================
 function toggleEstadoVictima(nombre, estadoActual) {
     const nuevoEstado = estadoActual === 'Activo' ? 'Inactivo' : 'Activo';
-    const mensaje = estadoActual === 'Activo' 
-        ? '¿Estás seguro de que quieres desactivar este caso?' 
+    const mensaje = estadoActual === 'Activo'
+        ? '¿Estás seguro de que quieres desactivar este caso?'
         : '¿Estás seguro de que quieres activar este caso?';
-    
+
     if (confirm(mensaje)) {
         // Encontrar y actualizar la víctima en el array
         const victima = victimas.find(v => v.nombre === nombre);
         if (victima) {
             victima.estado = nuevoEstado;
-            
+
             // Recargar la tabla actual
             aplicarFiltros();
-            
+
             // Mostrar notificación
             alert(`Caso ${nuevoEstado.toLowerCase()} exitosamente`);
         }
