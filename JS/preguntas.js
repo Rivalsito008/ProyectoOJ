@@ -148,7 +148,6 @@ async function cargarDatosIniciales() {
         console.log('Cargando datos iniciales...');
 
         // Cargar niveles de riesgo y ámbitos desde API si existen endpoints
-        // Por ahora usamos valores estáticos que coinciden con tu BD
         await cargarNivelesRiesgo();
         await cargarAmbitos();
 
@@ -164,14 +163,11 @@ async function cargarDatosIniciales() {
 
 async function cargarNivelesRiesgo() {
     try {
-        // Mapeo según tu base de datos
-        // Estos IDs deben coincidir con los de tu tabla nivel_riesgo
         nivelesRiesgoMap = {
             'bajo': { id: 1, nombre: 'Bajo', valor_puntaje: 1 },
             'moderado': { id: 2, nombre: 'Moderado', valor_puntaje: 2 },
             'alto': { id: 3, nombre: 'Alto', valor_puntaje: 3 },
-            'extremo': { id: 4, nombre: 'Extremo', valor_puntaje: 4 },
-            'activadora': { id: 5, nombre: 'Activadora', valor_puntaje: 100 }
+            'extremo': { id: 4, nombre: 'Extremo', valor_puntaje: 4 }
         };
 
         console.log('Niveles de riesgo cargados:', nivelesRiesgoMap);
@@ -224,6 +220,16 @@ async function cargarPreguntasDesdeAPI() {
     }
 }
 
+// Funcion para obtener las preguntas activadoras
+async function obtenerPreguntasActivadoras() {
+
+    const preguntas = await cargarPreguntasDesdeAPI();
+
+    return [preguntas.filter(p => p.activador === true)];
+}
+
+console.log(`preguntas activadores: ${obtenerPreguntasActivadoras()}`);
+
 // -------------------------------
 // FUNCIONES PARA CARGAR TABLAS
 // -------------------------------
@@ -233,7 +239,6 @@ function cargarTodasLasTablas() {
     cargarTablaPorNivel('moderado');
     cargarTablaPorNivel('alto');
     cargarTablaPorNivel('extremo');
-    cargarTablaPorNivel('activadora');
 }
 
 function cargarTablaPorNivel(nivel) {
@@ -294,7 +299,7 @@ function cargarTablaPorNivel(nivel) {
             case 'extremo':
                 riesgoClass = "bg-red-600";
                 break;
-            case 'activadora':
+            case 'activador':
                 riesgoClass = "bg-[#8B0000]";
                 riesgoText = "Activador";
                 break;

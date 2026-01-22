@@ -1,10 +1,13 @@
-
+import { inicializarObserverPadding } from './utils/ManageToastSW2.js';
+import { eliminarPaddingSweetAlert } from './utils/ManageToastSW2.js';
+import { mostrarExitoToast } from './utils/ManageToastSW2.js';
+import { mostrarError } from './utils/ManageToastSW2.js';
 
 // ======================================
 // PROTECCIÓN DE RUTA - SOLO ADMINISTRADORES
 // ======================================
 (async function () {
-    console.log('Verificando permisos de administrador...');
+    console.log('Verificando permisos...');
     const hasPermission = await auth.requireRole(['admin', 'colaborador'], 'inicio.php');
     if (!hasPermission) {
         console.error('Acceso denegado: No tienes permisos');
@@ -111,6 +114,17 @@ async function obtenerDatosAPI() {
 }
 
 function transformarDatosAPI(data) {
+
+    function setEstado(estadoCaso) {
+        if (estadoCaso === 'ABIERTO') {
+            return "Abierto";
+        } else if (estadoCaso === 'EN PROCESO') {
+            return "En Proceso";
+        } else {
+            return "Cerrado";
+        }
+    }
+
     return data.map(item => {
 
         // Calcular el nivel de riesgo segun los datos obtenidos
@@ -129,7 +143,7 @@ function transformarDatosAPI(data) {
             id_caso: item.id_caso,
             nombre: item.nombre_denunciante,
             riesgo: nivelRiesgo,
-            estado: item.estado_caso === 'ABIERTO' ? "Abierto" : "Cerrado",
+            estado: setEstado(item.estado_caso),
             fecha: item.fecha_caso.split(' ')[0], // obtenemos solo la fecha sin la hora
             respuestas: respuestas,
             puntajeTotal: item.puntaje_total,
@@ -441,7 +455,7 @@ function abrirModal(victima) {
                         </div>
                         <div class="flex items-center gap-2">
                             <span class="text-sm font-medium text-gray-600 dark:text-gray-400">Estado:</span>
-                            <span class="px-2 py-1 rounded text-sm ${victima.estado === 'Abierto' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200'}">${victima.estado}</span>
+                            <span class="px-2 py-1 rounded text-sm ${victima.estado === 'Abierto' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : victima.estado === 'En Proceso' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'}">${victima.estado}</span>
                         </div>
                     </div>
                     ${activadorExtremo ?
@@ -600,6 +614,9 @@ function cerrarModalAcciones() {
 // FUNCIONALIDAD DE TABS
 // ===================================================================
 document.addEventListener('DOMContentLoaded', function () {
+
+    inicializarObserverPadding();
+
     // Inicializar tabs
     const browserTabs = document.querySelectorAll('.browser-tab');
     const tabContents = document.querySelectorAll('.tab-content');
@@ -639,6 +656,8 @@ document.addEventListener('DOMContentLoaded', function () {
     if (floatingBtn) {
         floatingBtn.addEventListener('click', abrirRiskModal);
     }
+
+    mostrarCargandoDatos('Cargando resultados...');
 
     // Inicializar búsqueda
     inicializarBusqueda();
@@ -683,6 +702,8 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     }
+
+    cerrarCargando();
 });
 
 // ===================================================================
@@ -761,7 +782,7 @@ function renderTablaFiltrada() {
                 </div>
             </td>
             <td class="px-6 py-4">
-                <span class="state-badge-shimmer inline-flex items-center justify-center w-20 px-3 py-1 rounded-full text-xs font-semibold relative overflow-hidden ${v.estado === 'Abierto' ? 'bg-green-600 text-white' : 'bg-red-600 text-white'} border-0 shadow-sm">
+                <span class="state-badge-shimmer inline-flex items-center justify-center w-24 px-3 py-1 rounded-full text-xs font-semibold relative overflow-hidden ${v.estado === 'Abierto' ? 'bg-green-600 text-white' : v.estado === 'En Proceso' ? 'bg-yellow-600 text-white' : 'bg-red-600 text-white'} border-0 shadow-sm">
                     ${v.estado}
                 </span>
             </td>
@@ -777,10 +798,6 @@ function renderTablaFiltrada() {
                     <button onclick="abrirModalDetalles(${JSON.stringify(v).replace(/"/g, '&quot;')})" class="action-btn-details w-20 px-3 py-1 rounded-lg text-sm font-medium transition-all duration-200 shadow-sm relative overflow-hidden">
                         Detalles
                     </button>                  
-                    <button onclick="toggleEstadoVictima('${v.nombre}', '${v.estado}')" 
-                            class="action-btn-toggle-estado w-24 px-3 py-1 rounded-lg text-sm font-medium transition-all duration-200 shadow-sm relative overflow-hidden ${v.estado === 'Abierto' ? 'bg-red-500 hover:bg-red-600' : 'bg-green-500 hover:bg-green-600'} text-white">
-                        ${v.estado === 'Abierto' ? 'Desactivar' : 'Activar'}
-                    </button>
                 </div>
             </td>
         `;
@@ -1021,19 +1038,23 @@ function abrirModalAcciones(victima) {
             </div>
             
             <!-- Botones de Acción -->
-            <div class="flex justify-center pt-2">
+            <div class="flex justify-center gap-12 pt-2">
                 <button 
                     onclick="abrirModal(${JSON.stringify(victima).replace(/"/g, '&quot;')}); cerrarModalAcciones();" 
                     class="action-btn-view flex items-center justify-center gap-2 w-32 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 shadow-sm relative overflow-hidden bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white border-0"
                 >
-                    Ver Detalles
+                    Ver Resumen
+                </button>
+                <button onclick="toggleEstadoVictima('${victima.id_caso}', '${victima.estado}')" 
+                            class="action-btn-toggle-estado w-32 px-3 py-1 rounded-lg text-sm font-medium transition-all duration-200 shadow-sm relative overflow-hidden ${victima.estado === 'Abierto' ? 'bg-red-500 hover:bg-red-600' : victima.estado === 'En Proceso' ? 'bg-yellow-500 hover:bg-yellow-600' : 'bg-green-500 hover:bg-green-600'} text-white">
+                        ${victima.estado === 'Abierto' ? 'Finalizar Caso' : victima.estado === 'En Proceso' ? 'Continuar Caso' : 'Reabrir Caso'}
                 </button>
             </div>
             
             <!-- Footer -->
             <div class="pt-3 border-t border-gray-200 dark:border-gray-600">
                 <p class="text-xs text-gray-500 dark:text-gray-400 text-center">
-                    Estado: <span class="font-medium ${victima.estado === 'Abierto' ? 'text-green-600' : 'text-red-600'}">${victima.estado}</span>
+                    Estado: <span class="font-medium ${victima.estado === 'Abierto' ? 'text-green-600' : victima.estado === 'En Proceso' ? 'text-yellow-600' : 'text-red-600'}">${victima.estado}</span>
                     • Fecha: ${victima.fecha}
                 </p>
             </div>
@@ -1181,7 +1202,7 @@ async function abrirModalDetalles(victima) {
                                 </tr>
                                 <tr class="border-b border-gray-200 dark:border-gray-700">
                                     <td class="py-3 px-4 font-medium text-gray-700 dark:text-gray-300">Estado del Proceso:</td>
-                                    <td class="py-3 px-4"><span class="px-2 py-1 rounded text-xs font-medium ${infoAdmin.estado_proceso === 'ABIERTO' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}">${infoAdmin.estado_proceso}</span></td>
+                                    <td class="py-3 px-4"><span class="px-2 py-1 rounded text-xs font-medium ${infoAdmin.estado_proceso === 'ABIERTO' ? 'bg-green-100 text-green-800' : infoAdmin.estado_proceso === 'EN PROCESO' ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800'}">${infoAdmin.estado_proceso}</span></td>
                                 </tr>
                                 <tr class="border-b border-gray-200 dark:border-gray-700">
                                     <td class="py-3 px-4 font-medium text-gray-700 dark:text-gray-300">Juez Asignado:</td>
@@ -1569,32 +1590,32 @@ ${agresor.contactos.map(c => `${c.telefono}(${c.tipo})`).join('<br>')}
         </div>
     </div>
 `;
+
+    // Insertar contenido
+    modalDialog.innerHTML = contenidoCompleto;
+
+    // Inicializar acordeones y botones
+    setTimeout(() => {
+        inicializarAcordeones();
+
+        const btnVerDetalles = document.getElementById('btnVerDetalles');
+        const btnAcciones = document.getElementById('btnAcciones');
+
+        if (btnVerDetalles) {
+            btnVerDetalles.addEventListener('click', function () {
+                abrirModal(victima);
+                cerrarModalDetalles();
+            });
+        }
+
+        if (btnAcciones) {
+            btnAcciones.addEventListener('click', function () {
+                abrirModalAcciones(victima);
+                cerrarModalDetalles();
+            });
+        }
+    }, 100);
 }
-
-// Insertar contenido
-modalDialog.innerHTML = contenidoCompleto;
-
-// Inicializar acordeones y botones
-setTimeout(() => {
-    inicializarAcordeones();
-
-    const btnVerDetalles = document.getElementById('btnVerDetalles');
-    const btnAcciones = document.getElementById('btnAcciones');
-
-    if (btnVerDetalles) {
-        btnVerDetalles.addEventListener('click', function () {
-            abrirModal(victima);
-            cerrarModalDetalles();
-        });
-    }
-
-    if (btnAcciones) {
-        btnAcciones.addEventListener('click', function () {
-            abrirModalAcciones(victima);
-            cerrarModalDetalles();
-        });
-    }
-}, 100);
 
 function cerrarModalDetalles() {
     const modal = document.getElementById('modalDetalles');
@@ -1693,26 +1714,161 @@ document.addEventListener('keydown', function (e) {
     }
 });
 
+// ======================================
+// FUNCIONES DE NOTIFICACIÓN MEJORADAS
+// ======================================
+/**
+ * Muestra modal de carga con SweetAlert2
+ * @param {string} mensaje - Mensaje a mostrar
+ */
+function mostrarCargandoDatos(mensaje = 'Cargando...') {
+    Swal.fire({
+        title: mensaje,
+        allowOutsideClick: false,
+        showConfirmButton: false,
+        didOpen: () => {
+            Swal.showLoading();
+        }
+    });
+}
+
+/**
+ * Cierra el modal de carga y elimina el padding del body
+ */
+function cerrarCargando() {
+    Swal.close();
+    // Eliminar padding que SweetAlert2 pueda haber agregado
+    eliminarPaddingSweetAlert();
+}
+
 // ===================================================================
 // FUNCIÓN PARA TOGGLE DE ESTADO DE VÍCTIMA
 // ===================================================================
-function toggleEstadoVictima(nombre, estadoActual) {
-    const nuevoEstado = estadoActual === 'Activo' ? 'Inactivo' : 'Activo';
-    const mensaje = estadoActual === 'Activo'
-        ? '¿Estás seguro de que quieres desactivar este caso?'
-        : '¿Estás seguro de que quieres activar este caso?';
+async function toggleEstadoVictima(idCaso, estadoActual) {
+    // Determinar el nuevo estado y la acción a realizar según el estado actual
+    const nuevoEstado = estadoActual === 'Abierto' ? 'CERRADO' : 'ABIERTO';
+    const accion = estadoActual === 'Abierto' ? 'cerrar' : 'reabrir';
 
-    if (confirm(mensaje)) {
-        // Encontrar y actualizar la víctima en el array
-        const victima = victimas.find(v => v.nombre === nombre);
-        if (victima) {
-            victima.estado = nuevoEstado;
+    // Confirmación con SweetAlert2
+    const result = await Swal.fire({
+        title: '¿Estás seguro?',
+        text: `¿Deseas ${accion} este caso?`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: estadoActual === 'Abierto' ? '#ef4444' : '#10b981',
+        cancelButtonColor: '#6b7280',
+        confirmButtonText: `Sí, ${accion}`,
+        cancelButtonText: 'Cancelar',
+        reverseButtons: true,
+        didClose: () => {
+            // Eliminar padding después de cerrar el modal de confirmación
+            eliminarPaddingSweetAlert();
+        }
+    });
 
-            // Recargar la tabla actual
-            aplicarFiltros();
+    // Eliminar padding después de que se cierre el modal (ya sea confirmado o cancelado)
+    eliminarPaddingSweetAlert();
 
-            // Mostrar notificación
-            alert(`Caso ${nuevoEstado.toLowerCase()} exitosamente`);
+    if (!result.isConfirmed) {
+        return;
+    }
+    try {
+        // Mostrar modal de carga antes de cambiar estado
+        mostrarCargandoDatos(`${estadoActual === 'Abierto' ? 'Cerrando' : 'Reabriendo'} caso...`);
+
+        // Usar PATCH en lugar de POST
+        const response = await axios.patch(`/casos/${idCaso}/estado`, {
+            estado: nuevoEstado
+        });
+
+        // Cerrar modalAcciones
+        cerrarModalAcciones();
+
+        // Cerrar modal de carga
+        cerrarCargando();
+
+
+        if (response.data.success) {
+            // Esperar un momento para que el modal se cierre completamente antes de mostrar el toast
+            await new Promise(resolve => setTimeout(resolve, 100));
+
+            // Mostrar notificación de éxito CON TOAST
+            mostrarExitoToast(`Caso ${nuevoEstado === 'CERRADO' ? 'cerrado' : 'reabierto'} exitosamente`);
+
+            // Esperar un momento antes de recargar usuarios para no interferir con el toast
+            await new Promise(resolve => setTimeout(resolve, 500));
+            cargarDatosIniciales();
+        }
+    } catch (error) {
+        console.error('Error al cambiar estado:', error);
+        // Cerrar modal de carga en caso de error
+        cerrarCargando();
+
+        if (error.response?.status === 403) {
+            mostrarError('No tienes permisos para cambiar el estado de los casos');
+        } else {
+            mostrarError('Error al cambiar el estado del caso');
         }
     }
 }
+// ======================================
+// FUNCIONES DE RENDERIZADO
+// ======================================
+/**
+ * Renderiza la tabla según el filtro activo
+ * @param {string} tabName - Nombre de la pestaña activa
+ */
+function renderTabla(tabName) {
+    let usuariosFiltrados = [];
+    let tabla = null;
+
+    // Filtrar el usuario actual (sesión activa)
+    const usuariosSinActual = usuarios.filter(u => u.id_usuario !== usuarioActualId);
+
+    switch (tabName) {
+        case 'Todo':
+            usuariosFiltrados = usuariosSinActual;
+            tabla = elementos.tablaTodo;
+            break;
+        case 'activo':
+            usuariosFiltrados = usuariosSinActual.filter(u => u.estado === 'Activo');
+            tabla = elementos.tablaActivo;
+            break;
+        case 'inactivo':
+            usuariosFiltrados = usuariosSinActual.filter(u => u.estado === 'Inactivo');
+            tabla = elementos.tablaInactivo;
+            break;
+    }
+    if (!tabla) return;
+    tabla.innerHTML = '';
+    if (usuariosFiltrados.length === 0) {
+        tabla.innerHTML = `
+                <tr>
+                    <td colspan="6" class="px-6 py-8 text-center text-gray-500 dark:text-gray-400 text-lg">
+                        No hay usuarios ${tabName === 'Todo' ? 'para mostrar' : `en estado ${tabName}`}
+                    </td>
+                </tr>
+            `;
+        return;
+    }
+    usuariosFiltrados.forEach(usuario => {
+        const row = crearFilaUsuario(usuario);
+        tabla.appendChild(row);
+    });
+}
+
+// ===================================================================
+// EXPORTAR FUNCIONES AL SCOPE GLOBAL (para onclick en HTML)
+// ===================================================================
+// Cuando usamos type="module", las funciones son privadas al módulo por defecto.
+// Necesitamos exponerlas al objeto window para que funcionen los onclick del HTML.
+
+window.abrirModal = abrirModal;
+window.cerrarModal = cerrarModal;
+window.abrirModalAcciones = abrirModalAcciones;
+window.cerrarModalAcciones = cerrarModalAcciones;
+window.abrirModalDetalles = abrirModalDetalles;
+window.cerrarModalDetalles = cerrarModalDetalles;
+window.toggleEstadoVictima = toggleEstadoVictima;
+window.abrirRiskModal = abrirRiskModal;
+window.cerrarRiskModal = cerrarRiskModal;

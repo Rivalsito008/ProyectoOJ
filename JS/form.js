@@ -11,13 +11,13 @@ import { mostrarError } from './utils/ManageToastSW2.js';
 // PROTECCIÓN DE RUTA - SOLO ADMINISTRADORES
 // ======================================
 (async function () {
-    console.log('Verificando permisos de administrador...');
-    const hasPermission = await auth.requireRole('admin', 'inicio.php');
+    console.log('Verificando permisos...');
+    const hasPermission = await auth.requireRole(['admin', 'colaborador'], 'inicio.php');
     if (!hasPermission) {
-        console.error('Acceso denegado: No tienes permisos de administrador');
+        console.error('Acceso denegado: No tienes permisos');
         return;
     }
-    console.log('✓ Acceso autorizado: Usuario Administrador');
+    console.log('✓ Acceso autorizado');
 })();
 
 const api = axios;

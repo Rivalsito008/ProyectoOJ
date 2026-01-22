@@ -88,7 +88,7 @@
                             <table class="w-full text-sm text-left border-collapse">
                                 <thead class="text-xs uppercase border-b border-gray-200 dark:border-gray-600">
                                     <tr class="border-b border-gray-200 dark:border-gray-500">
-                                        <th scope="col" class="px-6 py-3">Víctima</th>
+                                        <th scope="col" class="px-6 py-3">Denunciante</th>
                                         <th scope="col" class="px-6 py-3">Riesgo</th>
                                         <th scope="col" class="px-6 py-3">Estado</th>
                                         <th scope="col" class="px-6 py-3">Fecha</th>
@@ -917,7 +917,7 @@
         </div>
     </div>
 
-    <script src="JS/respuestas2.js"></script>
+    <script src="JS/respuestas2.js" type="module"></script>
 </body>
 
 </html>

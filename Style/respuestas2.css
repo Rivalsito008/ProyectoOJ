@@ -42,19 +42,20 @@ body {
 
 /* ===== SIDEBAR ===== */
 .sidebar {
-    width: 80px; /* Estado inicial SIEMPRE colapsado */
+    width: 80px;
+    /* Estado inicial SIEMPRE colapsado */
     transition: width 0.3s ease;
     background-color: var(--sidebar-bg);
     color: var(--text-colorsdb);
     border-right: 1px solid var(--border-color);
 }
 
-.sidebar-collapsed { 
-    width: 80px !important; 
+.sidebar-collapsed {
+    width: 80px !important;
 }
 
-.sidebar-expanded { 
-    width: 256px !important; 
+.sidebar-expanded {
+    width: 256px !important;
 }
 
 .content {
@@ -137,7 +138,10 @@ body {
     box-shadow: inset 0 0 25px rgba(151, 120, 255, 0.35);
 }
 
-.nav-item svg { min-width: 20px; }
+.nav-item svg {
+    min-width: 20px;
+}
+
 .flecha {
     stroke: var(--flecha-color);
     transition: stroke 0.3s ease;
@@ -163,13 +167,29 @@ body {
     border-bottom: 1px solid var(--border-color);
 }
 
-.dropdown-avatar { border-color: var(--border-color); }
-.dropdown-username { color: var(--text-colorcrd); }
-.dropdown-role { color: #6b7280; }
-.dropdown-body { background-color: var(--card-bg); }
+.dropdown-avatar {
+    border-color: var(--border-color);
+}
 
-.dropdown-logout { color: #dc2626; }
-.dropdown-logout:hover { background-color: #fef2f2; }
+.dropdown-username {
+    color: var(--text-colorcrd);
+}
+
+.dropdown-role {
+    color: #6b7280;
+}
+
+.dropdown-body {
+    background-color: var(--card-bg);
+}
+
+.dropdown-logout {
+    color: #dc2626;
+}
+
+.dropdown-logout:hover {
+    background-color: #fef2f2;
+}
 
 /* Dropdown - Modo Oscuro */
 [data-theme="dark"] .dropdown {
@@ -182,12 +202,29 @@ body {
     border-bottom: 1px solid #3d3454;
 }
 
-[data-theme="dark"] .dropdown-avatar { border-color: #4b4563; }
-[data-theme="dark"] .dropdown-username { color: #f3f4f6; }
-[data-theme="dark"] .dropdown-role { color: #9ca3af; }
-[data-theme="dark"] .dropdown-body { background-color: #241c37; }
-[data-theme="dark"] .dropdown-logout { color: #fca5a5; }
-[data-theme="dark"] .dropdown-logout:hover { background-color: rgba(127, 29, 29, 0.3); }
+[data-theme="dark"] .dropdown-avatar {
+    border-color: #4b4563;
+}
+
+[data-theme="dark"] .dropdown-username {
+    color: #f3f4f6;
+}
+
+[data-theme="dark"] .dropdown-role {
+    color: #9ca3af;
+}
+
+[data-theme="dark"] .dropdown-body {
+    background-color: #241c37;
+}
+
+[data-theme="dark"] .dropdown-logout {
+    color: #fca5a5;
+}
+
+[data-theme="dark"] .dropdown-logout:hover {
+    background-color: rgba(127, 29, 29, 0.3);
+}
 
 /* ===== HEADER ===== */
 .header-bg {
@@ -208,7 +245,9 @@ body {
     transition: color 0.3s ease;
 }
 
-#profileButton:hover { background-color: var(--hover-hd); }
+#profileButton:hover {
+    background-color: var(--hover-hd);
+}
 
 /* ===== TABS ===== */
 .tabs-container {
@@ -247,7 +286,9 @@ body {
     padding: 12px 20px;
 }
 
-.browser-tab:hover:not(.active) { background: var(--hover-item); }
+.browser-tab:hover:not(.active) {
+    background: var(--hover-item);
+}
 
 .browser-tab.active {
     background: var(--card-bg);
@@ -292,15 +333,23 @@ body {
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-.tab-content { display: none; }
+.tab-content {
+    display: none;
+}
+
 .tab-content.active {
     display: block;
     animation: fadeIn 0.3s ease;
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
 }
 
 /* ===== TABLES ===== */
@@ -328,7 +377,8 @@ tbody tr {
     background-color: #f7f7f7;
 }
 
-input, select {
+input,
+select {
     background-color: var(--card-bg);
     color: var(--text-colorcrd);
     border-color: var(--border-color);
@@ -344,6 +394,7 @@ input, select {
         opacity: 0;
         transform: scale(0.9) translateY(-20px);
     }
+
     to {
         opacity: 1;
         transform: scale(1) translateY(0);
@@ -435,8 +486,13 @@ input, select {
 
 /* ===== ANIMACIÓN SHIMMER UNIVERSAL ===== */
 @keyframes shimmerUniversal {
-    0% { left: -100%; }
-    100% { left: 400%; }
+    0% {
+        left: -100%;
+    }
+
+    100% {
+        left: 400%;
+    }
 }
 
 /* ===== BARRAS DE RIESGO ===== */
@@ -712,16 +768,38 @@ tr:hover .risk-bar-table {
 }
 
 /* ===== COLORES MEJORADOS ===== */
-.text-green-600 { color: #059669; }
-.text-red-600 { color: #dc2626; }
-.dark .text-green-400 { color: #059669; }
-.dark .text-red-400 { color: #dc2626; }
+.text-green-600 {
+    color: #059669;
+}
+
+.text-red-600 {
+    color: #dc2626;
+}
+
+.dark .text-green-400 {
+    color: #059669;
+}
+
+.dark .text-red-400 {
+    color: #dc2626;
+}
 
 /* Gradientes para cards de niveles */
-.bg-green-50 { background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); }
-.bg-yellow-50 { background: linear-gradient(135deg, #fefce8 0%, #fef9c3 100%); }
-.bg-orange-50 { background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%); }
-.bg-red-50 { background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%); }
+.bg-green-50 {
+    background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+}
+
+.bg-yellow-50 {
+    background: linear-gradient(135deg, #fefce8 0%, #fef9c3 100%);
+}
+
+.bg-orange-50 {
+    background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%);
+}
+
+.bg-red-50 {
+    background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+}
 
 /* Hover en cards */
 #riskLevelsModal .bg-green-50:hover,
@@ -753,13 +831,19 @@ tr:hover .risk-bar-table {
 }
 
 /* ===== UTILIDADES ===== */
-.h-3 { height: 0.75rem; }
+.h-3 {
+    height: 0.75rem;
+}
+
 .w-20 {
     width: 5rem !important;
     min-width: 5rem !important;
     max-width: 5rem !important;
 }
-td:nth-child(2) { min-width: 180px; }
+
+td:nth-child(2) {
+    min-width: 180px;
+}
 
 /* Botón DETALLES - Nuevo botón verde */
 .action-btn-details {
@@ -833,13 +917,14 @@ td:nth-child(2) { min-width: 180px; }
         opacity: 0;
         transform: translateY(-10px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
     }
 }
 
-.accordion-content:not(.hidden) > * {
+.accordion-content:not(.hidden)>* {
     animation: slideDown 0.3s ease-out;
 }
 
@@ -917,11 +1002,12 @@ td:nth-child(2) { min-width: 180px; }
     display: flex;
     flex-direction: column;
     max-height: 90vh;
-    padding: 0 !important; /* Eliminar todo padding del contenedor */
+    padding: 0 !important;
+    /* Eliminar todo padding del contenedor */
     overflow: hidden;
 }
 
-#modalDetalles .modal-dialog > div {
+#modalDetalles .modal-dialog>div {
     display: flex;
     flex-direction: column;
     max-height: 90vh;
@@ -933,7 +1019,8 @@ td:nth-child(2) { min-width: 180px; }
     left: 0;
     right: 0;
     width: 100%;
-    border-radius: 12px 12px 0 0; /* Solo redondear esquinas superiores */
+    border-radius: 12px 12px 0 0;
+    /* Solo redondear esquinas superiores */
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
@@ -943,7 +1030,8 @@ td:nth-child(2) { min-width: 180px; }
     left: 0;
     right: 0;
     width: 100%;
-    border-radius: 0 0 12px 12px; /* Solo redondear esquinas inferiores */
+    border-radius: 0 0 12px 12px;
+    /* Solo redondear esquinas inferiores */
     box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.05);
 }
 
@@ -989,13 +1077,14 @@ td:nth-child(2) { min-width: 180px; }
         opacity: 0;
         transform: translateY(-10px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
     }
 }
 
-.accordion-content:not(.hidden) > * {
+.accordion-content:not(.hidden)>* {
     animation: slideDown 0.3s ease-out;
 }
 
@@ -1034,4 +1123,54 @@ td:nth-child(2) { min-width: 180px; }
 .accordion-content table .px-2 {
     display: inline-block;
     white-space: nowrap;
+}
+
+
+/* ===== SWEETALERT2 TOAST FIX ===== */
+/* Prevenir que SweetAlert2 agregue padding al body cuando muestra el toast */
+body.swal2-toast-shown {
+    padding-right: 0 !important;
+}
+
+body.swal2-shown:not(.swal2-no-backdrop):not(.swal2-toast-shown) {
+    padding-right: 0 !important;
+}
+
+/* Asegurar que el header no se vea afectado por el toast */
+.header-bg {
+    padding-right: 0 !important;
+    margin-right: 0 !important;
+}
+
+/* Prevenir que el contenedor principal se vea afectado */
+.content {
+    padding-right: 0 !important;
+    margin-right: 0 !important;
+}
+
+/* Asegurar que el toast no cause scroll horizontal */
+.swal2-container.swal2-top-end {
+    padding: 1em !important;
+}
+
+/* Prevenir overflow en el body cuando se muestra el toast */
+html.swal2-toast-shown,
+html.swal2-toast-shown body {
+    overflow-x: hidden !important;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+
+    .action-btn-view,
+    .action-btn-toggle-estado {
+        padding: 6px 10px !important;
+        font-size: 11px !important;
+        min-width: 70px !important;
+    }
+
+    .state-badge-shimmer {
+        font-size: 11px;
+        padding: 2px 8px !important;
+    }
 }

@@ -775,7 +775,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Inicializar observer para eliminar padding de SweetAlert2
     inicializarObserverPadding();
 
-    // 🔧 CAMBIO CRÍTICO: Mostrar modal de carga ANTES de cualquier operación asíncrona
+    // CAMBIO CRÍTICO: Mostrar modal de carga ANTES de cualquier operación asíncrona
     mostrarCargandoDatos();
 
     try {
