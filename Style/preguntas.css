@@ -333,6 +333,7 @@ body {
         opacity: 0;
         transform: translateY(10px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -353,6 +354,7 @@ body {
         opacity: 0;
         transform: translateY(20px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -371,6 +373,7 @@ table {
         opacity: 0;
         transform: translateY(20px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -394,25 +397,78 @@ tbody tr {
         opacity: 0;
         transform: translateX(-30px);
     }
+
     to {
         opacity: 1;
         transform: translateX(0);
     }
 }
 
+/* EFECTO DE APARICIÓN SUAVE PARA OPCION DE ACTIVADOR */
+@keyframes fade-in {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-fade-in {
+    animation: fade-in 0.3s ease-out;
+}
+
 /* Retrasos escalonados para cada fila (¡EFECTO INCREÍBLE!) */
-tbody tr:nth-child(1) { animation-delay: 0.1s; }
-tbody tr:nth-child(2) { animation-delay: 0.2s; }
-tbody tr:nth-child(3) { animation-delay: 0.3s; }
-tbody tr:nth-child(4) { animation-delay: 0.4s; }
-tbody tr:nth-child(5) { animation-delay: 0.5s; }
-tbody tr:nth-child(6) { animation-delay: 0.6s; }
-tbody tr:nth-child(7) { animation-delay: 0.7s; }
-tbody tr:nth-child(8) { animation-delay: 0.8s; }
-tbody tr:nth-child(9) { animation-delay: 0.9s; }
-tbody tr:nth-child(10) { animation-delay: 1.0s; }
-tbody tr:nth-child(11) { animation-delay: 1.1s; }
-tbody tr:nth-child(12) { animation-delay: 1.2s; }
+tbody tr:nth-child(1) {
+    animation-delay: 0.1s;
+}
+
+tbody tr:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+tbody tr:nth-child(3) {
+    animation-delay: 0.3s;
+}
+
+tbody tr:nth-child(4) {
+    animation-delay: 0.4s;
+}
+
+tbody tr:nth-child(5) {
+    animation-delay: 0.5s;
+}
+
+tbody tr:nth-child(6) {
+    animation-delay: 0.6s;
+}
+
+tbody tr:nth-child(7) {
+    animation-delay: 0.7s;
+}
+
+tbody tr:nth-child(8) {
+    animation-delay: 0.8s;
+}
+
+tbody tr:nth-child(9) {
+    animation-delay: 0.9s;
+}
+
+tbody tr:nth-child(10) {
+    animation-delay: 1.0s;
+}
+
+tbody tr:nth-child(11) {
+    animation-delay: 1.1s;
+}
+
+tbody tr:nth-child(12) {
+    animation-delay: 1.2s;
+}
 
 /* Efecto hover mejorado para filas */
 tbody tr:hover {
@@ -444,6 +500,7 @@ select {
         opacity: 0;
         transform: translateY(-30px) scale(0.95);
     }
+
     to {
         opacity: 1;
         transform: translateY(0) scale(1);
@@ -486,9 +543,17 @@ select {
 }
 
 @keyframes inputFocus {
-    0% { transform: translateY(0); }
-    50% { transform: translateY(-2px); }
-    100% { transform: translateY(-1px); }
+    0% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-2px);
+    }
+
+    100% {
+        transform: translateY(-1px);
+    }
 }
 
 /* Modo oscuro: focus morado */
@@ -509,6 +574,7 @@ select {
         opacity: 0;
         transform: translateY(-20px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -630,6 +696,7 @@ select {
         opacity: 0;
         transform: scale(0.8);
     }
+
     to {
         opacity: 1;
         transform: scale(1);
@@ -710,6 +777,7 @@ select {
         opacity: 0;
         transform: translateY(15px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -745,9 +813,12 @@ select {
 }
 
 @keyframes pulseRed {
-    0%, 100% {
+
+    0%,
+    100% {
         box-shadow: 0 3px 8px rgba(239, 68, 68, 0.3);
     }
+
     50% {
         box-shadow: 0 3px 15px rgba(239, 68, 68, 0.5);
     }
@@ -764,9 +835,12 @@ select {
 }
 
 @keyframes pulseGreen {
-    0%, 100% {
+
+    0%,
+    100% {
         box-shadow: 0 3px 8px rgba(16, 185, 129, 0.3);
     }
+
     50% {
         box-shadow: 0 3px 15px rgba(16, 185, 129, 0.5);
     }
@@ -804,9 +878,11 @@ select {
         opacity: 0;
         transform: scale(0.5);
     }
+
     50% {
         opacity: 0.3;
     }
+
     100% {
         opacity: 0;
         transform: scale(1.5);
@@ -851,10 +927,12 @@ select {
         transform: scale(1);
         opacity: 1;
     }
+
     50% {
         transform: scale(0.9);
         opacity: 0.7;
     }
+
     100% {
         transform: scale(1);
         opacity: 1;
@@ -897,6 +975,7 @@ select {
     0% {
         left: -100%;
     }
+
     100% {
         left: 400%;
     }
@@ -906,9 +985,11 @@ select {
     0% {
         transform: scale(1);
     }
+
     50% {
         transform: scale(0.9);
     }
+
     100% {
         transform: scale(1);
     }
@@ -946,6 +1027,7 @@ select {
         opacity: 0;
         transform: translateY(20px) scale(0.9);
     }
+
     to {
         opacity: 1;
         transform: translateY(0) scale(1);
@@ -1111,28 +1193,30 @@ select {
 
 /* ===== RESPONSIVE ===== */
 @media (max-width: 768px) {
+
     .action-btn-view,
     .action-btn-toggle-estado {
         padding: 6px 10px !important;
         font-size: 11px !important;
         width: 70px !important;
     }
-    
+
     .state-badge-shimmer {
         font-size: 11px;
         padding: 2px 8px !important;
     }
-    
+
     /* Ajustar animaciones para mobile */
     tbody tr {
         animation: slideInRowMobile 0.5s ease backwards;
     }
-    
+
     @keyframes slideInRowMobile {
         from {
             opacity: 0;
             transform: translateY(10px);
         }
+
         to {
             opacity: 1;
             transform: translateY(0);

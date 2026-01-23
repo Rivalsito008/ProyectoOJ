@@ -1,6 +1,7 @@
 import { inicializarObserverPadding } from './utils/ManageToastSW2.js';
 import { eliminarPaddingSweetAlert } from './utils/ManageToastSW2.js';
 import { mostrarExito } from './utils/ManageToastSW2.js';
+import { mostrarExitoToast } from './utils/ManageToastSW2.js';
 import { mostrarError } from './utils/ManageToastSW2.js';
 
 // PROTECCION DE RUTA - SOLO ADMINS Y COLABORADORES
@@ -220,15 +221,7 @@ async function cargarPreguntasDesdeAPI() {
     }
 }
 
-// Funcion para obtener las preguntas activadoras
-async function obtenerPreguntasActivadoras() {
 
-    const preguntas = await cargarPreguntasDesdeAPI();
-
-    return [preguntas.filter(p => p.activador === true)];
-}
-
-console.log(`preguntas activadores: ${obtenerPreguntasActivadoras()}`);
 
 // -------------------------------
 // FUNCIONES PARA CARGAR TABLAS
@@ -239,6 +232,7 @@ function cargarTodasLasTablas() {
     cargarTablaPorNivel('moderado');
     cargarTablaPorNivel('alto');
     cargarTablaPorNivel('extremo');
+    cargarTablaPorNivel('activadora');
 }
 
 function cargarTablaPorNivel(nivel) {
@@ -257,6 +251,19 @@ function cargarTablaPorNivel(nivel) {
 
     if (nivel === 'todo') {
         preguntasFiltradas = preguntas;
+    } else if (nivel === 'activadora') {
+        // Filtrar preguntas que son de nivel Extremo Y tienen activador: true
+        preguntasFiltradas = preguntas.filter(p => {
+            const nivelPregunta = (p.nivel_riesgo || '').toLowerCase().trim();
+            const esActivador = p.activador === true || p.activador === 1;
+            return nivelPregunta === 'extremo' && esActivador;
+        });
+    } else if (nivel === 'extremo') {
+        preguntasFiltradas = preguntas.filter(p => {
+            const nivelPregunta = (p.nivel_riesgo || '').toLowerCase().trim();
+            const esActivador = p.activador === true || p.activador === 1;
+            return nivelPregunta === 'extremo' && !esActivador;
+        });
     } else {
         // Normalizar nombre del nivel para comparar
         preguntasFiltradas = preguntas.filter(p => {
@@ -282,29 +289,32 @@ function cargarTablaPorNivel(nivel) {
         // Clase mejorada para los bordes en ambos modos
         tr.className = "border-b border-gray-200 dark:border-gray-700 hover:bg-gradient-to-r hover:from-gray-50 hover:to-gray-50 dark:hover:from-gray-800 dark:hover:to-gray-700 transition-all duration-300";
 
-        // Determinar clases CSS según el nivel de riesgo
+        // Determinar clases CSS según el nivel de riesgo y si es activador
         let riesgoClass = "";
         let riesgoText = p.nivel_riesgo || 'Sin nivel';
 
-        switch ((p.nivel_riesgo || '').toLowerCase()) {
-            case 'bajo':
-                riesgoClass = "bg-green-500";
-                break;
-            case 'moderado':
-                riesgoClass = "bg-yellow-500";
-                break;
-            case 'alto':
-                riesgoClass = "bg-orange-500";
-                break;
-            case 'extremo':
-                riesgoClass = "bg-red-600";
-                break;
-            case 'activador':
-                riesgoClass = "bg-[#8B0000]";
-                riesgoText = "Activador";
-                break;
-            default:
-                riesgoClass = "bg-gray-500";
+        // Si es activador (nivel Extremo + activador: true), usar color especial
+        if (p.activador === true && (p.nivel_riesgo || '').toLowerCase() === 'extremo') {
+            riesgoClass = "bg-[#8B0000]";
+            riesgoText = "Activador";
+        } else {
+            // Color normal según nivel de riesgo
+            switch ((p.nivel_riesgo || '').toLowerCase()) {
+                case 'bajo':
+                    riesgoClass = "bg-green-500";
+                    break;
+                case 'moderado':
+                    riesgoClass = "bg-yellow-500";
+                    break;
+                case 'alto':
+                    riesgoClass = "bg-orange-500";
+                    break;
+                case 'extremo':
+                    riesgoClass = "bg-red-600";
+                    break;
+                default:
+                    riesgoClass = "bg-gray-500";
+            }
         }
 
         // Determinar estado actual y clase para badge de estado
@@ -376,6 +386,7 @@ async function crearPregunta(datosPregunta) {
             id_ambito: idAmbito,
             id_nivel_riesgo: idNivelRiesgo,
             estado: datosPregunta.estado || 'Activo',
+            activador: datosPregunta.activador || false
         };
 
         console.log('Enviando al backend:', datosBackend);
@@ -383,10 +394,10 @@ async function crearPregunta(datosPregunta) {
         const response = await api.post('/preguntas', datosBackend);
 
         cerrarCargando();
-        mostrarExito('Pregunta creada exitosamente');
 
         // Recargar datos
         await cargarPreguntasDesdeAPI();
+        mostrarExitoToast('Pregunta creada exitosamente');
 
         return response.data;
     } catch (error) {
@@ -420,15 +431,19 @@ async function actualizarPregunta(id, datosActualizados) {
             datosBackend.estado = datosActualizados.estado;
         }
 
+        if (datosActualizados.hasOwnProperty('activador')) {
+            datosBackend.activador = datosActualizados.activador;
+        }
+
         console.log('Actualizando pregunta ID', id, 'con:', datosBackend);
 
         const response = await api.put(`/preguntas/${id}`, datosBackend);
 
         cerrarCargando();
-        mostrarExito('Pregunta actualizada exitosamente');
 
         // Recargar datos
         await cargarPreguntasDesdeAPI();
+        mostrarExitoToast('Pregunta actualizada exitosamente');
 
         return response.data;
     } catch (error) {
@@ -624,6 +639,28 @@ function mostrarModalEdicion(pregunta) {
         console.log('Estado seleccionado:', pregunta.estado);
     }
 
+    // Activador
+    const checkboxActivador = document.getElementById('activador');
+    const labelActivador = document.getElementById('activadorLabel');
+    if (checkboxActivador && labelActivador) {
+        const esActivador = pregunta.activador === true || pregunta.activador === 1;
+        checkboxActivador.checked = esActivador;
+        labelActivador.textContent = esActivador ? 'Activado' : 'Desactivado';
+        console.log('Activador seleccionado:', esActivador);
+    }
+
+    //  Mostrar/ocultar contenedor de activador según nivel de riesgo
+    const activadorContainer = document.getElementById('activadorContainer');
+    if (activadorContainer && pregunta.nivel_riesgo) {
+        const nivelNormalizado = pregunta.nivel_riesgo.toLowerCase().trim();
+        if (nivelNormalizado === 'extremo') {
+            activadorContainer.classList.remove('hidden');
+        } else {
+            activadorContainer.classList.add('hidden');
+        }
+        console.log('Contenedor activador visible:', nivelNormalizado === 'extremo');
+    }
+
     // Guardar ID para la actualización
     const btnGuardar = document.getElementById('btnGuardarPregunta');
     if (btnGuardar) {
@@ -646,6 +683,7 @@ async function guardarPregunta(e) {
     const ambito = document.getElementById('ambito').value;
     const riesgo = document.getElementById('riesgo').value;
     const estado = document.getElementById('estado').value;
+    const activador = document.getElementById('activador').checked;
 
     // Validaciones
     if (!pregunta) {
@@ -667,7 +705,8 @@ async function guardarPregunta(e) {
         pregunta,
         ambito,
         nivel_riesgo: riesgo,
-        estado
+        estado,
+        activador
     };
 
     // Verificar si es edición o creación
@@ -843,6 +882,44 @@ function inicializarEventListeners() {
             });
         });
     }
+
+    // Toggle del activador
+    const activadorCheckbox = document.getElementById('activador');
+    const activadorLabel = document.getElementById('activadorLabel');
+
+    if (activadorCheckbox && activadorLabel) {
+        activadorCheckbox.addEventListener('change', function () {
+            activadorLabel.textContent = this.checked ? 'Activado' : 'Desactivado';
+        });
+    }
+
+    // Mostramos la opción Activador al momento de seleccionar nivel de riesgo "Extremo"
+    const selectRiesgo = document.getElementById('riesgo');
+    const activadorContainer = document.getElementById('activadorContainer');
+
+    if (selectRiesgo && activadorContainer) {
+        selectRiesgo.addEventListener('change', function () {
+            const nivelSeleccionado = this.value.toLowerCase();
+
+            if (nivelSeleccionado === 'extremo') {
+                // Mostrar con animación suave
+                activadorContainer.classList.remove('hidden');
+                activadorContainer.classList.add('animate-fade-in');
+            } else {
+                // Ocultar y resetear el checkbox
+                activadorContainer.classList.add('hidden');
+                activadorContainer.classList.remove('animate-fade-in');
+
+                // Resetear el checkbox cuando se oculta
+                if (activadorCheckbox) {
+                    activadorCheckbox.checked = false;
+                    if (activadorLabel) {
+                        activadorLabel.textContent = 'Desactivado';
+                    }
+                }
+            }
+        });
+    }
 }
 
 function closeQuestionModal() {
@@ -864,6 +941,17 @@ function limpiarFormulario() {
     if (ambito) ambito.selectedIndex = 0;
     if (riesgo) riesgo.selectedIndex = 0;
     if (estado) estado.value = 'Activo';
+
+    const activador = document.getElementById('activador');
+    const activadorLabel = document.getElementById('activadorLabel');
+    if (activador) activador.checked = false;
+    if (activadorLabel) activadorLabel.textContent = 'Desactivado';
+
+    // Ocultar el contenedor de activador al limpiar
+    const activadorContainer = document.getElementById('activadorContainer');
+    if (activadorContainer) {
+        activadorContainer.classList.add('hidden');
+    }
 }
 
 // -------------------------------

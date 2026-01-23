@@ -261,8 +261,27 @@
                                     <option value="moderado" class="text-yellow-600">Moderado</option>
                                     <option value="alto" class="text-orange-600">Alto</option>
                                     <option value="extremo" class="text-red-600">Extremo</option>
-                                    <option value="activadora" class="text-purple-600">Activador Automático</option>
                                 </select>
+                            </div>
+
+                            <!-- Campo: Activador -->
+                            <div id="activadorContainer" class="hidden">
+                                <label class="block font-medium mb-3">Activador Automático</label>
+                                <div class="flex items-center space-x-3">
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" id="activador" name="activador" class="sr-only peer">
+                                        <div
+                                            class="w-11 h-6 bg-gray-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-600 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-500 peer-checked:bg-[#8B0000]">
+                                        </div>
+                                        <span class="ms-3 text-sm font-medium text-gray-700 dark:text-gray-300">
+                                            <span id="activadorLabel">Desactivado</span>
+                                        </span>
+                                    </label>
+                                </div>
+                                <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                                    Las preguntas activadoras indican automáticamente un riesgo inminente para la
+                                    víctima cuando se responden afirmativamente.
+                                </p>
                             </div>
 
                             <!-- Campo: Estado -->
