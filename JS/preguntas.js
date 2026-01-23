@@ -203,7 +203,18 @@ async function cargarPreguntasDesdeAPI() {
         mostrarCargando('Cargando preguntas...');
 
         const response = await api.get('/preguntas');
-        preguntas = response.data.data || response.data;
+        const preguntasRaw = response.data.data || response.data;
+
+        preguntas = preguntasRaw.map(p => ({
+            id: p.id || p.id_pregunta,
+            id_pregunta: p.id_pregunta,
+            pregunta: p.pregunta,
+            ambito: p.ambito?.ambito || 'N/A',
+            nivel_riesgo: p.nivel_riesgo?.nivel_riesgo || 'Bajo',
+            puntaje: p.puntaje,
+            activador: p.activador,
+            estado: p.estado
+        }));
 
         console.log(`${preguntas.length} preguntas cargadas`);
         console.log('Muestra de pregunta:', preguntas[0]);
@@ -497,7 +508,19 @@ async function actualizarEstadoPregunta(id, nuevoEstado) {
 async function obtenerPreguntaPorId(id) {
     try {
         const response = await api.get(`/preguntas/${id}`);
-        const pregunta = response.data.data || response.data;
+        const preguntaRaw = response.data.data || response.data;
+
+        const pregunta = {
+            id: preguntaRaw.id || preguntaRaw.id_pregunta,
+            id_pregunta: preguntaRaw.id_pregunta,
+            pregunta: preguntaRaw.pregunta,
+            ambito: preguntaRaw.ambito?.ambito || 'N/A',
+            nivel_riesgo: preguntaRaw.nivel_riesgo?.nivel_riesgo || 'Bajo',
+            puntaje: preguntaRaw.puntaje,
+            activador: preguntaRaw.activador,
+            estado: preguntaRaw.estado
+        };
+
         console.log('Pregunta obtenida:', pregunta);
         return pregunta;
     } catch (error) {
