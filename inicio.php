@@ -34,7 +34,7 @@
                         <p class="text-3xl font-bold text-green-500 mt-2">12</p>
                     </div>
                     <p class="text-sm text-gray-500 mt-3">
-                        Desde el mes pasado
+                        Desde el año pasado
                     </p>
                 </div>
 
@@ -45,7 +45,7 @@
                         <p class="text-3xl font-bold text-yellow-500 mt-2">96</p>
                     </div>
                     <p class="text-sm text-gray-500 mt-3">
-                        Desde el mes pasado
+                        Desde el año pasado
                     </p>
                 </div>
 
@@ -56,7 +56,7 @@
                         <p class="text-3xl font-bold text-orange-500 mt-2">54</p>
                     </div>
                     <p class="text-sm text-gray-500 mt-3">
-                        desde el mes pasado
+                        desde el año pasado
                     </p>
                 </div>
 
@@ -67,7 +67,7 @@
                         <p class="text-3xl font-bold text-red-500 mt-2">22</p>
                     </div>
                     <p class="text-sm text-gray-500 mt-3">
-                        Desde el mes pasado
+                        Desde el año pasado
                     </p>
                 </div>
             </section>

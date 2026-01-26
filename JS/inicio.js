@@ -63,72 +63,72 @@ const departamentosData = {
     "Ahuachapán": {
         casos: 15,
         riesgo: "Moderado",
-        actualizacion: "2024-01-15",
+        actualizacion: "2025-01-15",
     },
     "Santa Ana": {
         casos: 28,
         riesgo: "Alto",
-        actualizacion: "2024-01-14",
+        actualizacion: "2025-01-14",
     },
     "Sonsonate": {
         casos: 12,
         riesgo: "Bajo",
-        actualizacion: "2024-01-16",
+        actualizacion: "2025-01-16",
     },
     "Chalatenango": {
         casos: 8,
         riesgo: "Bajo",
-        actualizacion: "2024-01-13",
+        actualizacion: "2025-01-13",
     },
     "La Libertad": {
         casos: 35,
         riesgo: "Alto",
-        actualizacion: "2024-01-15",
+        actualizacion: "2025-01-15",
     },
     "San Salvador": {
         casos: 42,
         riesgo: "Extremo",
-        actualizacion: "2024-01-16",
+        actualizacion: "2025-01-16",
     },
     "Cuscatlán": {
         casos: 18,
         riesgo: "Moderado",
-        actualizacion: "2024-01-14",
+        actualizacion: "2025-01-14",
     },
     "La Paz": {
         casos: 22,
         riesgo: "Moderado",
-        actualizacion: "2024-01-15",
+        actualizacion: "2025-01-15",
     },
     "Cabañas": {
         casos: 6,
         riesgo: "Bajo",
-        actualizacion: "2024-01-12",
+        actualizacion: "2025-01-12",
     },
     "San Vicente": {
         casos: 14,
         riesgo: "Moderado",
-        actualizacion: "2024-01-14",
+        actualizacion: "2025-01-14",
     },
     "Usulután": {
         casos: 25,
         riesgo: "Alto",
-        actualizacion: "2024-01-15",
+        actualizacion: "2025-01-15",
     },
     "San Miguel": {
         casos: 31,
         riesgo: "Alto",
-        actualizacion: "2024-01-16",
+        actualizacion: "2025-01-16",
     },
     "Morazán": {
         casos: 9,
         riesgo: "Bajo",
-        actualizacion: "2024-01-13",
+        actualizacion: "2025-01-13",
     },
     "La Unión": {
         casos: 19,
         riesgo: "Moderado",
-        actualizacion: "2024-01-14",
+        actualizacion: "2025-01-14",
     }
 };
 

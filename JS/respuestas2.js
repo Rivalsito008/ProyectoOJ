@@ -1136,7 +1136,13 @@ async function abrirModalDetalles(victima) {
         "Extremo": "bg-red-600"
     };
 
-    const porcentaje = nivelRiesgo.porcentaje_riesgo || 0;
+    // Porcentaje de riesgo del backend (dato independiente)
+    const porcentajeRiesgo = nivelRiesgo.porcentaje_riesgo || 0;
+
+    // Calcular porcentaje de preguntas respondidas con "Sí" para la barra de progreso
+    const porcentajeBarraProgreso = nivelRiesgo.total_preguntas > 0
+        ? Math.round((nivelRiesgo.total_respuestas_si / nivelRiesgo.total_preguntas) * 100)
+        : 0;
 
     // Generar contenido del modal
     const contenidoCompleto = `
@@ -1149,7 +1155,7 @@ async function abrirModalDetalles(victima) {
                     </h3>
                     <div class="flex flex-wrap items-center gap-3">
                         <div class="flex items-center gap-2">
-                            <span class="text-sm font-medium text-gray-600 dark:text-gray-400">Víctima:</span>
+                            <span class="text-sm font-medium text-gray-600 dark:text-gray-400">Denunciante:</span>
                             <span class="font-semibold text-gray-800 dark:text-white">${victimas[0]?.nombre_completo || 'N/A'}</span>
                         </div>
                         <div class="flex items-center gap-2">
@@ -1514,7 +1520,7 @@ ${agresor.contactos.map(c => `${c.telefono}(${c.tipo})`).join('<br>')}
                                         <div class="text-xs text-gray-600 dark:text-gray-400">Respuestas Sí</div>
                                     </div>
                                     <div class="text-center">
-                                        <div class="text-3xl font-bold text-purple-600">${porcentaje}%</div>
+                                        <div class="text-3xl font-bold text-purple-600">${porcentajeRiesgo}%</div>
                                         <div class="text-xs text-gray-600 dark:text-gray-400">Riesgo</div>
                                     </div>
                                 </div>
@@ -1527,11 +1533,11 @@ ${agresor.contactos.map(c => `${c.telefono}(${c.tipo})`).join('<br>')}
                                     <span>100%</span>
                                 </div>
                                 <div class="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-3">
-                                    <div class="h-3 rounded-full transition-all duration-1000 ${colorClases[nivelRiesgo.nivel_riesgo]}" style="width: ${porcentaje}%"></div>
+                                    <div class="h-3 rounded-full transition-all duration-1000 ${colorClases[nivelRiesgo.nivel_riesgo]}" style="width: ${porcentajeBarraProgreso}%"></div>
                                 </div>
                                 <div class="flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-1">
                                     <span>${nivelRiesgo.total_respuestas_si} de ${nivelRiesgo.total_preguntas} preguntas</span>
-                                    <span>${porcentaje}% respondidas con "Sí"</span>
+                                    <span>${porcentajeBarraProgreso}% respondidas con "Sí"</span>
                                 </div>
                             </div>
                         </div>

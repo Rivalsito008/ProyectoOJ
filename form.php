@@ -47,11 +47,22 @@
             <h3 class="text-lg font-semibold mb-4 text-gray-800 border-b pb-2">Datos Generales</h3>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <!-- Nombre completo -->
-              <div class="md:col-span-2">
-                <label class="block text-gray-700 text-sm font-medium mb-2">Nombre completo</label>
-                <input type="text" placeholder="Ingrese nombre completo" id="denuncianteNombre"
-                  class="border border-gray-300 rounded-lg p-3 w-full focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-                  required>
+              <div class="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Nombres -->
+                <div class="md:col-span-1">
+                  <label class="block text-gray-700 text-sm font-medium mb-2">Nombres</label>
+                  <input type="text" placeholder="Ingrese los nombres" id="denuncianteNombres"
+                    class="border border-gray-300 rounded-lg p-3 w-full focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                    required>
+                </div>
+
+                <!-- Apellidos -->
+                <div class="md:col-span-1">
+                  <label class="block text-gray-700 text-sm font-medium mb-2">Apellidos</label>
+                  <input type="text" placeholder="Ingrese los apellidos" id="denuncianteApellidos"
+                    class="border border-gray-300 rounded-lg p-3 w-full focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                    required>
+                </div>
               </div>
 
               <!-- Conocido/a por -->
