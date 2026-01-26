@@ -364,7 +364,7 @@
                   <option value="mas">Más de 5 víctimas</option>
                 </select>
                 <input type="number"
-                  class="border border-gray-300 rounded-lg p-3 w-full focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                  class="border border-gray-300 rounded-lg p-3 w-full focus:border-blue-500 focus:ring-1 focus:ring-blue-500 hidden"
                   placeholder="1">
               </div>
 
@@ -1164,7 +1164,7 @@
               <option value="5">5 agresores</option>
               <option value="mas">Más de 5 agresores</option>
             </select>
-            <p class="text-sm text-gray-600 mt-2">
+            <p class="text-sm text-gray-600 mt-2 hidden">
               <strong>Nota:</strong> En caso de ser más de 1 agresor, se desplegarán formularios adicionales para cada
               uno.
             </p>

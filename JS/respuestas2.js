@@ -8,7 +8,7 @@ import { mostrarError } from './utils/ManageToastSW2.js';
 // ======================================
 (async function () {
     console.log('Verificando permisos...');
-    const hasPermission = await auth.requireRole(['admin', 'colaborador'], 'inicio.php');
+    const hasPermission = await auth.requireRole(['admin', 'colaborador', 'juez'], 'inicio.php');
     if (!hasPermission) {
         console.error('Acceso denegado: No tienes permisos');
         return;
